@@ -124,6 +124,9 @@ public function __construct($numberOfHiddenLayers = 1, $numberOfNeuronsPerLayer 
 
 public function setInputs($inputs)
 {
+  if(!is_array($inputs))
+    throw new ANN_Exception('Constraints: $inputs should be an array');
+
   $this->inputs = $inputs;
 }
 
@@ -152,13 +155,6 @@ public function setOutputs($outputs)
 protected function setInputsToTrain($inputs)
 {
   $this->hiddenLayers[0]->setInputs($inputs);
-
-/*
-  Großer Fehler: Nur das erste Hidden-Layer erhält die Inputs und nicht alle!!
-
- 	foreach ($this->hiddenLayers as $k => $value)
-		$this->hiddenLayers[$k]->setInputs($inputs);
-*/
 }
 	
 // ****************************************************************************
@@ -396,7 +392,7 @@ protected function isTrainingComplete()
 
     foreach($this->outputs as $key1 => $output)
       foreach($output as $key2 => $value)
-        if($this->formatLineary($value) != $this->formatLineary($outputs[$key1][$key2]))
+        if(round($value, 2) != round($outputs[$key1][$key2], 2))
           return FALSE;
 
     return TRUE;
@@ -414,23 +410,6 @@ protected function isTrainingComplete()
   }
 }
 	
-// ****************************************************************************
-
-/**
- * @param float $value
- * @return string
- */
-
-protected function formatLineary($value)
-{
-  /*
-  if($value == 1)
-    $value = '0.999999999999';
-  */
-  
-  return round($value, 2);
-}
-
 // ****************************************************************************
 
 /**
@@ -564,6 +543,9 @@ $this->maxTrainingLoops = $seconds * $this->maxTrainingLoopsFactor;
 
 public function setEpocheTrainingLoops($epocheTrainingLoops = 10)
 {
+  if(!is_int($epocheTrainingLoops) && $epocheTrainingLoops > 0)
+    throw new ANN_Exception('Constraints: $epocheTrainingLoops should be an positive integer');
+
   $this->epocheTrainingLoops = $epocheTrainingLoops;
 }
 
@@ -575,6 +557,9 @@ public function setEpocheTrainingLoops($epocheTrainingLoops = 10)
 
 public function setMaxTrainingLoopsFactor($maxTrainingLoopsFactor = 230)
 {
+  if(!is_int($maxTrainingLoopsFactor) && $maxTrainingLoopsFactor > 0)
+    throw new ANN_Exception('Constraints: $maxTrainingLoopsFactor should be an positive integer');
+
   $this->maxTrainingLoopsFactor = $maxTrainingLoopsFactor;
 }
 
@@ -599,10 +584,10 @@ public function __wakeup()
 
 public static function loadFromFile($filename = null)
 {
-if($filename === null)
-  $filename = self::getDefaultFilename();
+  if($filename === null)
+    $filename = self::getDefaultFilename();
   
-return parent::loadFromFile($filename);
+  return parent::loadFromFile($filename);
 }
 
 // ****************************************************************************
