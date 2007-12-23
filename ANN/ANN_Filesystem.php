@@ -75,7 +75,7 @@ public function saveToFile($filename = null)
 
 /**
  * @param string $filename (Default: null)
- * @return ANN_Network
+ * @return ANN_Network|ANN_InputValue|ANN_OutputValue
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
