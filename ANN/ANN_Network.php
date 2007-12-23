@@ -50,6 +50,7 @@ require_once('ANN_Layer.php');
 require_once('ANN_Filesystem.php');
 require_once('ANN_InputValue.php');
 require_once('ANN_OutputValue.php');
+require_once('ANN_NetworkGraph.php');
 
 /**
  * @package ANN
@@ -604,6 +605,48 @@ if($filename === null)
   $filename = self::getDefaultFilename();
 
 parent::saveToFile($filename);
+}
+
+// ****************************************************************************
+
+public function getNumberInputs()
+{
+if(isset($this->inputs) && is_array($this->inputs))
+  if(isset($this->inputs[0]))
+    return count($this->inputs[0]);
+    
+return 0;
+}
+
+// ****************************************************************************
+
+public function getNumberHiddenLayers()
+{
+if(isset($this->hiddenLayers) && is_array($this->hiddenLayers))
+  return count($this->hiddenLayers);
+
+return 0;
+}
+
+// ****************************************************************************
+
+public function getNumberHiddens()
+{
+if(isset($this->hiddenLayers) && is_array($this->hiddenLayers))
+  if(isset($this->hiddenLayers[0]))
+    return $this->hiddenLayers[0]->getNeuronsCount();
+
+return 0;
+}
+
+// ****************************************************************************
+
+public function getNumberOutputs()
+{
+if(isset($this->outputs[0]) && is_array($this->outputs[0]))
+  return count($this->outputs[0]);
+
+return 0;
 }
 
 // ****************************************************************************
