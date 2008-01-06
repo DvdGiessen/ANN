@@ -34,11 +34,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author Eddy Young <jeyoung_at_priscimon_dot_com>
  * @author Thomas Wien <info_at_thwien_dot_de>
- * @version ANN Version 1.0 by Eddy Young
  * @version ANN Version 2.0.1 by Thomas Wien
- * @copyright Copyright (c) 2002 Eddy Young
  * @copyright Copyright (c) 2007 Thomas Wien
  * @package ANN
  */
@@ -305,6 +302,8 @@ imagefill($this->image, 0, 0, $this->colorBackground);
 // ****************************************************************************
 
 /**
+ * Returns PNG image
+ *
  * @return binary Image
  */
 
@@ -324,6 +323,8 @@ return $return;
 // ****************************************************************************
 
 /**
+ * Print PNG image
+ *
  * @uses getImage()
  */
 
@@ -375,6 +376,8 @@ return (int)(($this->numberHiddenLayers + 2) * $this->layerDistance);
 // ****************************************************************************
 
 /**
+ * Saves PNG image
+ *
  * @param string $filename
  * @uses getImage()
  */

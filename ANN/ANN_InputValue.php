@@ -34,11 +34,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author Eddy Young <jeyoung_at_priscimon_dot_com>
  * @author Thomas Wien <info_at_thwien_dot_de>
- * @version ANN Version 1.0 by Eddy Young
  * @version ANN Version 2.0 by Thomas Wien
- * @copyright Copyright (c) 2002 Eddy Young
  * @copyright Copyright (c) 2007 Thomas Wien
  * @package ANN
  */
