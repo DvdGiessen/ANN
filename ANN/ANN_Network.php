@@ -51,6 +51,7 @@ require_once('ANN_Filesystem.php');
 require_once('ANN_InputValue.php');
 require_once('ANN_OutputValue.php');
 require_once('ANN_NetworkGraph.php');
+require_once('ANN_Logging.php');
 
 /**
  * @package ANN
@@ -76,6 +77,7 @@ protected $numberOfHiddenLayersDec = null; // decremented value
 protected $maxTrainingLoops;
 protected $maxTrainingLoopsFactor = 230;
 protected $epocheTrainingLoops = 10;
+protected $logging = FALSE;
 
 /**#@-*/
 
@@ -257,6 +259,7 @@ protected function activate()
  * @uses setInputsToTrain()
  * @uses training()
  * @uses isTrainingLoopEpoche()
+ * @uses logWeights()
  * @throws ANN_Exception
  * @return integer Seconds of training
  */
@@ -287,6 +290,9 @@ public function train()
     if($this->isTrainingLoopEpoche())
       if($this->isTrainingComplete())
         break;
+
+    if($this->logging)
+      $this->logWeights();
   }
 
   $this->totalLoops += $i;
@@ -443,8 +449,7 @@ protected function training($outputs)
 		
 	$this->hiddenLayers[$this->numberOfHiddenLayersDec]->calculateHiddenDeltas($this->outputLayer);
 		
-//	for ($i = $this->numberOfHiddenLayersDec; $i > 1; $i--)
-	for ($i = $this->numberOfHiddenLayersDec; $i > 0; $i--) // erstes Hidden-Layer mit berücksichtigen? Wahrscheinlich Ja!
+	for ($i = $this->numberOfHiddenLayersDec; $i > 0; $i--)
 		$this->hiddenLayers[$i - 1]->calculateHiddenDeltas($this->hiddenLayers[$i]);
 		
 	$this->outputLayer->adjustWeights();
@@ -609,6 +614,10 @@ parent::saveToFile($filename);
 
 // ****************************************************************************
 
+/**
+ * @return integer
+ */
+
 public function getNumberInputs()
 {
 if(isset($this->inputs) && is_array($this->inputs))
@@ -620,6 +629,10 @@ return 0;
 
 // ****************************************************************************
 
+/**
+ * @return integer
+ */
+
 public function getNumberHiddenLayers()
 {
 if(isset($this->hiddenLayers) && is_array($this->hiddenLayers))
@@ -629,6 +642,10 @@ return 0;
 }
 
 // ****************************************************************************
+
+/**
+ * @return integer
+ */
 
 public function getNumberHiddens()
 {
@@ -641,12 +658,76 @@ return 0;
 
 // ****************************************************************************
 
+/**
+ * @return integer
+ */
+
 public function getNumberOutputs()
 {
 if(isset($this->outputs[0]) && is_array($this->outputs[0]))
   return count($this->outputs[0]);
 
 return 0;
+}
+
+// ****************************************************************************
+
+/**
+ * Log weights while training in CSV format
+ *
+ * @param string $filename
+ */
+
+public function logToFile($filename)
+{
+$this->logging = TRUE;
+
+$objLogging = ANN_Logging::create();
+
+$objLogging->setFilename($filename);
+}
+
+// ****************************************************************************
+
+/**
+ * @uses ANN_Logging::create()
+ * @uses ANN_Layer::getNeurons()
+ * @uses ANN_Logging::logData()
+ * @uses ANN_Neuron::getWeights()
+ */
+
+protected function logWeights()
+{
+$arrData = array();
+
+// ****** HiddenLayers ****************
+
+foreach($this->hiddenLayers as $keyLayer => $objHiddenLayer)
+{
+$arrNeurons = $objHiddenLayer->getNeurons();
+
+$countNeurons = count($arrNeurons);
+
+foreach($arrNeurons as $keyNeuron => $objNeuron)
+  foreach($objNeuron->getWeights() as $keyWeight => $weight)
+      $arrData["H$keyLayer-N$keyNeuron-W$keyWeight"] = round($weight, 5);
+}
+
+// ****** OutputLayer *****************
+
+$arrNeurons = $this->outputLayer->getNeurons();
+
+$countNeurons = count($arrNeurons);
+
+foreach($arrNeurons as $keyNeuron => $objNeuron)
+  foreach($objNeuron->getWeights() as $keyWeight => $weight)
+      $arrData["O-N$keyNeuron-W$keyWeight"] = round($weight, 5);
+
+// ************************************
+
+$objLogging = ANN_Logging::create();
+
+$objLogging->logData($arrData);
 }
 
 // ****************************************************************************
