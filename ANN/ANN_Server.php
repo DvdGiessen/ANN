@@ -34,11 +34,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author Eddy Young <jeyoung_at_priscimon_dot_com>
  * @author Thomas Wien <info_at_thwien_dot_de>
- * @version ANN Version 1.0 by Eddy Young
  * @version ANN Version 2.0 by Thomas Wien
- * @copyright Copyright (c) 2002 Eddy Young
  * @copyright Copyright (c) 2007 Thomas Wien
  * @package ANN
  */
@@ -46,176 +43,173 @@
 
 /**
  * @package ANN
- * @access private
+ * @access public
  */
 
-final class ANN_Neuron
+class ANN_Server
 {
 /**#@+
  * @ignore
  */
- 
-protected $inputs = null;
-protected $weights = null;
-protected $output = null;
-protected $delta;
-protected $outputNeuron = FALSE;
-protected $learningRate;
-protected $momentum = 0.95;
+
+protected $login = FALSE;
+protected $network = null;
+protected $networkUnserialized = null;
+protected $dir = '';
 
 /**#@-*/
 
 // ****************************************************************************
 
 /**
- * @param boolean $outputNeuron (Default:  FALSE)
+ * @param string $dir (Default: 'networks')
+ * @uses ANN_Exception::__construct()
+ * @uses onPost()
+ * @throws ANN_Exception
  */
 
-public function __construct($outputNeuron = FALSE)
+public function __construct($dir = 'networks')
 {
-  $this->outputNeuron = $outputNeuron;
+if(!is_dir($dir) && is_writable($dir))
+  throw new ANN_Exception('Directory '. $dir .' does not exists or has no writing permissions');
+
+$this->dir = $dir;
+
+if(isset($_POST) && count($_POST))
+  $this->OnPost();
 }
 
 // ****************************************************************************
 
 /**
- * @param array $inputs
- * @uses initialiseWeights()
+ * @uses loadFromHost()
+ * @uses checkLogin()
+ * @uses saveToHost()
+ * @uses trainByHost()
  */
 
-public function setInputs($inputs)
+protected function onPost()
 {
-	$inputs[] = 1; // bias
-		
-	$this->inputs = $inputs;
+if(!isset($_POST['username']))
+  $_POST['username']='';
 
-	if(!$this->weights)
-		$this->initialiseWeights();
+if(!isset($_POST['password']))
+  $_POST['password']='';
+
+$this->login = $this->checkLogin($_POST['username'], $_POST['password']);
+
+if(!$this->login)
+  return;
+
+if(isset($_POST['mode']))
+switch($_POST['mode'])
+{
+case 'savetohost':
+
+  $this->networkUnserialized = $_POST['network'];
+
+  $this->saveToHost();
+
+  break;
+
+case 'loadfromhost':
+
+  $this->loadFromHost();
+
+  break;
+
+case 'trainbyhost':
+
+  $this->networkUnserialized = $_POST['network'];
+
+  $this->trainByHost();
+
+  break;
 }
-	
-// ****************************************************************************
-
-/**
- * @param array $output
- */
-
-protected function setOutput($output)
-{
-  $this->output = $output;
-}
-	
-// ****************************************************************************
-
-/**
- * @param float $delta
- */
-
-public function setDelta($delta)
-{
-	$this->delta = $delta;
-}
-	
-// ****************************************************************************
-
-/**
- * @return array
- */
-
-protected function getInputs()
-{
-	return $this->inputs;
-}
-	
-// ****************************************************************************
-
-/**
- * @return array
- */
-
-public function getWeights()
-{
-	return $this->weights;
 }
 
 // ****************************************************************************
 
 /**
- * @return array
+ * @param string $username
+ * @param string $password
+ * @return boolean
  */
 
-public function getOutput()
+protected function checkLogin($username, $password)
 {
-	return $this->output;
+return TRUE;
 }
 
 // ****************************************************************************
 
 /**
- * @return float
+ * @uses ANN_Network::saveToFile()
  */
 
-public function getDelta()
+protected function saveToHost()
 {
-	return $this->momentum * $this->delta;
-}
-	
-// ****************************************************************************
-
-/**
- * @uses ANN_Maths::random()
- */
-
-protected function initialiseWeights()
-{
-	foreach ($this->inputs as $k => $value)
-		$this->weights[$k] = ANN_Maths::random(-1000, 1000) / 1000;
-}
-	
-// ****************************************************************************
-
-/**
- * @uses ANN_Maths::sigmoid()
- * @uses setOutput()
- */
-
-public function activate()
-{
-	$sum = 0;
-		
-	foreach ($this->inputs as $k => $value)
-		$sum += ($this->inputs[$k] * $this->weights[$k]);
-
-  $this->setOutput(ANN_Maths::sigmoid($sum));
-}
-	
-// ****************************************************************************
-
-public function adjustWeights()
-{
-	foreach ($this->weights as $k => $value)
-		$this->weights[$k] += ($this->learningRate * $this->inputs[$k] * $this->delta);
+  $this->network = unserialize($this->networkUnserialized);
+  
+  if($this->network instanceof ANN_Network)
+    $this->network->saveToFile($this->dir .'/'. $_POST['username'] .'.dat');
 }
 
 // ****************************************************************************
 
 /**
- * @param float $learningRate
+ * @uses ANN_Network::loadFromFile()
  */
 
-public function setLearningRate($learningRate)
+protected function loadFromHost()
 {
-  $this->learningRate = $learningRate;
+$this->network = ANN_Network::loadFromFile($this->dir .'/'. $_POST['username'] .'.dat');
 }
 
 // ****************************************************************************
 
 /**
- * @param float $momentum (0 .. 1)
+ * @uses ANN_Network::saveToFile()
+ * @uses ANN_Network::train()
+ * @uses saveToHost()
  */
 
-public function setMomentum($momentum)
+protected function trainByHost()
 {
-  $this->momentum = $momentum;
+$this->saveToHost();
+
+if($this->network instanceof ANN_Network)
+{
+  $this->network->saveToFile($this->dir .'/'. $_POST['username'] .'.dat');
+
+  $this->network->train();
+}
+}
+
+// ****************************************************************************
+
+protected function printNetwork()
+{
+header('Content-Type: text/plain');
+
+print serialize($this->network);
+}
+
+// ****************************************************************************
+
+/**
+ * @uses printNetwork()
+ */
+
+public function __destruct()
+{
+if(isset($_POST['mode']))
+switch($_POST['mode'])
+{
+case 'loadfromhost':
+case 'trainbyhost':
+  $this->printNetwork();
+}
 }
 
 // ****************************************************************************

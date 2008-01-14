@@ -68,9 +68,9 @@ class ANN_Network extends ANN_Filesystem
 protected $outputLayer = array();
 protected $hiddenLayers = array();
 protected $inputs = null;
-protected $output = null;
+protected $outputs = null;
 protected $countHiddenLayers = null;
-protected $outputType = 'binary'; // binary or lineary
+protected $outputType = 'binary'; // binary or linear
 protected $totalLoops = 0;
 protected $numberOfHiddenLayers = null;
 protected $numberOfHiddenLayersDec = null; // decremented value
@@ -78,6 +78,7 @@ protected $maxTrainingLoops;
 protected $maxTrainingLoopsFactor = 230;
 protected $epocheTrainingLoops = 10;
 protected $logging = FALSE;
+protected $trained = FALSE;
 
 /**#@-*/
 
@@ -184,12 +185,12 @@ public function getOutputs()
 	    
     switch($this->outputType)
     {
-    case 'binary':
-      $returnOutputs[] = $this->outputLayer->getThresholdOutputs();
+    case 'linear':
+      $returnOutputs[] = $this->outputLayer->getOutputs();
       break;
 
-    case 'lineary':
-      $returnOutputs[] = $this->outputLayer->getOutputs();
+    case 'binary':
+      $returnOutputs[] = $this->outputLayer->getThresholdOutputs();
       break;
     }
   }
@@ -287,17 +288,19 @@ public function train()
 
     $this->training($this->outputs[$j]);
 
+    if($this->logging)
+      $this->logWeights();
+
     if($this->isTrainingLoopEpoche())
       if($this->isTrainingComplete())
         break;
-
-    if($this->logging)
-      $this->logWeights();
   }
 
   $this->totalLoops += $i;
 
   $stoptime = date('U');
+
+  $this->trained = TRUE;
 
   return $stoptime - $starttime;
 }
@@ -372,7 +375,7 @@ public function setMomentum($momentum = 0.95)
   if(!is_float($momentum) && !is_integer)
     throw new ANN_Exception('$learningRate should be between 0 and 1');
 
-  if($momentum < 0 || $momentum > 1)
+  if($momentum <= 0 || $momentum > 1)
     throw new ANN_Exception('$learningRate should be between 0 and 1');
 
   foreach($this->hiddenLayers as $hiddenLayer)
@@ -386,7 +389,6 @@ public function setMomentum($momentum = 0.95)
 /**
  * @return boolean
  * @uses getOutputs()
- * @uses formatLineary()
  */
 
 protected function isTrainingComplete()
@@ -395,7 +397,7 @@ protected function isTrainingComplete()
 
   switch($this->outputType)
   {
-  case 'lineary':
+  case 'linear':
 
     foreach($this->outputs as $key1 => $output)
       foreach($output as $key2 => $value)
@@ -472,10 +474,10 @@ protected static function getDefaultFilename()
 // ****************************************************************************
 
 /**
- * @param string $type (Default:  'lineary') (linary or binary)
+ * @param string $type (Default:  'linear') (linar or binary)
  */
 
-public function setOutputType($type = 'lineary')
+public function setOutputType($type = 'linear')
 {
   $this->outputType = $type;
 }
@@ -484,6 +486,9 @@ public function setOutputType($type = 'lineary')
 
 public function printNetwork()
 {
+if(!$this->trained)
+  return;
+
 print "<table border=\"1\" style=\"background-color: #AAAAAA\">\n";
 
 
@@ -518,7 +523,7 @@ foreach($this->hiddenLayers as $idx => $hiddenLayer)
 
   print "<tr>\n";
 
-  print "<td>Output-Layer</td>\n";
+  print "<td rowspan=\"2\">Output-Layer</td>\n";
 
   foreach($this->outputLayer->getNeurons() as $neuron)
     print "<td style=\"background-color: #CCCCCC\"><b>Inputs:</b> ". (count($neuron->getWeights())-1) ." + BIAS<br />"
@@ -528,6 +533,13 @@ foreach($this->hiddenLayers as $idx => $hiddenLayer)
           ."</td>\n";
 
   print "</tr>\n";
+
+  print "<tr>\n";
+
+  foreach($this->outputLayer->getNeurons() as $key => $neuron)
+    print "<td style=\"background-color: #CCCCCC\"><b>Output ". ($key+1) ."</b></td>\n";
+
+  print "<tr>\n";
 
   print "</table>\n";
 }
@@ -694,19 +706,20 @@ $objLogging->setFilename($filename);
  * @uses ANN_Layer::getNeurons()
  * @uses ANN_Logging::logData()
  * @uses ANN_Neuron::getWeights()
+ * @uses getNetworkError()
  */
 
 protected function logWeights()
 {
 $arrData = array();
 
+$arrData['E'] = $this->getNetworkError();
+
 // ****** HiddenLayers ****************
 
 foreach($this->hiddenLayers as $keyLayer => $objHiddenLayer)
 {
 $arrNeurons = $objHiddenLayer->getNeurons();
-
-$countNeurons = count($arrNeurons);
 
 foreach($arrNeurons as $keyNeuron => $objNeuron)
   foreach($objNeuron->getWeights() as $keyWeight => $weight)
@@ -717,8 +730,6 @@ foreach($arrNeurons as $keyNeuron => $objNeuron)
 
 $arrNeurons = $this->outputLayer->getNeurons();
 
-$countNeurons = count($arrNeurons);
-
 foreach($arrNeurons as $keyNeuron => $objNeuron)
   foreach($objNeuron->getWeights() as $keyWeight => $weight)
       $arrData["O-N$keyNeuron-W$keyWeight"] = round($weight, 5);
@@ -728,6 +739,128 @@ foreach($arrNeurons as $keyNeuron => $objNeuron)
 $objLogging = ANN_Logging::create();
 
 $objLogging->logData($arrData);
+}
+
+// ****************************************************************************
+
+/**
+ * @return float
+ * @uses getOutputs()
+ * @uses setOutputType()
+ */
+
+protected function getNetworkError()
+{
+$error = 0;
+
+$arrOutputs = $this->getOutputs();
+
+foreach($this->outputs as $keyOutputs => $outputs)
+  foreach($outputs as $keyOutput => $output)
+    $error += pow($arrOutputs[$keyOutputs][$keyOutput] - $output, 2);
+
+return $error / 2;
+}
+
+// ****************************************************************************
+
+/**
+ * @param string $username
+ * @param string $password
+ * @param string $host
+ * @return ANN_Network
+ * @throws ANN_Exception
+ */
+
+public function trainByHost($username, $password, $host)
+{
+if(!extension_loaded('curl'))
+  throw new ANN_Exception('Curl extension is not installed or active on this system');
+
+$ch = curl_init();
+
+settype($username, 'string');
+settype($password, 'string');
+settype($host, 'string');
+
+curl_setopt($ch, CURLOPT_URL, $host);
+curl_setopt($ch, CURLOPT_POST, TRUE);
+curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=trainbyhost&username=$username&password=$password&network=". serialize($this));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+$result = curl_exec($ch);
+
+curl_close($ch);
+
+$network = @unserialize($result);
+
+if($network instanceof ANN_Network)
+  return $network;
+}
+
+// ****************************************************************************
+
+/**
+ * @param string $username
+ * @param string $password
+ * @param string $host
+ * @throws ANN_Exception
+ */
+
+public function saveToHost($username, $password, $host)
+{
+if(!extension_loaded('curl'))
+  throw new ANN_Exception('Curl extension is not installed or active on this system');
+
+$ch = curl_init();
+
+settype($username, 'string');
+settype($password, 'string');
+settype($host, 'string');
+
+curl_setopt($ch, CURLOPT_URL, $host);
+curl_setopt($ch, CURLOPT_POST, TRUE);
+curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=savetohost&username=$username&password=$password&network=". serialize($this));
+
+curl_exec($ch);
+
+curl_close($ch);
+}
+
+// ****************************************************************************
+
+/**
+ * @param string $username
+ * @param string $password
+ * @param string $host
+ * @return ANN_Network
+ * @throws ANN_Exception
+ */
+
+public static function loadFromHost($username, $password, $host)
+{
+if(!extension_loaded('curl'))
+  throw new ANN_Exception('Curl extension is not installed or active on this system');
+
+$ch = curl_init();
+
+settype($username, 'string');
+settype($password, 'string');
+settype($host, 'string');
+
+curl_setopt($ch, CURLOPT_URL, $host);
+curl_setopt($ch, CURLOPT_POST, TRUE);
+curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=loadfromhost&username=$username&password=$password");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+$result = curl_exec($ch);
+
+curl_close($ch);
+
+$network = unserialize(trim($result));
+
+if($network instanceof ANN_Network)
+  return $network;
 }
 
 // ****************************************************************************

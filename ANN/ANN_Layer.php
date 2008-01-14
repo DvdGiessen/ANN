@@ -199,8 +199,7 @@ public function calculateHiddenDeltas(ANN_Layer $nextLayer)
     {
 			$weights = $neurons[$l]->getWeights();
 
-//    	$sum += (self::MOMENTUM * $weights[$k] * $neurons[$l]->getDelta() );
-    	$sum += ($weights[$k] * $neurons[$l]->getDelta() );
+    	$sum += ($weights[$k] * $neurons[$l]->getDelta());
 		}
 
     $output = $this->neurons[$k]->getOutput();
