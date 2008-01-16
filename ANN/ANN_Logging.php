@@ -52,7 +52,6 @@ class ANN_Logging
  * @ignore
  */
 
-protected static $instance = null;
 protected $filename;
 protected $fileHandle;
 protected $header = FALSE;
@@ -60,36 +59,6 @@ protected $header = FALSE;
 /**#@-*/
 
 const SEPARATOR = ';';
-
-// ****************************************************************************
-
-/**
- * Constructor cannot be use to create instance of ANN_Logging. Use methode create()
- * instead.
- */
-
-protected function __construct()
-{
-
-}
-
-// ****************************************************************************
-
-/**
- * @return ANN_Logging
- */
-
-public static function create()
-{
-if(!self::$instance)
-{
-$class = __CLASS__;
-
-self::$instance = new $class;
-}
-
-return self::$instance;
-}
 
 // ****************************************************************************
 
