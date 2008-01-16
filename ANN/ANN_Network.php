@@ -76,9 +76,14 @@ protected $numberOfHiddenLayers = null;
 protected $numberOfHiddenLayersDec = null; // decremented value
 protected $maxTrainingLoops;
 protected $maxTrainingLoopsFactor = 230;
-protected $epocheTrainingLoops = 10;
-protected $logging = FALSE;
+protected $numberEpoch = 0;
+protected $loggingWeights = FALSE;
+protected $loggingNetworkError = FALSE;
 protected $trained = FALSE;
+protected $trainingTime = 0; // Seconds
+protected $objLoggingWeights = null;
+protected $objLoggingNetworkError = null;
+protected $momentum = 0.95;
 
 /**#@-*/
 
@@ -132,12 +137,20 @@ public function setInputs($inputs)
     throw new ANN_Exception('Constraints: $inputs should be an array');
 
   $this->inputs = $inputs;
+  
+  $this->numberEpoch = count($inputs);
+  
+  $this->nextIndexInputToTrain = 0;
 }
 
 // ****************************************************************************
 
 /**
  * @param array $outputs
+ * @uses ANN_Exception::__construct()
+ * @uses detectOutputType()
+ * @uses ANN_Layer::getNeuronsCount()
+ * @throws ANN_Exception
  */
 
 public function setOutputs($outputs)
@@ -147,6 +160,8 @@ public function setOutputs($outputs)
       throw new ANN_Exception('Count of Outputs doesn\'t fit to number of outputs on instantiation of ANN_Network');
 
   $this->outputs = $outputs;
+  
+  $this->detectOutputType();
 }
 
 // ****************************************************************************
@@ -251,18 +266,17 @@ protected function activate()
 // ****************************************************************************
 
 /**
+ * @return boolean
  * @uses ANN_Exception::__construct()
- * @uses ANN_Maths::random()
  * @uses setInputs()
  * @uses setOutputs()
- * @uses getCountInputs()
  * @uses isTrainingComplete()
  * @uses setInputsToTrain()
  * @uses training()
- * @uses isTrainingLoopEpoche()
+ * @uses isEpoch()
  * @uses logWeights()
+ * @uses getNextIndexInputsToTrain()
  * @throws ANN_Exception
- * @return integer Seconds of training
  */
 
 public function train()
@@ -276,33 +290,71 @@ public function train()
   if($this->isTrainingComplete())
     return 0;
 
-  $inputCountDec = $this->getCountInputs() - 1;
-
   $starttime = date('U');
+  
+  $this->getNextIndexInputsToTrain(TRUE);
 
   for ($i = 0; $i < $this->maxTrainingLoops; $i++)
   {
-    $j = ANN_Maths::random(0, $inputCountDec);
+    $j = $this->getNextIndexInputsToTrain();
 
     $this->setInputsToTrain($this->inputs[$j]);
 
     $this->training($this->outputs[$j]);
 
-    if($this->logging)
-      $this->logWeights();
+    if($this->isEpoch())
+    {
+      if($this->loggingWeights)
+        $this->logWeights();
 
-    if($this->isTrainingLoopEpoche())
+      if($this->loggingNetworkError)
+        $this->logNetworkError();
+
       if($this->isTrainingComplete())
         break;
+    }
   }
-
-  $this->totalLoops += $i;
 
   $stoptime = date('U');
 
+  $this->totalLoops += $i;
+
   $this->trained = TRUE;
 
-  return $stoptime - $starttime;
+  $this->trainingTime += $stoptime - $starttime;
+  
+  return $this->isTrainingComplete();
+}
+	
+// ****************************************************************************
+
+/**
+ * @param boolean $reset (Default: FALSE)
+ * @return integer
+ */
+
+protected function getNextIndexInputsToTrain($reset = FALSE)
+{
+static $arrIndex = array();
+static $index = -1;
+
+if($reset)
+{
+  $arrIndex = array_keys($this->inputs);
+  $index = -1;
+  
+  return;
+}
+
+$index++;
+
+if(!isset($arrIndex[$index]))
+{
+  shuffle($arrIndex);
+  $index = 0;
+}
+
+return $arrIndex[$index];
 }
 	
 // ****************************************************************************
@@ -322,13 +374,13 @@ public function getTotalLoops()
  * @return boolean
  */
 
-protected function isTrainingLoopEpoche()
+protected function isEpoch()
 {
 static $countLoop = 0;
 
 $countLoop++;
 
-if($countLoop >= $this->epocheTrainingLoops)
+if($countLoop >= $this->numberEpoch)
 {
   $countLoop = 0;
 
@@ -372,7 +424,7 @@ public function setLearningRate($learningRate = 0.5)
 
 public function setMomentum($momentum = 0.95)
 {
-  if(!is_float($momentum) && !is_integer)
+  if(!is_float($momentum) && !is_integer($momentum))
     throw new ANN_Exception('$learningRate should be between 0 and 1');
 
   if($momentum <= 0 || $momentum > 1)
@@ -382,6 +434,8 @@ public function setMomentum($momentum = 0.95)
     $hiddenLayer->setMomentum($momentum);
 
   $this->outputLayer->setMomentum($momentum);
+  
+  $this->momentum = $momentum;
 }
 
 // ****************************************************************************
@@ -474,12 +528,25 @@ protected static function getDefaultFilename()
 // ****************************************************************************
 
 /**
- * @param string $type (Default:  'linear') (linar or binary)
+ * @param string $type (Default:  'linear') (linear or binary)
+ * @uses ANN_Exception::__construct()
+ * @throws ANN_Exception
  */
 
-public function setOutputType($type = 'linear')
+protected function setOutputType($type = 'linear')
 {
-  $this->outputType = $type;
+  settype($type, 'string');
+
+  switch($type)
+  {
+  case 'linear':
+  case 'binary':
+    $this->outputType = $type;
+    break;
+    
+  default:
+    throw new ANN_Exception('$type must be "linear" or "binary"');
+  }
 }
 
 // ****************************************************************************
@@ -490,6 +557,68 @@ if(!$this->trained)
   return;
 
 print "<table border=\"1\" style=\"background-color: #AAAAAA\">\n";
+
+
+  print "<tr>\n";
+
+  print "<td>Detected OutputType</td>\n";
+
+  print "<td style=\"background-color: #CCCCCC\">"
+        .$this->outputType
+        ."</td>\n";
+
+  print "</tr>\n";
+
+  print "<tr>\n";
+
+  print "<td>Momentum</td>\n";
+
+  print "<td style=\"background-color: #CCCCCC\">"
+        .$this->momentum
+        ."</td>\n";
+
+  print "</tr>\n";
+
+  print "<tr>\n";
+
+  print "<td>Training-Loops</td>\n";
+
+  print "<td style=\"background-color: #CCCCCC\">"
+        .$this->totalLoops
+        ."</td>\n";
+
+  print "</tr>\n";
+
+
+  print "<tr>\n";
+
+  print "<td>Epoch</td>\n";
+
+  print "<td style=\"background-color: #CCCCCC\">"
+        .$this->numberEpoch
+        ."</td>\n";
+
+  print "</tr>\n";
+
+
+  print "<tr>\n";
+
+  print "<td>Training time</td>\n";
+
+  print "<td style=\"background-color: #CCCCCC\">"
+        .$this->trainingTime ." seconds = ". round($this->trainingTime / 60,1) ." minutes</td>\n";
+
+  print "</tr>\n";
+
+
+  print "<tr>\n";
+
+  print "<td>Loops / second</td>\n";
+
+  print "<td style=\"background-color: #CCCCCC\">"
+        .round($this->totalLoops / $this->trainingTime) ." Loops / second</td>\n";
+
+  print "</tr>\n";
 
 
   print "<tr>\n";
@@ -551,20 +680,6 @@ protected function calculateMaxTrainingLoops()
 $seconds = (int)ini_get('max_execution_time');
 
 $this->maxTrainingLoops = $seconds * $this->maxTrainingLoopsFactor;
-}
-
-// ****************************************************************************
-
-/**
- * @param integer $epocheTrainingLoops (Default: 10)
- */
-
-public function setEpocheTrainingLoops($epocheTrainingLoops = 10)
-{
-  if(!is_int($epocheTrainingLoops) && $epocheTrainingLoops > 0)
-    throw new ANN_Exception('Constraints: $epocheTrainingLoops should be an positive integer');
-
-  $this->epocheTrainingLoops = $epocheTrainingLoops;
 }
 
 // ****************************************************************************
@@ -688,21 +803,41 @@ return 0;
  * Log weights while training in CSV format
  *
  * @param string $filename
+ * @uses ANN_Logging::__construct()
+ * @uses ANN_Logging::setFilename()
  */
 
-public function logToFile($filename)
+public function logWeightsToFile($filename)
 {
-$this->logging = TRUE;
+$this->loggingWeights = TRUE;
 
-$objLogging = ANN_Logging::create();
+$this->objLoggingWeights = new ANN_Logging;
 
-$objLogging->setFilename($filename);
+$this->objLoggingWeights->setFilename($filename);
 }
 
 // ****************************************************************************
 
 /**
- * @uses ANN_Logging::create()
+ * Log network error while training in CSV format
+ *
+ * @param string $filename
+ * @uses ANN_Logging::__construct()
+ * @uses ANN_Logging::setFilename()
+ */
+
+public function logNetworkErrorToFile($filename)
+{
+$this->loggingNetworkError = TRUE;
+
+$this->objLoggingNetworkError = new ANN_Logging;
+
+$this->objLoggingNetworkError->setFilename($filename);
+}
+
+// ****************************************************************************
+
+/**
  * @uses ANN_Layer::getNeurons()
  * @uses ANN_Logging::logData()
  * @uses ANN_Neuron::getWeights()
@@ -736,9 +871,23 @@ foreach($arrNeurons as $keyNeuron => $objNeuron)
 
 // ************************************
 
-$objLogging = ANN_Logging::create();
+$this->objLoggingWeights->logData($arrData);
+}
 
-$objLogging->logData($arrData);
+// ****************************************************************************
+
+/**
+ * @uses getNetworkError()
+ * @uses ANN_Logging::logData()
+ */
+
+protected function logNetworkError()
+{
+$arrData = array();
+
+$arrData['E'] = $this->getNetworkError();
+
+$this->objLoggingNetworkError->logData($arrData);
 }
 
 // ****************************************************************************
@@ -861,6 +1010,25 @@ $network = unserialize(trim($result));
 
 if($network instanceof ANN_Network)
   return $network;
+}
+
+// ****************************************************************************
+
+/**
+ * @uses setOutputType()
+ */
+
+protected function detectOutputType()
+{
+foreach($this->outputs as $arrOutputs)
+  foreach($arrOutputs as $output)
+    if($output < 1 && $output > 0)
+    {
+      $this->setOutputType('linear');
+      return;
+    }
+  
+$this->setOutputType('binary');
 }
 
 // ****************************************************************************
