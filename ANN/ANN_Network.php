@@ -317,11 +317,11 @@ public function train()
 
   $this->totalLoops += $i;
 
-  $this->trained = TRUE;
-
   $this->trainingTime += $stoptime - $starttime;
   
-  return $this->isTrainingComplete();
+  $this->trained = $this->isTrainingComplete();
+  
+  return $this->trained;
 }
 	
 // ****************************************************************************
@@ -546,73 +546,68 @@ public function printNetwork()
 if(!$this->trained)
   return;
 
-print "<table border=\"1\" style=\"background-color: #AAAAAA\">\n";
-
+  print "<table border=\"1\" style=\"background-color: #AAAAAA\" cellpadding=\"2\" cellspacing=\"0\">\n";
 
   print "<tr>\n";
-
-  print "<td>Detected OutputType</td>\n";
-
+  print "<td>Detected output type</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->outputType
         ."</td>\n";
-
   print "</tr>\n";
 
   print "<tr>\n";
-
   print "<td>Momentum</td>\n";
-
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->momentum
         ."</td>\n";
-
   print "</tr>\n";
 
   print "<tr>\n";
-
-  print "<td>Training-Loops</td>\n";
-
+  print "<td>Learning rate</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .$this->totalLoops
+        .$this->learningRate
         ."</td>\n";
-
   print "</tr>\n";
 
+  print "<tr>\n";
+  print "<td>Training loops</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">"
+        .number_format($this->totalLoops, 0, '.', ',')
+        ." loops</td>\n";
+  print "</tr>\n";
 
   print "<tr>\n";
-
   print "<td>Epoch</td>\n";
-
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->numberEpoch
-        ."</td>\n";
-
+        ." loops</td>\n";
   print "</tr>\n";
 
+  $trainingTime = ($this->trainingTime > 0) ? $this->trainingTime : 1;
 
   print "<tr>\n";
-
   print "<td>Training time</td>\n";
-
   print "<td style=\"background-color: #CCCCCC\">"
-        .$this->trainingTime ." seconds = ". round($this->trainingTime / 60,1) ." minutes</td>\n";
-
+        .$this->trainingTime ." seconds = ". round($trainingTime / 60,1) ." minutes</td>\n";
   print "</tr>\n";
 
-
   print "<tr>\n";
-
   print "<td>Loops / second</td>\n";
-
   print "<td style=\"background-color: #CCCCCC\">"
-        .round($this->totalLoops / $this->trainingTime) ." Loops / second</td>\n";
-
+        .round($this->totalLoops / $trainingTime) ." loops / second</td>\n";
   print "</tr>\n";
 
+  print "<tr>\n";
+  print "<td>Training finished</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">"
+        .(($this->trained) ? 'Yes' : 'No') ."</td>\n";
+  print "</tr>\n";
+
+  print "</table>\n<br />\n";
+
+  print "<table border=\"1\" style=\"background-color: #AAAAAA\" cellpadding=\"2\" cellspacing=\"0\">\n";
 
   print "<tr>\n";
-
   print "<td>Input-Layer</td>\n";
 
   foreach($this->inputs[0] as $key => $input)
@@ -627,7 +622,6 @@ print "<table border=\"1\" style=\"background-color: #AAAAAA\">\n";
 foreach($this->hiddenLayers as $idx => $hiddenLayer)
 {
   print "<tr>\n";
-
   print "<td>Hidden-Layer ". ($idx+1) ."</td>\n";
 
   foreach($hiddenLayer->getNeurons() as $neuron)
@@ -641,7 +635,6 @@ foreach($this->hiddenLayers as $idx => $hiddenLayer)
 }
 
   print "<tr>\n";
-
   print "<td rowspan=\"2\">Output-Layer</td>\n";
 
   foreach($this->outputLayer->getNeurons() as $neuron)
@@ -652,14 +645,12 @@ foreach($this->hiddenLayers as $idx => $hiddenLayer)
           ."</td>\n";
 
   print "</tr>\n";
-
   print "<tr>\n";
 
   foreach($this->outputLayer->getNeurons() as $key => $neuron)
     print "<td style=\"background-color: #CCCCCC\"><b>Output ". ($key+1) ."</b></td>\n";
 
   print "<tr>\n";
-
   print "</table>\n";
 }
 
