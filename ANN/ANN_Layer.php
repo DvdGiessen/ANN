@@ -55,22 +55,26 @@ final class ANN_Layer
  * @ignore
  */
 
-protected $neurons;
-protected $outputs;
+protected $neurons = array();
+protected $outputs = array();
+protected $network = null;
 
 /**#@-*/
 
 // ****************************************************************************
 
 /**
+ * @param ANN_Network $network
  * @param integer $numberOfNeurons
- * @param boolean $outputLayer  (Default:  FALSE)
+ * @param boolean $outputLayer (Default: FALSE)
  * @uses createNeurons()
  */
 
-public function __construct($numberOfNeurons, $outputLayer = FALSE)
+public function __construct(ANN_Network $network, $numberOfNeurons)
 {
-  $this->createNeurons($numberOfNeurons, $outputLayer);
+  $this->network = $network;
+
+  $this->createNeurons($numberOfNeurons);
 }
 	
 // ****************************************************************************
@@ -155,10 +159,10 @@ public function getThresholdOutputs()
  * @uses ANN_Neuron::__construct()
  */
 
-protected function createNeurons($numberOfNeurons, $outputLayer = FALSE)
+protected function createNeurons($numberOfNeurons)
 {
 	for ($i = 0; $i < $numberOfNeurons; $i++)
-		$this->neurons[] = new ANN_Neuron($outputLayer);
+		$this->neurons[] = new ANN_Neuron($this->network);
 }
 	
 // ****************************************************************************
@@ -240,32 +244,6 @@ public function adjustWeights()
 {
 	foreach ($this->neurons as $k => $value)
 		$this->neurons[$k]->adjustWeights();
-}
-
-// ****************************************************************************
-
-/**
- * @param float $learningRate (0.1 .. 0.9)
- * @uses ANN_Neuron::setLearningRate()
- */
-
-public function setLearningRate($learningRate)
-{
-	foreach ($this->neurons as $k => $value)
-		$this->neurons[$k]->setLearningRate($learningRate);
-}
-
-// ****************************************************************************
-
-/**
- * @param float $momentum (0.1 .. 0.9)
- * @uses ANN_Neuron::setMomentum()
- */
-
-public function setMomentum($momentum)
-{
-	foreach ($this->neurons as $k => $value)
-		$this->neurons[$k]->setMomentum($momentum);
 }
 
 // ****************************************************************************

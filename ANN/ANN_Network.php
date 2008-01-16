@@ -83,21 +83,21 @@ protected $trained = FALSE;
 protected $trainingTime = 0; // Seconds
 protected $objLoggingWeights = null;
 protected $objLoggingNetworkError = null;
-protected $momentum = 0.95;
+public $momentum = 0.95;
+public $learningRate = 0.5;
 
 /**#@-*/
 
 // ****************************************************************************
 
 /**
- * @param integer $numberOfHiddenLayers (Default:  1)
- * @param integer $numberOfNeuronsPerLayer  (Default:  10)
- * @param integer $numberOfOutputs  (Default:  1)
+ * @param integer $numberOfHiddenLayers (Default: 1)
+ * @param integer $numberOfNeuronsPerLayer  (Default: 10)
+ * @param integer $numberOfOutputs  (Default: 1)
  * @uses ANN_Exception::__construct()
  * @uses calculateMaxTrainingLoops()
  * @uses createHiddenLayers()
  * @uses createOutputLayer()
- * @uses setLearningRate()
  * @throws ANN_Exception
  */
 
@@ -118,9 +118,7 @@ public function __construct($numberOfHiddenLayers = 1, $numberOfNeuronsPerLayer 
 	
 	$this->numberOfHiddenLayers = $numberOfHiddenLayers;
 
-  $this->numberOfHiddenLayersDec = $this->numberOfHiddenLayers -1;
-  
-  $this->setLearningRate(0.5);
+  $this->numberOfHiddenLayersDec = $this->numberOfHiddenLayers - 1;
   
   $this->calculateMaxTrainingLoops();
 }
@@ -224,7 +222,7 @@ public function getOutputs()
 protected function createHiddenLayers($numberOfHiddenLayers, $numberOfNeuronsPerLayer)
 {
 	for ($i = 0; $i < $numberOfHiddenLayers; $i++)
-		$this->hiddenLayers[] = new ANN_Layer($numberOfNeuronsPerLayer);
+		$this->hiddenLayers[] = new ANN_Layer($this, $numberOfNeuronsPerLayer);
 }
 	
 // ****************************************************************************
@@ -236,7 +234,7 @@ protected function createHiddenLayers($numberOfHiddenLayers, $numberOfNeuronsPer
 
 protected function createOutputLayer($numberOfOutputs)
 {
-	$this->outputLayer = new ANN_Layer($numberOfOutputs, TRUE);
+	$this->outputLayer = new ANN_Layer($this, $numberOfOutputs, TRUE);
 }
 	
 // ****************************************************************************
@@ -407,10 +405,7 @@ public function setLearningRate($learningRate = 0.5)
   if($learningRate <= 0 || $learningRate >= 1)
     throw new ANN_Exception('$learningRate should be between 0.1 and 0.9');
 
-  foreach($this->hiddenLayers as $hiddenLayer)
-    $hiddenLayer->setLearningRate($learningRate);
-
-  $this->outputLayer->setLearningRate($learningRate);
+  $this->learningRate = $learningRate;
 }
 
 // ****************************************************************************
@@ -430,11 +425,6 @@ public function setMomentum($momentum = 0.95)
   if($momentum <= 0 || $momentum > 1)
     throw new ANN_Exception('$learningRate should be between 0 and 1');
 
-  foreach($this->hiddenLayers as $hiddenLayer)
-    $hiddenLayer->setMomentum($momentum);
-
-  $this->outputLayer->setMomentum($momentum);
-  
   $this->momentum = $momentum;
 }
 

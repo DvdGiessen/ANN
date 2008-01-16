@@ -58,22 +58,21 @@ final class ANN_Neuron
 protected $inputs = null;
 protected $weights = null;
 protected $output = null;
-protected $delta;
-protected $outputNeuron = FALSE;
-protected $learningRate;
-protected $momentum = 0.95;
+protected $delta = 0;
+protected $network = null;
 
 /**#@-*/
 
 // ****************************************************************************
 
 /**
+ * @param ANN_Network $network
  * @param boolean $outputNeuron (Default:  FALSE)
  */
 
-public function __construct($outputNeuron = FALSE)
+public function __construct(ANN_Network $network)
 {
-  $this->outputNeuron = $outputNeuron;
+  $this->network = $network;
 }
 
 // ****************************************************************************
@@ -156,7 +155,7 @@ public function getOutput()
 
 public function getDelta()
 {
-	return $this->momentum * $this->delta;
+	return $this->network->momentum * $this->delta;
 }
 	
 // ****************************************************************************
@@ -193,29 +192,7 @@ public function activate()
 public function adjustWeights()
 {
 	foreach ($this->weights as $k => $value)
-		$this->weights[$k] += ($this->learningRate * $this->inputs[$k] * $this->delta);
-}
-
-// ****************************************************************************
-
-/**
- * @param float $learningRate
- */
-
-public function setLearningRate($learningRate)
-{
-  $this->learningRate = $learningRate;
-}
-
-// ****************************************************************************
-
-/**
- * @param float $momentum (0 .. 1)
- */
-
-public function setMomentum($momentum)
-{
-  $this->momentum = $momentum;
+		$this->weights[$k] += ($this->network->learningRate * $this->inputs[$k] * $this->delta);
 }
 
 // ****************************************************************************
