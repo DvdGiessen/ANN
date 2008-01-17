@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Artificial Neural Network - Version 2.0.0
+ * Artificial Neural Network - Version 2.0
  *
  * For updates and changes visit the project page at http://ann.thwien.de/
  *
@@ -37,9 +37,9 @@
  * @author Eddy Young <jeyoung_at_priscimon_dot_com>
  * @author Thomas Wien <info_at_thwien_dot_de>
  * @version ANN Version 1.0 by Eddy Young
- * @version ANN Version 2.0.1 by Thomas Wien
- * @copyright Copyright (c) 2002 Eddy Young
- * @copyright Copyright (c) 2007 Thomas Wien
+ * @version ANN Version 2.0 by Thomas Wien
+ * @copyright Copyright (c) 2002 by Eddy Young
+ * @copyright Copyright (c) 2007-08 by Thomas Wien
  * @package ANN
  */
 
