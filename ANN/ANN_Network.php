@@ -83,6 +83,9 @@ protected $trained = FALSE;
 protected $trainingTime = 0; // Seconds
 protected $objLoggingWeights = null;
 protected $objLoggingNetworkError = null;
+protected $dynamicLearningRate = TRUE;
+private $networkErrorCurrent = 10;
+private $networkErrorPrevious = 10;
 public $momentum = 0.95;
 public $learningRate = 0.5;
 
@@ -274,6 +277,7 @@ protected function activate()
  * @uses isEpoch()
  * @uses logWeights()
  * @uses getNextIndexInputsToTrain()
+ * @uses adjustLearningRate()
  * @throws ANN_Exception
  */
 
@@ -310,6 +314,8 @@ public function train()
 
       if($this->isTrainingComplete())
         break;
+        
+      $this->adjustLearningRate();
     }
   }
 
@@ -541,11 +547,16 @@ protected function setOutputType($type = 'linear')
 
 // ****************************************************************************
 
+/**
+ * @uses getNetworkError()
+ * @uses ANN_Layer::getNeurons()
+ * @uses ANN_Neuron::getDelta()
+ * @uses ANN_Neuron::getWeights()
+ * @uses ANN_Layer::getNeurons()
+ */
+
 public function printNetwork()
 {
-if(!$this->trained)
-  return;
-
   print "<table border=\"1\" style=\"background-color: #AAAAAA\" cellpadding=\"2\" cellspacing=\"0\">\n";
 
   print "<tr>\n";
@@ -566,6 +577,13 @@ if(!$this->trained)
   print "<td>Learning rate</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->learningRate
+        ."</td>\n";
+  print "</tr>\n";
+
+  print "<tr>\n";
+  print "<td>Network error</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">"
+        .$this->getNetworkError()
         ."</td>\n";
   print "</tr>\n";
 
@@ -866,7 +884,8 @@ protected function logNetworkError()
 {
 $arrData = array();
 
-$arrData['E'] = $this->getNetworkError();
+$arrData['network error'] = $this->getNetworkError();
+$arrData['learning rate'] = $this->learningRate;
 
 $this->objLoggingNetworkError->logData($arrData);
 }
@@ -1010,6 +1029,60 @@ foreach($this->outputs as $arrOutputs)
     }
   
 $this->setOutputType('binary');
+}
+
+// ****************************************************************************
+
+/**
+ * If network error of current epoch is higher than the network error of the previous
+ * epoch the learning rate is adjusted by minus 1 per cent of current learning rate.
+ * Otherwise the learning rate is adjusted by plus 1 per cent of current learning
+ * rate. So, learning rate increases faster than decreasing does. But if learning rate
+ * reaches 0.9 it switches back to 0.5 to avoid endless training. The lowest learning
+ * rate is 0.5 also to avoid endless training.
+ *
+ * @uses getNetworkError()
+ */
+
+protected function adjustLearningRate()
+{
+if(!$this->dynamicLearningRate)
+  return;
+
+$this->networkErrorCurrent = $this->getNetworkError();
+
+if($this->networkErrorCurrent >= $this->networkErrorPrevious)
+{
+$this->learningRate *= 1.01;
+
+if($this->learningRate > 0.9)
+  $this->learningRate = 0.5;
+}
+else
+{
+$this->learningRate *= 0.99;
+
+if($this->learningRate < 0.5)
+  $this->learningRate = 0.5;
+}
+
+$this->networkErrorPrevious = $this->networkErrorCurrent;
+}
+
+// ****************************************************************************
+
+/**
+ * @param boolean $dynamicLearningRate (Default: TRUE)
+ * @uses ANN_Exception::__construct()
+ * @throws ANN_Exception
+ */
+
+public function setDynamicLearningRate($dynamicLearningRate = TRUE)
+{
+if(!is_bool($dynamicLearningRate))
+  throw new ANN_Exception('$dynamicLearningRate must be boolean');
+
+$this->dynamicLearningRate = $dynamicLearningRate;
 }
 
 // ****************************************************************************
