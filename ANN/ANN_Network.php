@@ -397,9 +397,10 @@ return FALSE;
 // ****************************************************************************
 
 /**
+ * Setting the learning rate disables dynamic learning rate automatically.
+ *
  * @param float $learningRate (Default: 0.5) (0.1 .. 0.9)
  * @uses ANN_Exception::__construct()
- * @uses ANN_Layer::setLearningRate()
  * @throws ANN_Exception
  */
 
@@ -412,6 +413,8 @@ public function setLearningRate($learningRate = 0.5)
     throw new ANN_Exception('$learningRate should be between 0.1 and 0.9');
 
   $this->learningRate = $learningRate;
+  
+  $this->dynamicLearningRate = FALSE;
 }
 
 // ****************************************************************************
@@ -419,7 +422,6 @@ public function setLearningRate($learningRate = 0.5)
 /**
  * @param float $momentum (Default: 0.95) (0 .. 1)
  * @uses ANN_Exception::__construct()
- * @uses ANN_Layer::setMomentum()
  * @throws ANN_Exception
  */
 
@@ -1034,6 +1036,8 @@ $this->setOutputType('binary');
 // ****************************************************************************
 
 /**
+ * Adjusting learning rate dynamically
+ *
  * If network error of current epoch is higher than the network error of the previous
  * epoch the learning rate is adjusted by minus 1 per cent of current learning rate.
  * Otherwise the learning rate is adjusted by plus 1 per cent of current learning
