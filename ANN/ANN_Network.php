@@ -78,11 +78,11 @@ protected $maxTrainingLoops;
 protected $maxTrainingLoopsFactor = 230;
 protected $numberEpoch = 0;
 protected $loggingWeights = FALSE;
-protected $loggingNetworkError = FALSE;
+protected $loggingNetworkErrors = FALSE;
 protected $trained = FALSE;
 protected $trainingTime = 0; // Seconds
 protected $objLoggingWeights = null;
-protected $objLoggingNetworkError = null;
+protected $objLoggingNetworkErrors = null;
 protected $dynamicLearningRate = TRUE;
 private $networkErrorCurrent = 10;
 private $networkErrorPrevious = 10;
@@ -276,6 +276,7 @@ protected function activate()
  * @uses training()
  * @uses isEpoch()
  * @uses logWeights()
+ * @uses logNetworkErrors()
  * @uses getNextIndexInputsToTrain()
  * @uses adjustLearningRate()
  * @throws ANN_Exception
@@ -309,8 +310,8 @@ public function train()
       if($this->loggingWeights)
         $this->logWeights();
 
-      if($this->loggingNetworkError)
-        $this->logNetworkError();
+      if($this->loggingNetworkErrors)
+        $this->logNetworkErrors();
 
       if($this->isTrainingComplete())
         break;
@@ -820,20 +821,20 @@ $this->objLoggingWeights->setFilename($filename);
 // ****************************************************************************
 
 /**
- * Log network error while training in CSV format
+ * Log network errors while training in CSV format
  *
  * @param string $filename
  * @uses ANN_Logging::__construct()
  * @uses ANN_Logging::setFilename()
  */
 
-public function logNetworkErrorToFile($filename)
+public function logNetworkErrorsToFile($filename)
 {
-$this->loggingNetworkError = TRUE;
+$this->loggingNetworkErrors = TRUE;
 
-$this->objLoggingNetworkError = new ANN_Logging;
+$this->objLoggingNetworkErrors = new ANN_Logging;
 
-$this->objLoggingNetworkError->setFilename($filename);
+$this->objLoggingNetworkErrors->setFilename($filename);
 }
 
 // ****************************************************************************
@@ -882,14 +883,14 @@ $this->objLoggingWeights->logData($arrData);
  * @uses ANN_Logging::logData()
  */
 
-protected function logNetworkError()
+protected function logNetworkErrors()
 {
 $arrData = array();
 
 $arrData['network error'] = $this->getNetworkError();
 $arrData['learning rate'] = $this->learningRate;
 
-$this->objLoggingNetworkError->logData($arrData);
+$this->objLoggingNetworkErrors->logData($arrData);
 }
 
 // ****************************************************************************
