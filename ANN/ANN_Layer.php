@@ -190,6 +190,7 @@ public function activate()
  * @uses ANN_Neuron::getDeltaWithMomentum()
  * @uses ANN_Neuron::setDelta()
  * @uses ANN_Layer::getNeurons()
+ * @uses calculateDeltaByQuickProp()
  */
 
 public function calculateHiddenDeltas(ANN_Layer $nextLayer)
@@ -211,6 +212,9 @@ public function calculateHiddenDeltas(ANN_Layer $nextLayer)
 
 		$delta = $output * (1 - $output) * $sum;
 
+    if($this->network->quickPropMode && !$this->network->firstLoopOfTraining)
+      $delta = $this->calculateDeltaByQuickProp($this->neurons[$k], $delta);
+
     if($this->network->weightDecayMode)
       $delta -= $this->neurons[$k]->getDeltaWithMomentum() * $this->network->weightDecay;
 
@@ -218,6 +222,52 @@ public function calculateHiddenDeltas(ANN_Layer $nextLayer)
 	}
 }
 	
+// ****************************************************************************
+
+/**
+ * Quick propagation algorithm
+ *
+ * EXPERIMENTAL
+ *
+ * @param ANN_Neuron $neuron
+ * @param float $delta
+ * @return float
+ * @uses ANN_Neuron::getDeltaWithMomentum()
+ * @todo Testing
+ */
+
+protected function calculateDeltaByQuickProp(ANN_Neuron $neuron, $delta)
+{
+  $deltaPrevious = $neuron->getDeltaWithMomentum();
+
+  if(($deltaPrevious - $delta) != 0)
+  {
+    if(($deltaPrevious > 0 && $delta > 0) || ($deltaPrevious < 0 && $delta < 0))
+    {
+      $quickPropDelta = ($delta / ($deltaPrevious - $delta)) * $deltaPrevious;
+    }
+    else
+    {
+      return $delta;
+    }
+
+    $maxDelta = $this->network->quickPropMaxWeightChangeFactor * $deltaPrevious;
+
+    if($quickPropDelta > $maxDelta)
+      $quickPropDelta = $maxDelta;
+
+    if($quickPropDelta < $delta)
+      return $delta;
+
+    if(is_nan($quickPropDelta))
+      return $delta;
+
+    return $quickPropDelta;
+  }
+
+  return $delta;
+}
+
 // ****************************************************************************
 
 /**

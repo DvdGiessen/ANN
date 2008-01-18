@@ -90,6 +90,9 @@ public $momentum = 0.95;
 public $learningRate = 0.5;
 public $weightDecayMode = TRUE;
 public $weightDecay = 0.05;
+public $quickPropMode = TRUE;
+public $quickPropMaxWeightChangeFactor = 2.25;
+public $firstLoopOfTraining = TRUE;
 
 /**#@-*/
 
@@ -299,6 +302,8 @@ public function train()
   
   $this->getNextIndexInputsToTrain(TRUE);
 
+  $this->firstLoopOfTraining = TRUE;
+
   for ($i = 0; $i < $this->maxTrainingLoops; $i++)
   {
     $j = $this->getNextIndexInputsToTrain();
@@ -320,6 +325,8 @@ public function train()
         
       $this->adjustLearningRate();
     }
+
+    $this->firstLoopOfTraining = FALSE;
   }
 
   $stoptime = date('U');
@@ -568,6 +575,13 @@ public function printNetwork()
   print "<td>Detected output type</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->outputType
+        ."</td>\n";
+  print "</tr>\n";
+
+  print "<tr>\n";
+  print "<td>Quick propagation</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">"
+        .(($this->quickPropMode) ? 'Yes' : 'No')
         ."</td>\n";
   print "</tr>\n";
 
@@ -1131,6 +1145,40 @@ if($weightDecay < 0.03 || $weightDecay > 0.05)
 $this->weightDecay = $weightDecay;
 
 $this->weightDecayMode = TRUE;
+}
+
+// ****************************************************************************
+
+/**
+ * @param boolean $quickPropMode (Default: TRUE)
+ * @uses ANN_Exception::__construct()
+ * @throws ANN_Exception
+ */
+
+public function setQuickPropMode($quickPropMode = TRUE)
+{
+if(!is_bool($quickPropMode))
+  throw new ANN_Exception('$quickPropMode must be boolean');
+
+$this->quickPropMode = $quickPropMode;
+}
+
+// ****************************************************************************
+
+/**
+ * @param float $weightDecay (Default: 2.25)
+ * @uses ANN_Exception::__construct()
+ * @throws ANN_Exception
+ */
+
+public function setQuickPropMaxWeightChangeFactor($quickPropMaxWeightChangeFactor = 2.25)
+{
+if($quickPropMaxWeightChangeFactor < 1.75 || $quickPropMaxWeightChangeFactor > 2.25)
+  throw new ANN_Exception('$quickPropMaxWeightChangeFactor must be between 1.75 and 2.25');
+
+$this->quickPropMaxWeightChangeFactor = $quickPropMaxWeightChangeFactor;
+
+$this->quickPropMode = TRUE;
 }
 
 // ****************************************************************************
