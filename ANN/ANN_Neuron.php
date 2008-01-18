@@ -153,9 +153,20 @@ public function getOutput()
  * @return float
  */
 
-public function getDelta()
+public function getDeltaWithMomentum()
 {
 	return $this->network->momentum * $this->delta;
+}
+
+// ****************************************************************************
+
+/**
+ * @return float
+ */
+
+public function getDelta()
+{
+	return $this->delta;
 }
 	
 // ****************************************************************************
