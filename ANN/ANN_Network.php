@@ -88,6 +88,8 @@ private $networkErrorCurrent = 10;
 private $networkErrorPrevious = 10;
 public $momentum = 0.95;
 public $learningRate = 0.5;
+public $weightDecayMode = TRUE;
+public $weightDecay = 0.05;
 
 /**#@-*/
 
@@ -580,6 +582,13 @@ public function printNetwork()
   print "<td>Learning rate</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->learningRate
+        ."</td>\n";
+  print "</tr>\n";
+
+  print "<tr>\n";
+  print "<td>Weight decay</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">"
+        .(($this->weightDecayMode) ? $this->weightDecay : 'Off')
         ."</td>\n";
   print "</tr>\n";
 
@@ -1088,6 +1097,40 @@ if(!is_bool($dynamicLearningRate))
   throw new ANN_Exception('$dynamicLearningRate must be boolean');
 
 $this->dynamicLearningRate = $dynamicLearningRate;
+}
+
+// ****************************************************************************
+
+/**
+ * @param boolean $weightDecayMode (Default: TRUE)
+ * @uses ANN_Exception::__construct()
+ * @throws ANN_Exception
+ */
+
+public function setWeightDecayMode($weightDecayMode = TRUE)
+{
+if(!is_bool($weightDecayMode))
+  throw new ANN_Exception('$weightDecayMode must be boolean');
+
+$this->weightDecayMode = $weightDecayMode;
+}
+
+// ****************************************************************************
+
+/**
+ * @param float $weightDecay (Default: 0.05)
+ * @uses ANN_Exception::__construct()
+ * @throws ANN_Exception
+ */
+
+public function setWeightDecay($weightDecay = 0.05)
+{
+if($weightDecay < 0.03 || $weightDecay > 0.05)
+  throw new ANN_Exception('$weightDecay must be between 0.03 and 0.05');
+
+$this->weightDecay = $weightDecay;
+
+$this->weightDecayMode = TRUE;
 }
 
 // ****************************************************************************

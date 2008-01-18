@@ -187,6 +187,7 @@ public function activate()
 /**
  * @param ANN_Layer $nextLayer
  * @uses ANN_Neuron::getOutput()
+ * @uses ANN_Neuron::getDeltaWithMomentum()
  * @uses ANN_Neuron::setDelta()
  * @uses ANN_Layer::getNeurons()
  */
@@ -203,12 +204,15 @@ public function calculateHiddenDeltas(ANN_Layer $nextLayer)
     {
 			$weights = $neurons[$l]->getWeights();
 
-    	$sum += ($weights[$k] * $neurons[$l]->getDelta());
+    	$sum += ($weights[$k] * $neurons[$l]->getDeltaWithMomentum());
 		}
 
     $output = $this->neurons[$k]->getOutput();
 
 		$delta = $output * (1 - $output) * $sum;
+
+    if($this->network->weightDecayMode)
+      $delta -= $this->neurons[$k]->getDeltaWithMomentum() * $this->network->weightDecay;
 
 		$this->neurons[$k]->setDelta($delta);
 	}
