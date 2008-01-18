@@ -203,7 +203,7 @@ public function activate()
 public function adjustWeights()
 {
 	foreach ($this->weights as $k => $value)
-		$this->weights[$k] += ($this->network->learningRate * $this->inputs[$k] * $this->delta);
+		$this->weights[$k] += ($this->inputs[$k] * $this->delta);
 }
 
 // ****************************************************************************

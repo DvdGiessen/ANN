@@ -214,7 +214,7 @@ public function calculateHiddenDeltas(ANN_Layer $nextLayer)
     if($this->network->weightDecayMode)
       $delta -= $this->neurons[$k]->getDeltaWithMomentum() * $this->network->weightDecay;
 
-		$this->neurons[$k]->setDelta($delta);
+		$this->neurons[$k]->setDelta($delta * $this->network->learningRate);
 	}
 }
 	
