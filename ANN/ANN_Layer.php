@@ -58,6 +58,7 @@ final class ANN_Layer
 protected $neurons = array();
 protected $outputs = array();
 protected $network = null;
+protected $nextLayer = null;
 
 /**#@-*/
 
@@ -66,12 +67,15 @@ protected $network = null;
 /**
  * @param ANN_Network $network
  * @param integer $numberOfNeurons
+ * @param ANN_Layer $nextLayer (Default: null)
  * @uses createNeurons()
  */
 
-public function __construct(ANN_Network $network, $numberOfNeurons)
+public function __construct(ANN_Network $network, $numberOfNeurons, ANN_Layer $nextLayer = null)
 {
   $this->network = $network;
+
+  $this->nextLayer = $nextLayer;
 
   $this->createNeurons($numberOfNeurons);
 }
@@ -184,7 +188,6 @@ public function activate()
 // ****************************************************************************
 
 /**
- * @param ANN_Layer $nextLayer
  * @uses calculateDeltaByBackpropagation()
  * @uses calculateDeltaByQuickProp()
  * @uses calculateDeltaByRProp()
@@ -193,7 +196,7 @@ public function activate()
  * @uses ANN_Neuron::setDelta()
  */
 
-public function calculateHiddenDeltas(ANN_Layer $nextLayer)
+public function calculateHiddenDeltas()
 {
 	$delta = 0;
 
@@ -202,7 +205,7 @@ public function calculateHiddenDeltas(ANN_Layer $nextLayer)
     switch($this->network->backpropagationAlgorithm)
     {
     case ANN_Network::ALGORITHM_BACKPROPAGATION:
-      $delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron, $nextLayer);
+      $delta = $this->calculateDeltaByBackpropagation($keyNeuron);
 
       if($this->network->weightDecayMode)
         $delta -= $neuron->getDeltaWithMomentum() * $this->network->weightDecay;
@@ -211,18 +214,18 @@ public function calculateHiddenDeltas(ANN_Layer $nextLayer)
       break;
 
     case ANN_Network::ALGORITHM_ILR:
-      $delta = $this->calculateDeltaByILR($keyNeuron, $neuron, $nextLayer);
+      $delta = $this->calculateDeltaByILR($keyNeuron, $neuron);
 
       if($this->network->weightDecayMode)
         $delta -= $neuron->getDeltaWithMomentum() * $this->network->weightDecay;
       break;
 
     case ANN_Network::ALGORITHM_QUICKPROP:
-      $delta = $this->calculateDeltaByQuickProp($keyNeuron, $neuron, $nexLayer);
+      $delta = $this->calculateDeltaByQuickProp($keyNeuron, $neuron);
       break;
 
     case ANN_Network::ALGORITHM_RPROP:
-      $delta = $this->calculateDeltaByRProp($keyNeuron, $neuron, $nextLayer);
+      $delta = $this->calculateDeltaByRProp($keyNeuron, $neuron);
       break;
     }
 
@@ -234,8 +237,6 @@ public function calculateHiddenDeltas(ANN_Layer $nextLayer)
 
 /**
  * @param integer $keyNeuron
- * @param ANN_Neuron $neuron
- * @param ANN_Layer $nextLayer
  * @return float
  * @uses ANN_Neuron::getOutput()
  * @uses ANN_Neuron::getDeltaWithMomentum()
@@ -243,16 +244,16 @@ public function calculateHiddenDeltas(ANN_Layer $nextLayer)
  * @uses ANN_Layer::getNeurons()
  */
 
-protected function calculateDeltaByBackpropagation($keyNeuron, ANN_Neuron $neuron, ANN_Layer $nextLayer)
+protected function calculateDeltaByBackpropagation($keyNeuron)
 {
-	$neuronsNextLayer = $nextLayer->getNeurons();
+	$neuronsNextLayer = $this->nextLayer->getNeurons();
 
   $sum = 0;
 
 	foreach ($neuronsNextLayer as $neuronNextLayer)
     $sum += $neuronNextLayer->getWeight($keyNeuron) * $neuronNextLayer->getDeltaWithMomentum();
 
-  $output = $neuron->getOutput();
+  $output = $this->neurons[$keyNeuron]->getOutput();
 
   return $output * (1 - $output) * $sum;
 }
@@ -266,13 +267,12 @@ protected function calculateDeltaByBackpropagation($keyNeuron, ANN_Neuron $neuro
  *
  * @param integer $keyNeuron
  * @param ANN_Neuron $neuron
- * @param ANN_Layer $nextLayer
  * @return float
  * @uses calculateDeltaByBackpropagation()
  * @uses ANN_Neuron::getDeltaWithMomentum()
  */
 
-protected function calculateDeltaByQuickProp($keyNeuron, ANN_Neuron $neuron, ANN_Layer $nextLayer)
+protected function calculateDeltaByQuickProp($keyNeuron, ANN_Neuron $neuron)
 {
  if($this->network->firstLoopOfTraining)
     return $this->calculateDeltaByBackpropagation($keyNeuron, $neuron, $nextLayer);
@@ -316,7 +316,6 @@ protected function calculateDeltaByQuickProp($keyNeuron, ANN_Neuron $neuron, ANN
  *
  * @param integer $keyNeuron
  * @param ANN_Neuron $neuron
- * @param ANN_Layer $nextLayer
  * @return float
  * @uses calculateDeltaByBackpropagation()
  * @uses ANN_Neuron::adjustLearningRateMinus()
@@ -325,9 +324,9 @@ protected function calculateDeltaByQuickProp($keyNeuron, ANN_Neuron $neuron, ANN
  * @uses ANN_Neuron::getErrorWeightDerivative()
  */
 
-protected function calculateDeltaByILR($keyNeuron, ANN_Neuron $neuron, ANN_Layer $nextLayer)
+protected function calculateDeltaByILR($keyNeuron, ANN_Neuron $neuron)
 {
-$delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron, $nextLayer);
+$delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron);
 
 if($this->network->firstEpochOfTraining)
 {
@@ -361,7 +360,6 @@ else
  *
  * @param integer $keyNeuron
  * @param ANN_Neuron $neuron
- * @param ANN_Layer $nextLayer
  * @return float
  * @uses ANN_Maths::sign()
  * @uses calculateDeltaByBackpropagation()
@@ -372,9 +370,9 @@ else
  * @uses ANN_Neuron::setErrorWeightDerivative()
  */
 
-protected function calculateDeltaByRProp($keyNeuron, ANN_Neuron $neuron, ANN_Layer $nextLayer)
+protected function calculateDeltaByRProp($keyNeuron, ANN_Neuron $neuron)
 {
-$delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron, $nextLayer);
+$delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron);
 
 /*
 if($this->network->firstEpochOfTraining)

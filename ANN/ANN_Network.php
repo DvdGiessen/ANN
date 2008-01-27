@@ -176,10 +176,10 @@ public function __construct($numberOfHiddenLayers = 2, $numberOfNeuronsPerLayer 
   if(!is_integer($numberOfOutputs) && $numberOfOutputs < 1)
     throw new ANN_Exception('Constraints: $numberOfOutputs must be a positiv integer number > 1');
 
-	$this->createHiddenLayers($numberOfHiddenLayers, $numberOfNeuronsPerLayer);
-
 	$this->createOutputLayer($numberOfOutputs);
 	
+	$this->createHiddenLayers($numberOfHiddenLayers, $numberOfNeuronsPerLayer);
+
 	$this->numberOfHiddenLayers = $numberOfHiddenLayers;
 
   $this->numberOfHiddenLayersDec = $this->numberOfHiddenLayers - 1;
@@ -320,8 +320,22 @@ public function getOutputsByInputKey($keyInput)
 
 protected function createHiddenLayers($numberOfHiddenLayers, $numberOfNeuronsPerLayer)
 {
-	for ($i = 0; $i < $numberOfHiddenLayers; $i++)
-		$this->hiddenLayers[] = new ANN_Layer($this, $numberOfNeuronsPerLayer);
+  $layerId = $numberOfHiddenLayers;
+
+  for ($i = 0; $i < $numberOfHiddenLayers; $i++)
+  {
+    $layerId--;
+
+    if($i == 0)
+      $nextLayer = $this->outputLayer;
+
+    if($i > 0)
+      $nextLayer = $this->hiddenLayers[$layerId+1];
+
+    $this->hiddenLayers[$layerId] = new ANN_Layer($this, $numberOfNeuronsPerLayer, $nextLayer);
+  }
+
+  ksort($this->hiddenLayers);
 }
 	
 // ****************************************************************************
@@ -333,7 +347,7 @@ protected function createHiddenLayers($numberOfHiddenLayers, $numberOfNeuronsPer
 
 protected function createOutputLayer($numberOfOutputs)
 {
-	$this->outputLayer = new ANN_Layer($this, $numberOfOutputs, TRUE);
+	$this->outputLayer = new ANN_Layer($this, $numberOfOutputs);
 }
 	
 // ****************************************************************************
@@ -667,16 +681,14 @@ protected function training($outputs)
 	$this->activate();
 	
 	$this->outputLayer->calculateOutputDeltas($outputs);
-		
-	$this->hiddenLayers[$this->numberOfHiddenLayersDec]->calculateHiddenDeltas($this->outputLayer);
-		
-	for ($i = $this->numberOfHiddenLayersDec; $i > 0; $i--)
-		$this->hiddenLayers[$i - 1]->calculateHiddenDeltas($this->hiddenLayers[$i]);
+
+	for ($i = $this->numberOfHiddenLayersDec; $i >= 0; $i--)
+		$this->hiddenLayers[$i]->calculateHiddenDeltas();
 		
 	$this->outputLayer->adjustWeights();
 		
-	for ($i = $this->numberOfHiddenLayers; $i > 0; $i--)
-		$this->hiddenLayers[$i - 1]->adjustWeights();
+	for ($i = $this->numberOfHiddenLayersDec; $i >= 0; $i--)
+		$this->hiddenLayers[$i]->adjustWeights();
 		
 	$this->totalTrainings++;
 
