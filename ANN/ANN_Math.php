@@ -66,13 +66,53 @@ public static function sigmoid($x)
 // ****************************************************************************
 
 /**
+ * First derivative of sigmoid()
+ *
+ * @param float $x
+ * @return float (between near 0 and near 1)
+ */
+
+public static function sigmoidI($x)
+{
+  return self::sigmoid($x) * (1 - self::sigmoid($x));
+}
+
+// ****************************************************************************
+
+/**
  * @param float $x
  * @return float (between near 0 and near 1)
  */
 
 public static function tangensHyperbolicus($x)
 {
+  return tanh($x);
+}
+
+// ****************************************************************************
+
+/**
+ * @param float $x
+ * @return float (between near 0 and near 1)
+ */
+
+public static function tangensHyperbolicus01($x)
+{
   return (tanh($x) + 1) / 2;
+}
+
+// ****************************************************************************
+
+/**
+ * First derivative of tanh()
+ *
+ * @param float $x
+ * @return float (between near 0 and near 1)
+ */
+
+public static function tangensHyperbolicusI($x)
+{
+  return 1 - pow(tanh($x), 2);
 }
 
 // ****************************************************************************
@@ -98,6 +138,55 @@ public static function threshold($x)
 public static function random($min = 0, $max = 10)
 {
   return mt_rand($min, $max);
+}
+
+// ****************************************************************************
+
+/**
+ * Return the sign of a number
+ *
+ * If $value is positiv the method returns 1 otherwise -1.
+ *
+ * @param float $value
+ * @return integer
+ */
+
+public static function sign($value)
+{
+  if($value >= 0) return 1;
+
+  return -1;
+}
+
+// ****************************************************************************
+
+/**
+ * @param float $x
+ * @return float (-1 .. 1)
+ */
+
+public static function linearSaturated($x)
+{
+  if($x < -1) return -1;
+  if($x > 1) return 1;
+
+  return $x;
+}
+
+// ****************************************************************************
+
+/**
+ * @param float $x
+ * @return float (0 .. 1)
+ * @uses self::saturated()
+ */
+
+public static function linearSaturated01($x)
+{
+  if($x < -1) $x = -1;
+  if($x > 1)  $x = 1;
+
+  return ($x + 1) / 2;
 }
 
 // ****************************************************************************

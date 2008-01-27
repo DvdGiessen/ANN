@@ -72,6 +72,9 @@ protected $outputs = null;
 protected $countHiddenLayers = null;
 protected $outputType = 'binary'; // binary or linear
 protected $totalLoops = 0;
+protected $totalTrainings = 0;
+protected $totalActivations = 0;
+protected $totalActivationsRequests = 0;
 protected $numberOfHiddenLayers = null;
 protected $numberOfHiddenLayersDec = null; // decremented value
 protected $maxTrainingLoops;
@@ -83,18 +86,71 @@ protected $trained = FALSE;
 protected $trainingTime = 0; // Seconds
 protected $objLoggingWeights = null;
 protected $objLoggingNetworkErrors = null;
-protected $dynamicLearningRate = TRUE;
+protected $dynamicLearningRate = FALSE;
+protected $networkActivated = FALSE;
+protected $trainingCompleteArray = array();
+protected $numberOfNeuronsPerLayer = 0;
 private $networkErrorCurrent = 10;
 private $networkErrorPrevious = 10;
 public $momentum = 0.95;
 public $learningRate = 0.5;
-public $weightDecayMode = TRUE;
+public $weightDecayMode = FALSE;
 public $weightDecay = 0.05;
-public $quickPropMode = TRUE;
-public $quickPropMaxWeightChangeFactor = 2.25;
 public $firstLoopOfTraining = TRUE;
+public $firstEpochOfTraining = TRUE;
+public $quickPropMaxWeightChangeFactor = 0;
+public $backpropagationAlgorithm = self::ALGORITHM_BACKPROPAGATION;
 
 /**#@-*/
+
+/**
+ * Back propagation (default)
+ */
+
+const ALGORITHM_BACKPROPAGATION = 1;
+
+/**
+ * Quick propagation (EXPERIMENTAL)
+ */
+
+const ALGORITHM_QUICKPROP = 2;
+
+/**
+ * RProp (EXPERIMENTAL)
+ */
+
+const ALGORITHM_RPROP = 3;
+
+/**
+ * RProp- (EXPERIMENTAL)
+ */
+
+const ALGORITHM_RPROPMINUS = 4;
+
+/**
+ * RProp+ (EXPERIMENTAL)
+ */
+
+const ALGORITHM_RPROPPLUS = 5;
+
+/**
+ * iRProp- (EXPERIMENTAL)
+ */
+
+const ALGORITHM_IRPROPMINUS = 6;
+
+/**
+ * iRProp+ (EXPERIMENTAL)
+ */
+
+const ALGORITHM_IRPROPPLUS = 7;
+
+
+/**
+ * Individual learning rate (EXPERIMENTAL)
+ */
+
+const ALGORITHM_ILR = 8;
 
 // ****************************************************************************
 
@@ -109,7 +165,7 @@ public $firstLoopOfTraining = TRUE;
  * @throws ANN_Exception
  */
 
-public function __construct($numberOfHiddenLayers = 1, $numberOfNeuronsPerLayer = 10, $numberOfOutputs = 1)
+public function __construct($numberOfHiddenLayers = 2, $numberOfNeuronsPerLayer = 4, $numberOfOutputs = 1)
 {
   if(!is_integer($numberOfHiddenLayers) && $numberOfHiddenLayers < 2)
     throw new ANN_Exception('Constraints: $numberOfHiddenLayers must be a positiv integer >= 2');
@@ -127,6 +183,8 @@ public function __construct($numberOfHiddenLayers = 1, $numberOfNeuronsPerLayer 
 	$this->numberOfHiddenLayers = $numberOfHiddenLayers;
 
   $this->numberOfHiddenLayersDec = $this->numberOfHiddenLayers - 1;
+  
+  $this->numberOfNeuronsPerLayer = $numberOfNeuronsPerLayer;
   
   $this->calculateMaxTrainingLoops();
 }
@@ -147,6 +205,8 @@ public function setInputs($inputs)
   $this->numberEpoch = count($inputs);
   
   $this->nextIndexInputToTrain = 0;
+  
+  $this->networkActivated = FALSE;
 }
 
 // ****************************************************************************
@@ -168,6 +228,8 @@ public function setOutputs($outputs)
   $this->outputs = $outputs;
   
   $this->detectOutputType();
+  
+  $this->networkActivated = FALSE;
 }
 
 // ****************************************************************************
@@ -180,6 +242,8 @@ public function setOutputs($outputs)
 protected function setInputsToTrain($inputs)
 {
   $this->hiddenLayers[0]->setInputs($inputs);
+  
+  $this->networkActivated = FALSE;
 }
 	
 // ****************************************************************************
@@ -197,13 +261,13 @@ public function getOutputs()
   $returnOutputs = array();
 
   $countInputs = $this->getCountInputs();
-  
+
 	for ($i = 0; $i < $countInputs; $i++)
 	{
     $this->setInputsToTrain($this->inputs[$i]);
-      
+
     $this->activate();
-	    
+
     switch($this->outputType)
     {
     case 'linear':
@@ -218,7 +282,34 @@ public function getOutputs()
 
 	return $returnOutputs;
 }
-	
+
+// ****************************************************************************
+
+/**
+ * @param integer $keyInput
+ * @return array
+ * @uses activate()
+ * @uses ANN_Layer::getOutputs()
+ * @uses ANN_Layer::getThresholdOutputs()
+ * @uses setInputsToTrain()
+ */
+
+public function getOutputsByInputKey($keyInput)
+{
+	$this->setInputsToTrain($this->inputs[$keyInput]);
+
+  $this->activate();
+
+  switch($this->outputType)
+  {
+  case 'linear':
+    return $this->outputLayer->getOutputs();
+
+  case 'binary':
+    return $this->outputLayer->getThresholdOutputs();
+  }
+}
+
 // ****************************************************************************
 
 /**
@@ -255,18 +346,27 @@ protected function createOutputLayer($numberOfOutputs)
 
 protected function activate()
 {
+  $this->totalActivationsRequests++;
+
+  if($this->networkActivated)
+    return;
+
 	for ($i = 0; $i < $this->numberOfHiddenLayersDec; $i++)
   {
 		$this->hiddenLayers[$i]->activate();
 			
-		$this->hiddenLayers[$i + 1]->setInputs($this->hiddenLayers[$i]->getOutputs() );
+		$this->hiddenLayers[$i + 1]->setInputs($this->hiddenLayers[$i]->getOutputs());
 	}
 		
 	$this->hiddenLayers[$i]->activate();
-		
-	$this->outputLayer->setInputs($this->hiddenLayers[$i]->getOutputs() );
+	
+	$this->outputLayer->setInputs($this->hiddenLayers[$i]->getOutputs());
 		
 	$this->outputLayer->activate();
+	
+	$this->networkActivated = TRUE;
+	
+  $this->totalActivations++;
 }
 	
 // ****************************************************************************
@@ -277,6 +377,7 @@ protected function activate()
  * @uses setInputs()
  * @uses setOutputs()
  * @uses isTrainingComplete()
+ * @uses isTrainingCompleteByEpoch()
  * @uses setInputsToTrain()
  * @uses training()
  * @uses isEpoch()
@@ -284,6 +385,7 @@ protected function activate()
  * @uses logNetworkErrors()
  * @uses getNextIndexInputsToTrain()
  * @uses adjustLearningRate()
+ * @uses isTrainingCompleteByInputKey()
  * @throws ANN_Exception
  */
 
@@ -303,6 +405,8 @@ public function train()
   $this->getNextIndexInputsToTrain(TRUE);
 
   $this->firstLoopOfTraining = TRUE;
+  
+  $this->firstEpochOfTraining = TRUE;
 
   for ($i = 0; $i < $this->maxTrainingLoops; $i++)
   {
@@ -310,7 +414,8 @@ public function train()
 
     $this->setInputsToTrain($this->inputs[$j]);
 
-    $this->training($this->outputs[$j]);
+    if(!($this->trainingCompleteArray[$j] = $this->isTrainingCompleteByInputKey($j)))
+      $this->training($this->outputs[$j]);
 
     if($this->isEpoch())
     {
@@ -320,10 +425,12 @@ public function train()
       if($this->loggingNetworkErrors)
         $this->logNetworkErrors();
 
-      if($this->isTrainingComplete())
+      if($this->isTrainingCompleteByEpoch())
         break;
         
       $this->adjustLearningRate();
+
+      $this->firstEpochOfTraining = FALSE;
     }
 
     $this->firstLoopOfTraining = FALSE;
@@ -480,7 +587,56 @@ protected function isTrainingComplete()
   break;
   }
 }
-	
+
+// ****************************************************************************
+
+/**
+ * @return boolean
+ */
+
+protected function isTrainingCompleteByEpoch()
+{
+  foreach($this->trainingCompleteArray as $trainingComplete)
+    if(!$trainingComplete)
+      return FALSE;
+    
+  return TRUE;
+}
+
+// ****************************************************************************
+
+/**
+ * @param integer $keyInput
+ * @return boolean
+ * @uses getOutputsByInputKey()
+ */
+
+protected function isTrainingCompleteByInputKey($keyInput)
+{
+  $outputs = $this->getOutputsByInputKey($keyInput);
+
+  switch($this->outputType)
+  {
+  case 'linear':
+
+      foreach($this->outputs[$keyInput] as $key2 => $value)
+        if(round($value, 2) != round($outputs[$key2], 2))
+          return FALSE;
+
+    return TRUE;
+  break;
+
+  case 'binary':
+
+      foreach($this->outputs[$keyInput] as $key2 => $value)
+        if($value != $outputs[$key2])
+          return FALSE;
+
+    return TRUE;
+  break;
+  }
+}
+
 // ****************************************************************************
 
 /**
@@ -503,12 +659,13 @@ protected function getCountInputs()
  * @uses ANN_Layer::calculateHiddenDeltas()
  * @uses ANN_Layer::adjustWeights()
  * @uses ANN_Layer::calculateOutputDeltas()
+ * @uses getNetworkError()
  */
 
 protected function training($outputs)
 {
 	$this->activate();
-		
+	
 	$this->outputLayer->calculateOutputDeltas($outputs);
 		
 	$this->hiddenLayers[$this->numberOfHiddenLayersDec]->calculateHiddenDeltas($this->outputLayer);
@@ -520,6 +677,10 @@ protected function training($outputs)
 		
 	for ($i = $this->numberOfHiddenLayers; $i > 0; $i--)
 		$this->hiddenLayers[$i - 1]->adjustWeights();
+		
+	$this->totalTrainings++;
+
+  $this->networkActivated = FALSE;
 }
 
 // ****************************************************************************
@@ -560,68 +721,196 @@ protected function setOutputType($type = 'linear')
 // ****************************************************************************
 
 /**
- * @uses getNetworkError()
- * @uses ANN_Layer::getNeurons()
+ * @param integer $level (0, 1, 2) (Default: 0)
+ * @uses ANN_Neuron::getLearningRate()
+ * @uses ANN_Neuron::getDeltaFactor()
  * @uses ANN_Neuron::getDelta()
  * @uses ANN_Neuron::getWeights()
  * @uses ANN_Layer::getNeurons()
+ * @uses getNumberInputs()
+ * @uses getNumberOutputs()
+ * @uses printNetworkDetails1()
+ * @uses printNetworkDetails2()
  */
 
-public function printNetwork()
+public function printNetwork($level = 0)
 {
-  print "<table border=\"1\" style=\"background-color: #AAAAAA\" cellpadding=\"2\" cellspacing=\"0\">\n";
+  if($level >= 1)
+    $this->printNetworkDetails1();
+
+  $countColumns = max($this->numberOfNeuronsPerLayer, $this->getNumberInputs(), $this->getNumberOutputs());
+
+  print "<table border=\"1\" style=\"background-color: #AAAAAA; border-width: 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
 
   print "<tr>\n";
-  print "<td>Detected output type</td>\n";
+  print "<td style=\"color: #DDDDDD\">Input-Layer</td>\n";
+
+  foreach($this->inputs[0] as $key => $input)
+  {
+  print "<td style=\"background-color: #CCCCCC\">"
+          ."<b>Input ". ($key + 1) ."</b></td>\n";
+  }
+  
+  for($i = $this->getNumberInputs()+1; $i <= $countColumns; $i++)
+    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
+
+  print "</tr>\n";
+
+
+foreach($this->hiddenLayers as $idx => $hiddenLayer)
+{
+  print "<tr>\n";
+  print "<td style=\"color: #DDDDDD\">Hidden-Layer ". ($idx+1) ."</td>\n";
+
+  foreach($hiddenLayer->getNeurons() as $neuron)
+    print "<td style=\"background-color: #CCCCCC\"><b>Inputs:</b> ". (count($neuron->getWeights())-1) ." + BIAS<br />"
+          ."<b>Delta:</b> ". round($neuron->getDelta(),4) ."<br />"
+          .(($this->backpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<b>Delta factor:</b> '. $neuron->getDeltaFactor() .'<br />' : '')
+          .(($this->backpropagationAlgorithm == self::ALGORITHM_ILR) ? '<b>Learning rate:</b> '. $neuron->getLearningRate() .'<br />' : '')
+          ."<b>Weights:</b><br />"
+          .implode('<br />', $neuron->getWeights())
+          ."</td>\n";
+
+  for($i = $this->numberOfNeuronsPerLayer+1; $i <= $countColumns; $i++)
+    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
+
+
+  print "</tr>\n";
+}
+
+  print "<tr>\n";
+  print "<td style=\"color: #DDDDDD\" rowspan=\"2\">Output-Layer</td>\n";
+
+  foreach($this->outputLayer->getNeurons() as $neuron)
+    print "<td style=\"background-color: #CCCCCC\"><b>Inputs:</b> ". (count($neuron->getWeights())-1) ." + BIAS<br />"
+          ."<b>Delta:</b> ". round($neuron->getDelta(),4) ."<br />"
+          .(($this->backpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<b>Delta factor:</b> '. $neuron->getDeltaFactor() .'<br />' : '')
+          .(($this->backpropagationAlgorithm == self::ALGORITHM_ILR) ? '<b>Learning rate:</b> '. $neuron->getLearningRate() .'<br />' : '')
+          ."<b>Weights:</b><br />"
+          .implode('<br />', $neuron->getWeights())
+          ."</td>\n";
+
+  for($i = $this->getNumberOutputs()+1; $i <= $countColumns; $i++)
+    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
+
+  print "</tr>\n";
+  print "<tr>\n";
+
+  foreach($this->outputLayer->getNeurons() as $key => $neuron)
+    print "<td style=\"background-color: #CCCCCC\"><b>Output ". ($key+1) ."</b></td>\n";
+
+  for($i = $this->getNumberOutputs()+1; $i <= $countColumns; $i++)
+    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
+
+  print "<tr>\n";
+  print "</table>\n";
+  
+  if($level >= 2)
+    $this->printNetworkDetails2();
+}
+
+// ****************************************************************************
+
+/**
+ * @uses getNetworkError()
+ */
+
+protected function printNetworkDetails1()
+{
+  print "<table border=\"1\" style=\"background-color: #AAAAAA; border: solid #000000 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
+
+  print "<tr>\n";
+  print "<td style=\"color: #DDDDDD\">Detected output type</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->outputType
         ."</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
-  print "<td>Quick propagation</td>\n";
-  print "<td style=\"background-color: #CCCCCC\">"
-        .(($this->quickPropMode) ? 'Yes' : 'No')
-        ."</td>\n";
+  print "<td style=\"color: #DDDDDD\">Backpropagation algorithm</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">";
+
+  switch($this->backpropagationAlgorithm)
+  {
+  case self::ALGORITHM_BACKPROPAGATION : print 'Back propagation';         break;
+  case self::ALGORITHM_QUICKPROP :       print 'QuickProp';                break;
+  case self::ALGORITHM_RPROP :           print 'RProp';                    break;
+  case self::ALGORITHM_RPROPPLUS :       print 'RProp+';                   break;
+  case self::ALGORITHM_RPROPMINUS :      print 'RProp-';                   break;
+  case self::ALGORITHM_IRPROPMINUS :     print 'iRProp-';                  break;
+  case self::ALGORITHM_IRPROPPLUS :      print 'iRProp+';                  break;
+  case self::ALGORITHM_ILR :             print 'Individual learning rate'; break;
+  }
+
+  print "</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
-  print "<td>Momentum</td>\n";
+  print "<td style=\"color: #DDDDDD\">Activation function</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">Sigmoid</td>\n";
+  print "</tr>\n";
+
+  print "<tr>\n";
+  print "<td style=\"color: #DDDDDD\">Momentum</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->momentum
         ."</td>\n";
   print "</tr>\n";
 
+  if($this->backpropagationAlgorithm == self::ALGORITHM_BACKPROPAGATION)
+  {
   print "<tr>\n";
-  print "<td>Learning rate</td>\n";
+  print "<td style=\"color: #DDDDDD\">Learning rate</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->learningRate
         ."</td>\n";
   print "</tr>\n";
+  }
 
   print "<tr>\n";
-  print "<td>Weight decay</td>\n";
+  print "<td style=\"color: #DDDDDD\">Weight decay</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .(($this->weightDecayMode) ? $this->weightDecay : 'Off')
         ."</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
-  print "<td>Network error</td>\n";
+  print "<td style=\"color: #DDDDDD\">Network error</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->getNetworkError()
         ."</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
-  print "<td>Training loops</td>\n";
+  print "<td style=\"color: #DDDDDD\">Total loops</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .number_format($this->totalLoops, 0, '.', ',')
         ." loops</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
-  print "<td>Epoch</td>\n";
+  print "<td style=\"color: #DDDDDD\">Total trainings</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">"
+        .number_format($this->totalTrainings, 0, '.', ',')
+        ." trainings</td>\n";
+  print "</tr>\n";
+
+  print "<tr>\n";
+  print "<td style=\"color: #DDDDDD\">Total activations</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">"
+        .number_format($this->totalActivations, 0, '.', ',')
+        ." activations</td>\n";
+  print "</tr>\n";
+
+  print "<tr>\n";
+  print "<td style=\"color: #DDDDDD\">Total activation requests</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">"
+        .number_format($this->totalActivationsRequests, 0, '.', ',')
+        ." activation requests</td>\n";
+  print "</tr>\n";
+
+  print "<tr>\n";
+  print "<td style=\"color: #DDDDDD\">Epoch</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->numberEpoch
         ." loops</td>\n";
@@ -630,71 +919,86 @@ public function printNetwork()
   $trainingTime = ($this->trainingTime > 0) ? $this->trainingTime : 1;
 
   print "<tr>\n";
-  print "<td>Training time</td>\n";
+  print "<td style=\"color: #DDDDDD\">Training time</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->trainingTime ." seconds = ". round($trainingTime / 60,1) ." minutes</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
-  print "<td>Loops / second</td>\n";
+  print "<td style=\"color: #DDDDDD\">Loops / second</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .round($this->totalLoops / $trainingTime) ." loops / second</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
-  print "<td>Training finished</td>\n";
+  print "<td style=\"color: #DDDDDD\">Training finished</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .(($this->trained) ? 'Yes' : 'No') ."</td>\n";
   print "</tr>\n";
 
   print "</table>\n<br />\n";
-
-  print "<table border=\"1\" style=\"background-color: #AAAAAA\" cellpadding=\"2\" cellspacing=\"0\">\n";
-
-  print "<tr>\n";
-  print "<td>Input-Layer</td>\n";
-
-  foreach($this->inputs[0] as $key => $input)
-  {
-  print "<td style=\"background-color: #CCCCCC\">"
-          ."<b>Input ". ($key + 1) ."</b></td>\n";
-  }
-  
-  print "</tr>\n";
-
-
-foreach($this->hiddenLayers as $idx => $hiddenLayer)
-{
-  print "<tr>\n";
-  print "<td>Hidden-Layer ". ($idx+1) ."</td>\n";
-
-  foreach($hiddenLayer->getNeurons() as $neuron)
-    print "<td style=\"background-color: #CCCCCC\"><b>Inputs:</b> ". (count($neuron->getWeights())-1) ." + BIAS<br />"
-          ."<b>Delta:</b> ". round($neuron->getDelta(),4) ."<br />"
-          ."<b>Weights:</b><br />"
-          .implode('<br />', $neuron->getWeights())
-          ."</td>\n";
-
-  print "</tr>\n";
 }
 
+// ****************************************************************************
+
+/**
+ * @uses getOutputsByInputKey()
+ */
+
+protected function printNetworkDetails2()
+{
+  $trained = 0;
+
+  print "<br />\n";
+
+  print "<table border=\"1\" style=\"background-color: #AAAAAA; border: solid #000000 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
+
   print "<tr>\n";
-  print "<td rowspan=\"2\">Output-Layer</td>\n";
-
-  foreach($this->outputLayer->getNeurons() as $neuron)
-    print "<td style=\"background-color: #CCCCCC\"><b>Inputs:</b> ". (count($neuron->getWeights())-1) ." + BIAS<br />"
-          ."<b>Delta:</b> ". round($neuron->getDelta(),4) ."<br />"
-          ."<b>Weights:</b><br />"
-          .implode('<br />', $neuron->getWeights())
-          ."</td>\n";
-
+  print "<td style=\"color: #DDDDDD\">Input</td>\n";
+  print "<td style=\"color: #DDDDDD\">Output</td>\n";
+  print "<td style=\"color: #DDDDDD\">Desired output</td>\n";
   print "</tr>\n";
-  print "<tr>\n";
 
-  foreach($this->outputLayer->getNeurons() as $key => $neuron)
-    print "<td style=\"background-color: #CCCCCC\"><b>Output ". ($key+1) ."</b></td>\n";
+  foreach($this->inputs as $keyInputs => $arrInputs)
+  {
+  print "<tr>\n";
+  
+  foreach($arrInputs as $keyInput => $input)
+    $arrInputs[$keyInput] = round($input, 2);
+  
+  print "<td style=\"color: #DDDDDD\" align=\"right\">&nbsp;f(". implode(',', $arrInputs) .") =&nbsp;</td>\n";
+
+  $arrOutputs = $this->getOutputsByInputKey($keyInputs);
+
+  foreach($arrOutputs as $keyOutput => $output)
+    $arrOutputs[$keyOutput] = round($output, 2);
+
+  $arrDesiredOutputs = $this->outputs[$keyInputs];
+
+  foreach($arrDesiredOutputs as $keyDesiredOutput => $desiredOutput)
+    $arrDesiredOutputs[$keyDesiredOutput] = round($desiredOutput, 2);
+
+  $strOutputs = implode(',', $arrOutputs);
+
+  $strDesiredOutputs = implode(',', $arrDesiredOutputs);
+
+  $color = ($strOutputs == $strDesiredOutputs) ? '#CCFF99' : '#F0807F';
+  
+  if($strOutputs == $strDesiredOutputs)
+    $trained++;
+
+  print "<td style=\"background-color: $color\">$strOutputs</td>\n";
+
+  print "<td style=\"background-color: $color\">$strDesiredOutputs</td>\n";
+  print "</tr>\n";
+  }
+
+  $trainedPerCent = round(($trained / @count($this->outputs)) * 100, 1);
 
   print "<tr>\n";
+  print "<td colspan=\"3\">$trainedPerCent per cent trained patterns</td>\n";
+  print "</tr>\n";
+
   print "</table>\n";
 }
 
@@ -730,6 +1034,8 @@ public function setMaxTrainingLoopsFactor($maxTrainingLoopsFactor = 230)
 public function __wakeup()
 {
   $this->calculateMaxTrainingLoops();
+
+  $this->networkActivated = FALSE;
 }
 
 // ****************************************************************************
@@ -1150,23 +1456,45 @@ $this->weightDecayMode = TRUE;
 // ****************************************************************************
 
 /**
- * @param boolean $quickPropMode (Default: TRUE)
+ * Selecting propagation algorithm
+ *
+ * EXPERIMENTAL
+ *
+ * @param integer $algorithm (Default: self::ALGORITHM_BACKPROPAGATION)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setQuickPropMode($quickPropMode = TRUE)
+public function setBackpropagationAlgorithm($algorithm = self::ALGORITHM_BACKPROPAGATION)
 {
-if(!is_bool($quickPropMode))
-  throw new ANN_Exception('$quickPropMode must be boolean');
+if(!is_int($algorithm))
+  throw new ANN_Exception('$algorithm must be integer');
 
-$this->quickPropMode = $quickPropMode;
+$this->backpropagationAlgorithm = $algorithm;
+
+switch($algorithm)
+{
+case self::ALGORITHM_RPROP:
+case self::ALGORITHM_RPROPMINUS:
+case self::ALGORITHM_RPROPPLUS:
+case self::ALGORITHM_IRPROPMINUS:
+case self::ALGORITHM_IRPROPPLUS:
+case self::ALGORITHM_ILR:
+
+$this->dynamicLearningRate = FALSE;
+
+break;
+}
 }
 
 // ****************************************************************************
 
 /**
- * @param float $weightDecay (Default: 2.25)
+ * Parameter setting for QiuckProp algorithm
+ *
+ * EXPERIMENTAL
+ *
+ * @param float $quickPropMaxWeightChangeFactor (Default: 2.25)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
@@ -1178,7 +1506,7 @@ if($quickPropMaxWeightChangeFactor < 1.75 || $quickPropMaxWeightChangeFactor > 2
 
 $this->quickPropMaxWeightChangeFactor = $quickPropMaxWeightChangeFactor;
 
-$this->quickPropMode = TRUE;
+$this->backpropagationAlorigthm = self::QUICKPROP;
 }
 
 // ****************************************************************************

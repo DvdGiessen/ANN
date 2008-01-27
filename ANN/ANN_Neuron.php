@@ -60,6 +60,9 @@ protected $weights = null;
 protected $output = null;
 protected $delta = 0;
 protected $network = null;
+protected $deltaFactor = 0.1;
+protected $errorWeightDerivative = 0;
+protected $learningRate = 0;
 
 /**#@-*/
 
@@ -67,12 +70,13 @@ protected $network = null;
 
 /**
  * @param ANN_Network $network
- * @param boolean $outputNeuron (Default:  FALSE)
  */
 
 public function __construct(ANN_Network $network)
 {
   $this->network = $network;
+  
+  $this->learningRate = ANN_Maths::random(400, 600) / 1000;
 }
 
 // ****************************************************************************
@@ -139,6 +143,18 @@ public function getWeights()
 // ****************************************************************************
 
 /**
+ * @param integer $keyNeuron
+ * @return float
+ */
+
+public function getWeight($keyNeuron)
+{
+	return $this->weights[$keyNeuron];
+}
+
+// ****************************************************************************
+
+/**
  * @return array
  */
 
@@ -168,7 +184,7 @@ public function getDelta()
 {
 	return $this->delta;
 }
-	
+
 // ****************************************************************************
 
 /**
@@ -177,14 +193,16 @@ public function getDelta()
 
 protected function initialiseWeights()
 {
-	foreach ($this->inputs as $k => $value)
-		$this->weights[$k] = ANN_Maths::random(-1000, 1000) / 1000;
+	foreach ($this->inputs as $k => $input)
+		$this->weights[$k] = ANN_Maths::random(-500, 500) / 1000;
 }
 	
 // ****************************************************************************
 
 /**
+ * @uses ANN_Maths::linearSaturated01()
  * @uses ANN_Maths::sigmoid()
+ * @uses ANN_Maths::tangensHyperbolicus01()
  * @uses setOutput()
  */
 
@@ -192,18 +210,123 @@ public function activate()
 {
 	$sum = 0;
 		
-	foreach ($this->inputs as $k => $value)
-		$sum += ($this->inputs[$k] * $this->weights[$k]);
+	foreach ($this->inputs as $k => $input)
+		$sum += $input * $this->weights[$k];
 
   $this->setOutput(ANN_Maths::sigmoid($sum));
+//  $this->setOutput(ANN_Maths::tangensHyperbolicus01($sum));
+//  $this->setOutput(ANN_Maths::linearSaturated01($sum));
 }
 	
 // ****************************************************************************
 
 public function adjustWeights()
 {
-	foreach ($this->weights as $k => $value)
+	foreach ($this->weights as $k => $weight)
 		$this->weights[$k] += ($this->inputs[$k] * $this->delta);
+}
+
+// ****************************************************************************
+
+/**
+ * @param float $deltaFactor
+ */
+
+public function setDeltaFactor($deltaFactor)
+{
+  $this->deltaFactor = $deltaFactor;
+}
+
+// ****************************************************************************
+
+/**
+ * @return float
+ */
+
+public function getDeltaFactor()
+{
+  return $this->deltaFactor;
+}
+
+// ****************************************************************************
+
+/**
+ * @param float $errorWeightDerivative dE/dw(t)
+ * @return float dE/dw(t-1)
+ */
+
+public function updateErrorWeightDerivative($errorWeightDerivative)
+{
+  $return = $this->errorWeightDerivative;
+  
+  $this->errorWeightDerivative = $errorWeightDerivative;
+  
+  return $this->errorWeightDerivative;
+}
+
+// ****************************************************************************
+
+/**
+ * @param float $errorWeightDerivative
+ */
+
+public function setErrorWeightDerivative($errorWeightDerivative)
+{
+  $this->errorWeightDerivative = $errorWeightDerivative;
+}
+
+// ****************************************************************************
+
+/**
+ * @return float
+ */
+
+public function getErrorWeightDerivative()
+{
+  return $this->errorWeightDerivative;
+}
+
+// ****************************************************************************
+
+/**
+ * @return float
+ */
+
+public function adjustLearningRatePlus()
+{
+  $learningRate = $this->learningRate + 0.02;
+  
+  if($learningRate < 0.6)
+    $this->learningRate = $learningRate;
+
+  return $this->learningRate;
+}
+
+// ****************************************************************************
+
+/**
+ * @return float
+ */
+
+public function adjustLearningRateMinus()
+{
+  $learningRate = $this->learningRate - 0.02;
+
+  if($learningRate > 0.4)
+    $this->learningRate = $learningRate;
+
+  return $this->learningRate;
+}
+
+// ****************************************************************************
+
+/**
+ * @return float
+ */
+
+public function getLearningRate()
+{
+  return $this->learningRate;
 }
 
 // ****************************************************************************
