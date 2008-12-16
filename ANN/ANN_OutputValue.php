@@ -64,6 +64,12 @@ protected $override = FALSE;
  * @param float $min
  * @param float $max
  * @param boolean $override (Default: FALSE)
+ * @throws ANN_Exception
+ *
+ * If $override is FALSE, an exception will be thrown if getOutputValue() will
+ * be called with outranged values. If $override is TRUE, no exception will be
+ * thrown in this case, but lower values are replaced by $min and upper values
+ * are replaced by $max.
  */
 
 public function __construct($min, $max, $override = FALSE)
@@ -91,6 +97,7 @@ public function __construct($min, $max, $override = FALSE)
  * @param float $value
  * @return float (0..1)
  * @uses calculateOutputValue()
+ * @throws ANN_Exception
  */
 
 public function getOutputValue($value)
@@ -116,10 +123,14 @@ public function getOutputValue($value)
 /**
  * @param float $value (0..1)
  * @return float
+ * @throws ANN_Exception
  */
 
 public function getRealOutputValue($value)
 {
+  if($value < 0 || $value > 1)
+    throw new ANN_Exception('Constraints: $value should be between 0 and 1');
+
   return $value * ($this->max - $this->min) + $this->min;
 }
 

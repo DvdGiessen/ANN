@@ -64,21 +64,27 @@ protected $override = FALSE;
  * @param float $min
  * @param float $max
  * @param boolean $override (Default: FALSE)
+ * @throws ANN_Exception
+ *
+ * If $override is FALSE, an exception will be thrown if getInputValue() will
+ * be called with outranged values. If $override is TRUE, no exception will be
+ * thrown in this case, but lower values are replaced by $min and upper values
+ * are replaced by $max.
  */
 
 public function __construct($min, $max, $override = FALSE)
 {
   if(!is_float($min) && !is_integer($min))
-    throw new ANN_Exception('Constraints: $min must be a float number');
+    throw new ANN_Exception('Constraints: $min should be a float or integer number');
 
   if(!is_float($max) && !is_integer($max))
-    throw new ANN_Exception('Constraints: $min must be a float number');
+    throw new ANN_Exception('Constraints: $min should be a float or integer number');
 
   if($min > $max)
     throw new ANN_Exception('Constraints: $min should be lower than $max');
     
   if(!is_bool($override))
-    throw new ANN_Exception('Constraints: $override must be boolean');
+    throw new ANN_Exception('Constraints: $override should be boolean');
 
   $this->min = $min;
   $this->max = $max;
@@ -91,6 +97,7 @@ public function __construct($min, $max, $override = FALSE)
  * @param float $value
  * @return float
  * @uses calculateInputValue()
+ * @throws ANN_Exception
  */
 
 public function getInputValue($value)
@@ -107,7 +114,7 @@ public function getInputValue($value)
   if($this->override && $value > $this->max)
     $value = $this->max;
 
-  if($value > $this->min && $value < $this->max)
+  if($value >= $this->min && $value <= $this->max)
     return $this->calculateInputValue($value);
 }
 
