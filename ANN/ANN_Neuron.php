@@ -115,7 +115,7 @@ protected function setOutput($output)
 
 public function setDelta($delta)
 {
-	$this->delta = $delta;
+	$this->delta = round($delta, ANN_Maths::PRECISION);
 }
 	
 // ****************************************************************************
@@ -213,6 +213,7 @@ public function activate()
 	foreach ($this->inputs as $k => $input)
 		$sum += $input * $this->weights[$k];
 
+//  $this->setOutput(ANN_tanh_1_2($sum));
   $this->setOutput(ANN_Maths::sigmoid($sum));
 //  $this->setOutput(ANN_Maths::tangensHyperbolicus01($sum));
 //  $this->setOutput(ANN_Maths::linearSaturated01($sum));
@@ -223,7 +224,7 @@ public function activate()
 public function adjustWeights()
 {
 	foreach ($this->weights as $k => $weight)
-		$this->weights[$k] += ($this->inputs[$k] * $this->delta);
+		$this->weights[$k] += round($this->inputs[$k] * $this->delta, ANN_Maths::PRECISION);
 }
 
 // ****************************************************************************
