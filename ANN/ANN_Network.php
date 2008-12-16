@@ -43,16 +43,6 @@
  * @package ANN
  */
 
-require_once('ANN_Exception.php');
-require_once('ANN_Math.php');
-require_once('ANN_Neuron.php');
-require_once('ANN_Layer.php');
-require_once('ANN_Filesystem.php');
-require_once('ANN_InputValue.php');
-require_once('ANN_OutputValue.php');
-require_once('ANN_NetworkGraph.php');
-require_once('ANN_Logging.php');
-
 /**
  * @package ANN
  * @access public
