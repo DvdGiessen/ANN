@@ -51,6 +51,8 @@
 
 class ANN_Maths
 {
+const PRECISION = 3;
+
 // ****************************************************************************
 
 /**
@@ -60,7 +62,7 @@ class ANN_Maths
 
 public static function sigmoid($x)
 {
-  return 1 / (1 + exp(-1 * $x));
+  return round(1 / (1 + exp(-1 * $x)), self::PRECISION);
 }
 
 // ****************************************************************************
@@ -74,7 +76,7 @@ public static function sigmoid($x)
 
 public static function sigmoidI($x)
 {
-  return self::sigmoid($x) * (1 - self::sigmoid($x));
+  return round(self::sigmoid($x) * (1 - self::sigmoid($x)), self::PRECISION);
 }
 
 // ****************************************************************************
@@ -86,7 +88,7 @@ public static function sigmoidI($x)
 
 public static function tangensHyperbolicus($x)
 {
-  return tanh($x);
+  return round(tanh($x), self::PRECISION);
 }
 
 // ****************************************************************************
@@ -98,7 +100,7 @@ public static function tangensHyperbolicus($x)
 
 public static function tangensHyperbolicus01($x)
 {
-  return (tanh($x) + 1) / 2;
+  return round((tanh($x) + 1) / 2, self::PRECISION);
 }
 
 // ****************************************************************************
@@ -112,7 +114,7 @@ public static function tangensHyperbolicus01($x)
 
 public static function tangensHyperbolicusI($x)
 {
-  return 1 - pow(tanh($x), 2);
+  return round(1 - pow(tanh($x), 2), self::PRECISION);
 }
 
 // ****************************************************************************
@@ -137,7 +139,7 @@ public static function threshold($x)
 
 public static function random($min = 0, $max = 10)
 {
-  return mt_rand($min, $max);
+  return round(mt_rand($min, $max), self::PRECISION);
 }
 
 // ****************************************************************************
