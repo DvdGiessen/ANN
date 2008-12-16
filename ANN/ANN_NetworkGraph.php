@@ -82,16 +82,19 @@ protected $neuronDistance = 50;
 
 public function __construct(ANN_Network $network)
 {
-$this->numberInputs = $network->getNumberInputs();
-$this->numberHiddenLayers = $network->getNumberHiddenLayers();
-$this->numberNeuronsOfHiddenLayer = $network->getNumberHiddens();
-$this->numberOfOutputs = $network->getNumberOutputs();
+  $this->numberInputs = $network->getNumberInputs();
 
-$this->maxNeuronsPerLayer = max($this->numberInputs, $this->numberNeuronsOfHiddenLayer, $this->numberOfOutputs);
+  $this->numberHiddenLayers = $network->getNumberHiddenLayers();
 
-$this->createImage();
+  $this->numberNeuronsOfHiddenLayer = $network->getNumberHiddens();
 
-$this->drawNetwork();
+  $this->numberOfOutputs = $network->getNumberOutputs();
+
+  $this->maxNeuronsPerLayer = max($this->numberInputs, $this->numberNeuronsOfHiddenLayer, $this->numberOfOutputs);
+
+  $this->createImage();
+
+  $this->drawNetwork();
 }
 
 // ****************************************************************************
@@ -105,11 +108,13 @@ $this->drawNetwork();
 
 protected function drawNetwork()
 {
-$this->drawConnections();
+  $this->drawConnections();
 
-$this->drawInputNeurons();
-$this->drawHiddenNeurons();
-$this->drawOutputNeurons();
+  $this->drawInputNeurons();
+
+  $this->drawHiddenNeurons();
+
+  $this->drawOutputNeurons();
 }
 
 // ****************************************************************************
@@ -122,9 +127,11 @@ $this->drawOutputNeurons();
 
 protected function drawConnections()
 {
-$this->drawConnectionsInputHidden();
-$this->drawConnectionsHiddens();
-$this->drawConnectionsHiddenOutput();
+  $this->drawConnectionsInputHidden();
+
+  $this->drawConnectionsHiddens();
+
+  $this->drawConnectionsHiddenOutput();
 }
 
 // ****************************************************************************
@@ -135,20 +142,23 @@ $this->drawConnectionsHiddenOutput();
 
 protected function drawConnectionsInputHidden()
 {
-$yposHiddenStart = $this->calculateYPosStart($this->numberNeuronsOfHiddenLayer);
-$yposInputStart = $this->calculateYPosStart($this->numberInputs);
+  $yposHiddenStart = $this->calculateYPosStart($this->numberNeuronsOfHiddenLayer);
 
-for($input=0; $input < $this->numberInputs; $input++)
-for($hidden=0; $hidden < $this->numberNeuronsOfHiddenLayer; $hidden++)
-{
-$xposInput = 100;
-$yposInput = $yposInputStart + $this->neuronDistance * $input;
+  $yposInputStart = $this->calculateYPosStart($this->numberInputs);
 
-$xposHidden = 100 + $this->layerDistance;
-$yposHidden = $yposHiddenStart + $this->neuronDistance * $hidden;
+  for($input = 0; $input < $this->numberInputs; $input++)
+    for($hidden = 0; $hidden < $this->numberNeuronsOfHiddenLayer; $hidden++)
+    {
+      $xposInput = 100;
+      
+      $yposInput = $yposInputStart + $this->neuronDistance * $input;
 
-imageline($this->image, $xposInput, $yposInput, $xposHidden, $yposHidden, $this->colorConnection);
-}
+      $xposHidden = 100 + $this->layerDistance;
+      
+      $yposHidden = $yposHiddenStart + $this->neuronDistance * $hidden;
+
+      imageline($this->image, $xposInput, $yposInput, $xposHidden, $yposHidden, $this->colorConnection);
+    }
 }
 
 // ****************************************************************************
@@ -159,23 +169,26 @@ imageline($this->image, $xposInput, $yposInput, $xposHidden, $yposHidden, $this-
 
 protected function drawConnectionsHiddenOutput()
 {
-for($layer=0; $layer < $this->numberHiddenLayers; $layer++)
-  $xposHidden = 100 + $this->layerDistance + $this->layerDistance * $layer;
+  for($layer = 0; $layer < $this->numberHiddenLayers; $layer++)
+    $xposHidden = 100 + $this->layerDistance + $this->layerDistance * $layer;
 
-$yposHiddenStart = $this->calculateYPosStart($this->numberNeuronsOfHiddenLayer);
-$yposOutputStart = $this->calculateYPosStart($this->numberOfOutputs);
+  $yposHiddenStart = $this->calculateYPosStart($this->numberNeuronsOfHiddenLayer);
 
-for($output=0; $output < $this->numberOfOutputs; $output++)
-for($hidden=0; $hidden < $this->numberNeuronsOfHiddenLayer; $hidden++)
-{
-$xposHidden = $xposHidden;
-$yposHidden = $yposHiddenStart + $this->neuronDistance * $hidden;
+  $yposOutputStart = $this->calculateYPosStart($this->numberOfOutputs);
 
-$xposOutput = $xposHidden + $this->layerDistance;
-$yposOutput = $yposOutputStart + $this->neuronDistance * $output;
+  for($output = 0; $output < $this->numberOfOutputs; $output++)
+    for($hidden = 0; $hidden < $this->numberNeuronsOfHiddenLayer; $hidden++)
+    {
+      $xposHidden = $xposHidden;
 
-imageline($this->image, $xposHidden, $yposHidden, $xposOutput, $yposOutput, $this->colorConnection);
-}
+      $yposHidden = $yposHiddenStart + $this->neuronDistance * $hidden;
+
+      $xposOutput = $xposHidden + $this->layerDistance;
+
+      $yposOutput = $yposOutputStart + $this->neuronDistance * $output;
+
+      imageline($this->image, $xposHidden, $yposHidden, $xposOutput, $yposOutput, $this->colorConnection);
+  }
 }
 
 // ****************************************************************************
@@ -186,22 +199,25 @@ imageline($this->image, $xposHidden, $yposHidden, $xposOutput, $yposOutput, $thi
 
 protected function drawConnectionsHiddens()
 {
-if($this->numberHiddenLayers <= 1) return;
+  if($this->numberHiddenLayers <= 1)
+    return;
 
-$yposHiddenStart = $this->calculateYPosStart($this->numberNeuronsOfHiddenLayer);
+  $yposHiddenStart = $this->calculateYPosStart($this->numberNeuronsOfHiddenLayer);
 
-for($layer=1; $layer < $this->numberHiddenLayers; $layer++)
-for($hidden1=0; $hidden1 < $this->numberNeuronsOfHiddenLayer; $hidden1++)
-for($hidden2=0; $hidden2 < $this->numberNeuronsOfHiddenLayer; $hidden2++)
-{
-$xposHidden1 = 100 + $this->layerDistance + $this->layerDistance * $layer - $this->layerDistance;
-$yposHidden1 = $yposHiddenStart + $this->neuronDistance * $hidden1;
+  for($layer = 1; $layer < $this->numberHiddenLayers; $layer++)
+    for($hidden1 = 0; $hidden1 < $this->numberNeuronsOfHiddenLayer; $hidden1++)
+      for($hidden2 = 0; $hidden2 < $this->numberNeuronsOfHiddenLayer; $hidden2++)
+      {
+        $xposHidden1 = 100 + $this->layerDistance + $this->layerDistance * $layer - $this->layerDistance;
 
-$xposHidden2 = 100 + $this->layerDistance + $this->layerDistance * $layer;
-$yposHidden2 = $yposHiddenStart + $this->neuronDistance * $hidden2;
+        $yposHidden1 = $yposHiddenStart + $this->neuronDistance * $hidden1;
 
-imageline($this->image, $xposHidden1, $yposHidden1, $xposHidden2, $yposHidden2, $this->colorConnection);
-}
+        $xposHidden2 = 100 + $this->layerDistance + $this->layerDistance * $layer;
+
+        $yposHidden2 = $yposHiddenStart + $this->neuronDistance * $hidden2;
+
+        imageline($this->image, $xposHidden1, $yposHidden1, $xposHidden2, $yposHidden2, $this->colorConnection);
+      }
 }
 
 // ****************************************************************************
@@ -212,13 +228,14 @@ imageline($this->image, $xposHidden1, $yposHidden1, $xposHidden2, $yposHidden2, 
 
 protected function drawInputNeurons()
 {
-$yposInputStart = $this->calculateYPosStart($this->numberInputs);
+  $yposInputStart = $this->calculateYPosStart($this->numberInputs);
 
-for($idx=0; $idx < $this->numberInputs; $idx++)
-{
-imagefilledellipse($this->image, 100, $yposInputStart + $this->neuronDistance * $idx, 30, 30, $this->colorNeuronInput);
-imageellipse($this->image, 100, $yposInputStart + $this->neuronDistance * $idx, 30, 30, $this->colorNeuronBorder);
-}
+  for($idx = 0; $idx < $this->numberInputs; $idx++)
+  {
+    imagefilledellipse($this->image, 100, $yposInputStart + $this->neuronDistance * $idx, 30, 30, $this->colorNeuronInput);
+
+    imageellipse($this->image, 100, $yposInputStart + $this->neuronDistance * $idx, 30, 30, $this->colorNeuronBorder);
+  }
 }
 
 // ****************************************************************************
@@ -229,14 +246,14 @@ imageellipse($this->image, 100, $yposInputStart + $this->neuronDistance * $idx, 
 
 protected function drawHiddenNeurons()
 {
-$yposHiddenStart = $this->calculateYPosStart($this->numberNeuronsOfHiddenLayer);
+  $yposHiddenStart = $this->calculateYPosStart($this->numberNeuronsOfHiddenLayer);
 
-for($layer=0; $layer < $this->numberHiddenLayers; $layer++)
-for($neuron=0; $neuron < $this->numberNeuronsOfHiddenLayer; $neuron++)
-{
-imagefilledellipse($this->image, 100 + $this->layerDistance + $this->layerDistance *$layer, $yposHiddenStart + $this->neuronDistance * $neuron, 30, 30, $this->colorNeuronHidden);
-imageellipse($this->image, 100 + $this->layerDistance + $this->layerDistance * $layer, $yposHiddenStart + $this->neuronDistance * $neuron, 30, 30, $this->colorNeuronBorder);
-}
+  for($layer = 0; $layer < $this->numberHiddenLayers; $layer++)
+    for($neuron = 0; $neuron < $this->numberNeuronsOfHiddenLayer; $neuron++)
+    {
+      imagefilledellipse($this->image, 100 + $this->layerDistance + $this->layerDistance *$layer, $yposHiddenStart + $this->neuronDistance * $neuron, 30, 30, $this->colorNeuronHidden);
+      imageellipse($this->image, 100 + $this->layerDistance + $this->layerDistance * $layer, $yposHiddenStart + $this->neuronDistance * $neuron, 30, 30, $this->colorNeuronBorder);
+    }
 }
 
 // ****************************************************************************
@@ -247,16 +264,16 @@ imageellipse($this->image, 100 + $this->layerDistance + $this->layerDistance * $
 
 protected function drawOutputNeurons()
 {
-for($layer=0; $layer < $this->numberHiddenLayers; $layer++)
-$xpos = 100 + $this->layerDistance + $this->layerDistance * $layer;
+  for($layer = 0; $layer < $this->numberHiddenLayers; $layer++)
+    $xpos = 100 + $this->layerDistance + $this->layerDistance * $layer;
 
-$yposStart = $this->calculateYPosStart($this->numberOfOutputs);
+  $yposStart = $this->calculateYPosStart($this->numberOfOutputs);
 
-for($neuron=0; $neuron < $this->numberOfOutputs; $neuron++)
-{
-imagefilledellipse($this->image, $xpos + $this->layerDistance, $yposStart + $this->neuronDistance * $neuron, 30, 30, $this->colorNeuronOutput);
-imageellipse($this->image, $xpos + $this->layerDistance, $yposStart + $this->neuronDistance * $neuron, 30, 30, $this->colorNeuronBorder);
-}
+  for($neuron = 0; $neuron < $this->numberOfOutputs; $neuron++)
+  {
+    imagefilledellipse($this->image, $xpos + $this->layerDistance, $yposStart + $this->neuronDistance * $neuron, 30, 30, $this->colorNeuronOutput);
+    imageellipse($this->image, $xpos + $this->layerDistance, $yposStart + $this->neuronDistance * $neuron, 30, 30, $this->colorNeuronBorder);
+  }
 }
 
 // ****************************************************************************
@@ -270,33 +287,35 @@ imageellipse($this->image, $xpos + $this->layerDistance, $yposStart + $this->neu
 
 protected function createImage()
 {
-$this->image = imagecreatetruecolor($this->calculateImageWidth(), $this->calculateImageHeight());
+  $this->image = imagecreatetruecolor($this->calculateImageWidth(), $this->calculateImageHeight());
 
-$this->setColors();
+  $this->setColors();
 
-$this->setBackground();
+  $this->setBackground();
 }
 
 // ****************************************************************************
 
 protected function setColors()
 {
-$this->colorBackground = imagecolorallocate($this->image, 200, 200, 200);
+  $this->colorBackground = imagecolorallocate($this->image, 200, 200, 200);
 
-$this->colorNeuronInput = imagecolorallocate($this->image, 0, 255, 0);
-$this->colorNeuronHidden = imagecolorallocate($this->image, 255, 0, 0);
-$this->colorNeuronOutput = imagecolorallocate($this->image, 0, 0, 255);
+  $this->colorNeuronInput = imagecolorallocate($this->image, 0, 255, 0);
 
-$this->colorConnection = imagecolorallocate($this->image, 155, 255, 155);
+  $this->colorNeuronHidden = imagecolorallocate($this->image, 255, 0, 0);
 
-$this->colorNeuronBorder = imagecolorallocate($this->image, 0, 0, 0);
+  $this->colorNeuronOutput = imagecolorallocate($this->image, 0, 0, 255);
+
+  $this->colorConnection = imagecolorallocate($this->image, 155, 255, 155);
+
+  $this->colorNeuronBorder = imagecolorallocate($this->image, 0, 0, 0);
 }
 
 // ****************************************************************************
 
 protected function setBackground()
 {
-imagefill($this->image, 0, 0, $this->colorBackground);
+  imagefill($this->image, 0, 0, $this->colorBackground);
 }
 
 // ****************************************************************************
@@ -309,15 +328,15 @@ imagefill($this->image, 0, 0, $this->colorBackground);
 
 public function getImage()
 {
-ob_start();
+  ob_start();
 
-imagepng($this->image);
+  imagepng($this->image);
 
-$return = ob_get_contents();
+  $return = ob_get_contents();
 
-ob_end_clean();
+  ob_end_clean();
 
-return $return;
+  return $return;
 }
 
 // ****************************************************************************
@@ -330,9 +349,9 @@ return $return;
 
 public function printImage()
 {
-header('Content-type: image/png');
+  header('Content-type: image/png');
 
-print $this->getImage();
+  print $this->getImage();
 }
 
 // ****************************************************************************
@@ -344,11 +363,11 @@ print $this->getImage();
 
 protected function calculateYPosStart($numberNeurons)
 {
-$v1 = $this->maxNeuronsPerLayer * $this->neuronDistance / 2;
+  $v1 = $this->maxNeuronsPerLayer * $this->neuronDistance / 2;
 
-$v2 = $numberNeurons * $this->neuronDistance / 2;
+  $v2 = $numberNeurons * $this->neuronDistance / 2;
 
-return $v1 - $v2 + $this->neuronDistance;
+  return $v1 - $v2 + $this->neuronDistance;
 }
 
 // ****************************************************************************
@@ -359,7 +378,7 @@ return $v1 - $v2 + $this->neuronDistance;
 
 protected function calculateImageHeight()
 {
-return (int)($this->maxNeuronsPerLayer * $this->neuronDistance + $this->neuronDistance);
+  return (int)($this->maxNeuronsPerLayer * $this->neuronDistance + $this->neuronDistance);
 }
 
 // ****************************************************************************
@@ -370,7 +389,7 @@ return (int)($this->maxNeuronsPerLayer * $this->neuronDistance + $this->neuronDi
 
 protected function calculateImageWidth()
 {
-return (int)(($this->numberHiddenLayers + 2) * $this->layerDistance);
+  return (int)(($this->numberHiddenLayers + 2) * $this->layerDistance);
 }
 
 // ****************************************************************************
@@ -384,7 +403,7 @@ return (int)(($this->numberHiddenLayers + 2) * $this->layerDistance);
 
 public function saveToFile($filename)
 {
-file_put_contents($filename, $this->getImage());
+  file_put_contents($filename, $this->getImage());
 }
 
 // ****************************************************************************

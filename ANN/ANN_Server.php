@@ -70,13 +70,13 @@ protected $dir = '';
 
 public function __construct($dir = 'networks')
 {
-if(!is_dir($dir) && is_writable($dir))
-  throw new ANN_Exception('Directory '. $dir .' does not exists or has no writing permissions');
+  if(!is_dir($dir) && is_writable($dir))
+    throw new ANN_Exception('Directory '. $dir .' does not exists or has no writing permissions');
 
-$this->dir = $dir;
+  $this->dir = $dir;
 
-if(isset($_POST) && count($_POST))
-  $this->OnPost();
+  if(isset($_POST) && count($_POST))
+    $this->OnPost();
 }
 
 // ****************************************************************************
@@ -90,42 +90,42 @@ if(isset($_POST) && count($_POST))
 
 protected function onPost()
 {
-if(!isset($_POST['username']))
-  $_POST['username']='';
+  if(!isset($_POST['username']))
+    $_POST['username']='';
 
-if(!isset($_POST['password']))
-  $_POST['password']='';
+  if(!isset($_POST['password']))
+    $_POST['password']='';
 
-$this->login = $this->checkLogin($_POST['username'], $_POST['password']);
+  $this->login = $this->checkLogin($_POST['username'], $_POST['password']);
 
-if(!$this->login)
-  return;
+  if(!$this->login)
+    return;
 
-if(isset($_POST['mode']))
-switch($_POST['mode'])
-{
-case 'savetohost':
+  if(isset($_POST['mode']))
+    switch($_POST['mode'])
+    {
+      case 'savetohost':
 
-  $this->networkUnserialized = $_POST['network'];
+        $this->networkUnserialized = $_POST['network'];
 
-  $this->saveToHost();
+        $this->saveToHost();
 
-  break;
+        break;
 
-case 'loadfromhost':
+      case 'loadfromhost':
 
-  $this->loadFromHost();
+        $this->loadFromHost();
 
-  break;
+        break;
 
-case 'trainbyhost':
+      case 'trainbyhost':
 
-  $this->networkUnserialized = $_POST['network'];
+        $this->networkUnserialized = $_POST['network'];
 
-  $this->trainByHost();
+        $this->trainByHost();
 
-  break;
-}
+        break;
+    }
 }
 
 // ****************************************************************************
@@ -138,7 +138,7 @@ case 'trainbyhost':
 
 protected function checkLogin($username, $password)
 {
-return TRUE;
+  return TRUE;
 }
 
 // ****************************************************************************
@@ -163,7 +163,7 @@ protected function saveToHost()
 
 protected function loadFromHost()
 {
-$this->network = ANN_Network::loadFromFile($this->dir .'/'. $_POST['username'] .'.dat');
+  $this->network = ANN_Network::loadFromFile($this->dir .'/'. $_POST['username'] .'.dat');
 }
 
 // ****************************************************************************
@@ -176,23 +176,23 @@ $this->network = ANN_Network::loadFromFile($this->dir .'/'. $_POST['username'] .
 
 protected function trainByHost()
 {
-$this->saveToHost();
+  $this->saveToHost();
 
-if($this->network instanceof ANN_Network)
-{
-  $this->network->saveToFile($this->dir .'/'. $_POST['username'] .'.dat');
+  if($this->network instanceof ANN_Network)
+  {
+    $this->network->saveToFile($this->dir .'/'. $_POST['username'] .'.dat');
 
-  $this->network->train();
-}
+    $this->network->train();
+  }
 }
 
 // ****************************************************************************
 
 protected function printNetwork()
 {
-header('Content-Type: text/plain');
+  header('Content-Type: text/plain');
 
-print serialize($this->network);
+  print serialize($this->network);
 }
 
 // ****************************************************************************
@@ -203,13 +203,13 @@ print serialize($this->network);
 
 public function __destruct()
 {
-if(isset($_POST['mode']))
-switch($_POST['mode'])
-{
-case 'loadfromhost':
-case 'trainbyhost':
-  $this->printNetwork();
-}
+  if(isset($_POST['mode']))
+    switch($_POST['mode'])
+    {
+      case 'loadfromhost':
+      case 'trainbyhost':
+        $this->printNetwork();
+    }
 }
 
 // ****************************************************************************

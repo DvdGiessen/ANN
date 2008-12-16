@@ -70,12 +70,12 @@ const SEPARATOR = ';';
 
 public function setFilename($filename)
 {
-$this->filename = $filename;
+  $this->filename = $filename;
 
-$this->fileHandle = @fopen($filename, 'w+');
+  $this->fileHandle = @fopen($filename, 'w+');
 
-if(!is_resource($this->fileHandle))
-  throw new ANN_Exception('File '. basename($filename). ' cannot be created');
+  if(!is_resource($this->fileHandle))
+    throw new ANN_Exception('File '. basename($filename). ' cannot be created');
 }
 
 // ****************************************************************************
@@ -88,23 +88,23 @@ if(!is_resource($this->fileHandle))
 
 public function logData($data)
 {
-if(!$this->isHeader())
-  $this->logHeader($data);
+  if(!$this->isHeader())
+    $this->logHeader($data);
 
-$strData = implode(self::SEPARATOR, $data);
+  $strData = implode(self::SEPARATOR, $data);
 
-if(is_resource($this->fileHandle))
-  @fwrite($this->fileHandle, $strData, strlen($strData));
-  
-@fwrite($this->fileHandle, "\r\n", strlen("\r\n"));
+  if(is_resource($this->fileHandle))
+    @fwrite($this->fileHandle, $strData, strlen($strData));
+
+  @fwrite($this->fileHandle, "\r\n", strlen("\r\n"));
 }
 
 // ****************************************************************************
 
 public function __destruct()
 {
-if(is_resource($this->fileHandle))
-  @fclose($this->fileHandle);
+  if(is_resource($this->fileHandle))
+    @fclose($this->fileHandle);
 }
 
 // ****************************************************************************
@@ -115,7 +115,7 @@ if(is_resource($this->fileHandle))
 
 protected function isHeader()
 {
-return $this->header;
+  return $this->header;
 }
 
 // ****************************************************************************
@@ -126,14 +126,14 @@ return $this->header;
 
 protected function logHeader($data)
 {
-$strData = implode(self::SEPARATOR, array_keys($data));
+  $strData = implode(self::SEPARATOR, array_keys($data));
 
-if(is_resource($this->fileHandle))
-  @fwrite($this->fileHandle, $strData, strlen($strData));
+  if(is_resource($this->fileHandle))
+    @fwrite($this->fileHandle, $strData, strlen($strData));
 
-@fwrite($this->fileHandle, "\r\n", strlen("\r\n"));
+  @fwrite($this->fileHandle, "\r\n", strlen("\r\n"));
 
-$this->header = TRUE;
+  $this->header = TRUE;
 }
 
 // ****************************************************************************

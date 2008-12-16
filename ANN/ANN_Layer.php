@@ -326,29 +326,29 @@ protected function calculateDeltaByQuickProp($keyNeuron, ANN_Neuron $neuron)
 
 protected function calculateDeltaByILR($keyNeuron, ANN_Neuron $neuron)
 {
-$delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron);
+  $delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron);
 
-if($this->network->firstEpochOfTraining)
-{
-$neuron->setErrorWeightDerivative($delta);
+  if($this->network->firstEpochOfTraining)
+  {
+    $neuron->setErrorWeightDerivative($delta);
 
-return $delta * 0.5;
-}
+    return $delta * 0.5;
+  }
 
-// $delta1 = $neuron->updateErrorWeightDerivative($delta);
+  // $delta1 = $neuron->updateErrorWeightDerivative($delta);
 
-$delta1 = $neuron->getErrorWeightDerivative();
+  $delta1 = $neuron->getErrorWeightDerivative();
 
-$neuron->setErrorWeightDerivative($delta);
+  $neuron->setErrorWeightDerivative($delta);
 
-if($delta * $delta1 > 0)
-{
-  return $delta * $neuron->adjustLearningRatePlus();
-}
-else
-{
-  return $delta * $neuron->adjustLearningRateMinus();
-}
+  if($delta * $delta1 > 0)
+  {
+    return $delta * $neuron->adjustLearningRatePlus();
+  }
+  else
+  {
+    return $delta * $neuron->adjustLearningRateMinus();
+  }
 }
 
 // ****************************************************************************
@@ -372,104 +372,104 @@ else
 
 protected function calculateDeltaByRProp($keyNeuron, ANN_Neuron $neuron)
 {
-$delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron);
+  $delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron);
 
-/*
-if($this->network->firstEpochOfTraining)
-{
-$neuron->setErrorWeightDerivative($delta);
+  /*
+  if($this->network->firstEpochOfTraining)
+  {
+  $neuron->setErrorWeightDerivative($delta);
 
-return $delta;
-}
-*/
+  return $delta;
+  }
+  */
 
-$debug = TRUE;
+  $debug = TRUE;
 
-$delta1 = $neuron->getErrorWeightDerivative();
+  $delta1 = $neuron->getErrorWeightDerivative();
 
-$neuron->setErrorWeightDerivative($delta);
+  $neuron->setErrorWeightDerivative($delta);
 
-$deltaFactor = 0;
+  $deltaFactor = 0;
 
-$deltaFactor1 = $neuron->getDeltaFactor();
+  $deltaFactor1 = $neuron->getDeltaFactor();
 
-$learningRatePlus = 1.2;
-$learningRateMinus = 0.5;
+  $learningRatePlus = 1.2;
+  $learningRateMinus = 0.5;
 
-$deltaMax = 50;
-$deltaMin = 0.000001;
+  $deltaMax = 50;
+  $deltaMin = 0.000001;
 
-$delta_mul_delta1 = $delta * $delta1;
+  $delta_mul_delta1 = $delta * $delta1;
 
-if($debug)
-  print "k = $keyNeuron, D = $delta, D(t-1) = $delta1, sign() = ". ANN_Maths::sign($delta_mul_delta1) .", DF(t-1) = $deltaFactor1";
+  if($debug)
+    print "k = $keyNeuron, D = $delta, D(t-1) = $delta1, sign() = ". ANN_Maths::sign($delta_mul_delta1) .", DF(t-1) = $deltaFactor1";
 
-if($debug)
-{
-static $counter = 0;
+  if($debug)
+  {
+    static $counter = 0;
 
-$counter++;
-}
+    $counter++;
+  }
 
-// ************************************
+  // ************************************
 
-if($delta_mul_delta1 > 0)
-{
-$deltaFactor = min($deltaFactor1 * $learningRatePlus, $deltaMax);
+  if($delta_mul_delta1 > 0)
+  {
+    $deltaFactor = min($deltaFactor1 * $learningRatePlus, $deltaMax);
 
-$neuron->setDeltaFactor($deltaFactor);
+    $neuron->setDeltaFactor($deltaFactor);
 
-if($debug && $delta != 0)
-  print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)). "<br>\n";
+    if($debug && $delta != 0)
+      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)). "<br>\n";
 
-if($debug && $delta == 0)
-  print ", D(t) = 0<br>\n";
+    if($debug && $delta == 0)
+      print ", D(t) = 0<br>\n";
 
-if($debug)
-  if($counter > 1000) exit;
+    if($debug)
+      if($counter > 1000) exit;
 
-return ANN_maths::sign($delta) * abs($deltaFactor);
-}
+    return ANN_maths::sign($delta) * abs($deltaFactor);
+  }
 
-// ************************************
+  // ************************************
 
-if($delta_mul_delta1 < 0)
-{
-$deltaFactor = max($deltaFactor1 * $learningRateMinus, $deltaMin);
+  if($delta_mul_delta1 < 0)
+  {
+    $deltaFactor = max($deltaFactor1 * $learningRateMinus, $deltaMin);
 
-$neuron->setDeltaFactor($deltaFactor);
+    $neuron->setDeltaFactor($deltaFactor);
 
-if($debug && $delta != 0)
-  print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)) ."<br>\n";
+    if($debug && $delta != 0)
+      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)) ."<br>\n";
 
-if($debug && $delta == 0)
-  print ", D(t) = 0<br>\n";
+    if($debug && $delta == 0)
+      print ", D(t) = 0<br>\n";
 
-if($debug)
-  if($counter > 1000) exit;
+    if($debug)
+      if($counter > 1000) exit;
 
-return ANN_maths::sign($delta) * abs($deltaFactor);
-}
+    return ANN_maths::sign($delta) * abs($deltaFactor);
+  }
 
-// ************************************
+  // ************************************
 
-if($delta_mul_delta1 == 0)
-{
-$deltaFactor = $deltaFactor1;
+  if($delta_mul_delta1 == 0)
+  {
+    $deltaFactor = $deltaFactor1;
 
-if($debug && $delta != 0)
-  print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)). "<br>\n";
+    if($debug && $delta != 0)
+      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)). "<br>\n";
 
-if($debug && $delta == 0)
-  print ", D(t) = 0<br>\n";
+    if($debug && $delta == 0)
+      print ", D(t) = 0<br>\n";
 
-if($debug)
-  if($counter > 1000) exit;
+    if($debug)
+      if($counter > 1000) exit;
 
-return ANN_maths::sign($delta) * abs($deltaFactor);
-}
+    return ANN_maths::sign($delta) * abs($deltaFactor);
+  }
 
-// ************************************
+  // ************************************
 }
 
 // ****************************************************************************
@@ -524,29 +524,29 @@ public function calculateOutputDeltas($desiredOutputs)
 
 protected function calculateOutputDeltaByILR($desiredOutput, ANN_Neuron $neuron)
 {
-$delta = $this->calculateOutputDeltaByBackpropagation($desiredOutput, $neuron);
+  $delta = $this->calculateOutputDeltaByBackpropagation($desiredOutput, $neuron);
 
-if($this->network->firstEpochOfTraining)
-{
-$neuron->setErrorWeightDerivative($delta);
+  if($this->network->firstEpochOfTraining)
+  {
+    $neuron->setErrorWeightDerivative($delta);
 
-return $delta * 0.5;
-}
+    return $delta * 0.5;
+  }
 
-// $delta1 = $neuron->updateErrorWeightDerivative($delta);
+  // $delta1 = $neuron->updateErrorWeightDerivative($delta);
 
-$delta1 = $neuron->getErrorWeightDerivative();
+  $delta1 = $neuron->getErrorWeightDerivative();
 
-$neuron->setErrorWeightDerivative($delta);
+  $neuron->setErrorWeightDerivative($delta);
 
-if($delta * $delta1 > 0)
-{
-  return $delta * $neuron->adjustLearningRatePlus();
-}
-else
-{
-  return $delta * $neuron->adjustLearningRateMinus();
-}
+  if($delta * $delta1 > 0)
+  {
+    return $delta * $neuron->adjustLearningRatePlus();
+  }
+  else
+  {
+    return $delta * $neuron->adjustLearningRateMinus();
+  }
 }
 
 // ****************************************************************************
@@ -570,88 +570,88 @@ else
 
 protected function calculateOutputDeltaByRProp($desiredOutput, ANN_Neuron $neuron)
 {
-$delta = $this->calculateOutputDeltaByBackpropagation($desiredOutput, $neuron);
+  $delta = $this->calculateOutputDeltaByBackpropagation($desiredOutput, $neuron);
 
-if($this->network->firstEpochOfTraining)
-{
-$neuron->setErrorWeightDerivative($delta);
+  if($this->network->firstEpochOfTraining)
+  {
+    $neuron->setErrorWeightDerivative($delta);
 
-return $delta;
-}
+    return $delta;
+  }
 
-$debug = FALSE;
+  $debug = FALSE;
 
-$delta1 = $neuron->getErrorWeightDerivative();
+  $delta1 = $neuron->getErrorWeightDerivative();
 
-$neuron->setErrorWeightDerivative($delta);
+  $neuron->setErrorWeightDerivative($delta);
 
-$deltaFactor = 0;
+  $deltaFactor = 0;
 
-// $deltaFactor1 = $neuron->getDeltaFactor();
+  // $deltaFactor1 = $neuron->getDeltaFactor();
 
-$learningRatePlus = 1.2;
-$learningRateMinus = 0.5;
+  $learningRatePlus = 1.2;
+  $learningRateMinus = 0.5;
 
-$deltaMax = 50;
-$deltaMin = 0.000001;
+  $deltaMax = 50;
+  $deltaMin = 0.000001;
 
-$delta_mul_delta1 = $delta * $delta1;
+  $delta_mul_delta1 = $delta * $delta1;
 
-if($debug)
-  print "k = $keyNeuron, D = $delta, D(t-1) = $delta1, sign() = ". ANN_Maths::sign($delta_mul_delta1) .", DF(t-1) = $deltaFactor1";
+  if($debug)
+    print "k = $keyNeuron, D = $delta, D(t-1) = $delta1, sign() = ". ANN_Maths::sign($delta_mul_delta1) .", DF(t-1) = $deltaFactor1";
 
-if($debug)
-{
-static $counter = 0;
+  if($debug)
+  {
+    static $counter = 0;
 
-$counter++;
-}
+    $counter++;
+  }
 
-// ************************************
+  // ************************************
 
-if($delta_mul_delta1 > 0)
-{
-$deltaFactor = min($delta * $learningRatePlus, $deltaMax);
+  if($delta_mul_delta1 > 0)
+  {
+    $deltaFactor = min($delta * $learningRatePlus, $deltaMax);
 
-// $neuron->setDeltaFactor($deltaFactor);
+    // $neuron->setDeltaFactor($deltaFactor);
 
-if($debug && $delta != 0)
-  print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)). "<br>\n";
+    if($debug && $delta != 0)
+      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)). "<br>\n";
 
-if($debug && $delta == 0)
-  print ", D(t) = 0<br>\n";
+    if($debug && $delta == 0)
+      print ", D(t) = 0<br>\n";
 
-if($debug)
-  if($counter > 1000) exit;
+    if($debug)
+      if($counter > 1000) exit;
 
-return $deltaFactor;
-}
+    return $deltaFactor;
+  }
 
-// ************************************
+  // ************************************
 
-if($delta_mul_delta1 < 0)
-{
-$deltaFactor = max($delta * $learningRateMinus, $deltaMin);
+  if($delta_mul_delta1 < 0)
+  {
+    $deltaFactor = max($delta * $learningRateMinus, $deltaMin);
 
-// $neuron->setDeltaFactor($deltaFactor);
+    // $neuron->setDeltaFactor($deltaFactor);
 
-if($debug && $delta != 0)
-  print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)) ."<br>\n";
+    if($debug && $delta != 0)
+      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)) ."<br>\n";
 
-if($debug && $delta == 0)
-  print ", D(t) = 0<br>\n";
+    if($debug && $delta == 0)
+      print ", D(t) = 0<br>\n";
 
-if($debug)
-  if($counter > 1000) exit;
+    if($debug)
+      if($counter > 1000) exit;
 
-return $deltaFactor;
-}
+    return $deltaFactor;
+  }
 
-// ************************************
+  // ************************************
 
-return 0;
+  return 0;
 
-// ************************************
+  // ************************************
 }
 
 // ****************************************************************************

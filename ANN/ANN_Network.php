@@ -261,13 +261,13 @@ public function getOutputs()
 
     switch($this->outputType)
     {
-    case 'linear':
-      $returnOutputs[] = $this->outputLayer->getOutputs();
-      break;
+      case 'linear':
+        $returnOutputs[] = $this->outputLayer->getOutputs();
+        break;
 
-    case 'binary':
-      $returnOutputs[] = $this->outputLayer->getThresholdOutputs();
-      break;
+      case 'binary':
+        $returnOutputs[] = $this->outputLayer->getThresholdOutputs();
+        break;
     }
   }
 
@@ -293,11 +293,11 @@ public function getOutputsByInputKey($keyInput)
 
   switch($this->outputType)
   {
-  case 'linear':
-    return $this->outputLayer->getOutputs();
+    case 'linear':
+      return $this->outputLayer->getOutputs();
 
-  case 'binary':
-    return $this->outputLayer->getThresholdOutputs();
+    case 'binary':
+      return $this->outputLayer->getThresholdOutputs();
   }
 }
 
@@ -465,26 +465,27 @@ public function train()
 
 protected function getNextIndexInputsToTrain($reset = FALSE)
 {
-static $arrIndex = array();
-static $index = -1;
+  static $arrIndex = array();
 
-if($reset)
-{
-  $arrIndex = array_keys($this->inputs);
-  $index = -1;
-  
-  return;
-}
+  static $index = -1;
 
-$index++;
+  if($reset)
+  {
+    $arrIndex = array_keys($this->inputs);
+    $index = -1;
 
-if(!isset($arrIndex[$index]))
-{
-  shuffle($arrIndex);
-  $index = 0;
-}
+    return;
+  }
 
-return $arrIndex[$index];
+  $index++;
+
+  if(!isset($arrIndex[$index]))
+  {
+    shuffle($arrIndex);
+    $index = 0;
+  }
+
+  return $arrIndex[$index];
 }
 	
 // ****************************************************************************
@@ -506,18 +507,18 @@ public function getTotalLoops()
 
 protected function isEpoch()
 {
-static $countLoop = 0;
+  static $countLoop = 0;
 
-$countLoop++;
+  $countLoop++;
 
-if($countLoop >= $this->numberEpoch)
-{
-  $countLoop = 0;
+  if($countLoop >= $this->numberEpoch)
+  {
+    $countLoop = 0;
 
-  return TRUE;
-}
+    return TRUE;
+  }
 
-return FALSE;
+  return FALSE;
 }
 
 // ****************************************************************************
@@ -575,31 +576,29 @@ protected function isTrainingComplete()
 
   switch($this->outputType)
   {
-  case 'linear':
+    case 'linear':
 
-    foreach($this->outputs as $key1 => $output)
-      foreach($output as $key2 => $value)
-      {
-        $value = round($value, 2);
-      
-        $value_output = round($outputs[$key1][$key2], 2);
-      
-        if($value > $value_output + $this->outputErrorTolerance || $value < $value_output - $this->outputErrorTolerance)
-          return FALSE;
-      }
+      foreach($this->outputs as $key1 => $output)
+        foreach($output as $key2 => $value)
+        {
+          $value = round($value, 2);
 
-    return TRUE;
-  break;
+          $value_output = round($outputs[$key1][$key2], 2);
 
-  case 'binary':
+          if($value > $value_output + $this->outputErrorTolerance || $value < $value_output - $this->outputErrorTolerance)
+            return FALSE;
+        }
 
-    foreach($this->outputs as $key1 => $output)
-      foreach($output as $key2 => $value)
-        if($value != $outputs[$key1][$key2])
-          return FALSE;
+      return TRUE;
 
-    return TRUE;
-  break;
+    case 'binary':
+
+      foreach($this->outputs as $key1 => $output)
+        foreach($output as $key2 => $value)
+          if($value != $outputs[$key1][$key2])
+            return FALSE;
+
+      return TRUE;
   }
 }
 
@@ -632,29 +631,27 @@ protected function isTrainingCompleteByInputKey($keyInput)
 
   switch($this->outputType)
   {
-  case 'linear':
+    case 'linear':
 
-      foreach($this->outputs[$keyInput] as $key2 => $value)
-      {
-        $value = round($value, 2);
-        
-        $value_output = round($outputs[$key2], 2);
-      
-        if($value > $value_output + $this->outputErrorTolerance || $value < $value_output - $this->outputErrorTolerance)
-          return FALSE;
-      }
+        foreach($this->outputs[$keyInput] as $key2 => $value)
+        {
+          $value = round($value, 2);
 
-    return TRUE;
-  break;
+          $value_output = round($outputs[$key2], 2);
 
-  case 'binary':
+          if($value > $value_output + $this->outputErrorTolerance || $value < $value_output - $this->outputErrorTolerance)
+            return FALSE;
+        }
 
-      foreach($this->outputs[$keyInput] as $key2 => $value)
-        if($value != $outputs[$key2])
-          return FALSE;
+      return TRUE;
 
-    return TRUE;
-  break;
+    case 'binary':
+
+        foreach($this->outputs[$keyInput] as $key2 => $value)
+          if($value != $outputs[$key2])
+            return FALSE;
+
+      return TRUE;
   }
 }
 
@@ -727,13 +724,13 @@ protected function setOutputType($type = 'linear')
 
   switch($type)
   {
-  case 'linear':
-  case 'binary':
-    $this->outputType = $type;
-    break;
-    
-  default:
-    throw new ANN_Exception('$type must be "linear" or "binary"');
+    case 'linear':
+    case 'binary':
+      $this->outputType = $type;
+      break;
+
+    default:
+      throw new ANN_Exception('$type must be "linear" or "binary"');
   }
 }
 
@@ -766,8 +763,8 @@ public function printNetwork($level = 0)
 
   foreach($this->inputs[0] as $key => $input)
   {
-  print "<td style=\"background-color: #CCCCCC\">"
-          ."<b>Input ". ($key + 1) ."</b></td>\n";
+    print "<td style=\"background-color: #CCCCCC\">"
+            ."<b>Input ". ($key + 1) ."</b></td>\n";
   }
   
   for($i = $this->getNumberInputs()+1; $i <= $countColumns; $i++)
@@ -851,14 +848,37 @@ protected function printNetworkDetails1()
 
   switch($this->backpropagationAlgorithm)
   {
-  case self::ALGORITHM_BACKPROPAGATION : print 'Back propagation';         break;
-  case self::ALGORITHM_QUICKPROP :       print 'QuickProp';                break;
-  case self::ALGORITHM_RPROP :           print 'RProp';                    break;
-  case self::ALGORITHM_RPROPPLUS :       print 'RProp+';                   break;
-  case self::ALGORITHM_RPROPMINUS :      print 'RProp-';                   break;
-  case self::ALGORITHM_IRPROPMINUS :     print 'iRProp-';                  break;
-  case self::ALGORITHM_IRPROPPLUS :      print 'iRProp+';                  break;
-  case self::ALGORITHM_ILR :             print 'Individual learning rate'; break;
+    case self::ALGORITHM_BACKPROPAGATION :
+      print 'Back propagation';
+      break;
+      
+    case self::ALGORITHM_QUICKPROP :
+      print 'QuickProp';
+      break;
+      
+    case self::ALGORITHM_RPROP :
+      print 'RProp';
+      break;
+      
+    case self::ALGORITHM_RPROPPLUS :
+      print 'RProp+';
+      break;
+      
+    case self::ALGORITHM_RPROPMINUS :
+      print 'RProp-';
+      break;
+      
+    case self::ALGORITHM_IRPROPMINUS :
+      print 'iRProp-';
+      break;
+      
+    case self::ALGORITHM_IRPROPPLUS :
+      print 'iRProp+';
+      break;
+      
+    case self::ALGORITHM_ILR :
+      print 'Individual learning rate';
+      break;
   }
 
   print "</td>\n";
@@ -878,12 +898,12 @@ protected function printNetworkDetails1()
 
   if($this->backpropagationAlgorithm == self::ALGORITHM_BACKPROPAGATION)
   {
-  print "<tr>\n";
-  print "<td style=\"color: #DDDDDD\">Learning rate</td>\n";
-  print "<td style=\"background-color: #CCCCCC\">"
-        .$this->learningRate
-        ."</td>\n";
-  print "</tr>\n";
+    print "<tr>\n";
+    print "<td style=\"color: #DDDDDD\">Learning rate</td>\n";
+    print "<td style=\"background-color: #CCCCCC\">"
+          .$this->learningRate
+          ."</td>\n";
+    print "</tr>\n";
   }
 
   print "<tr>\n";
@@ -988,36 +1008,36 @@ protected function printNetworkDetails2()
 
   foreach($this->inputs as $keyInputs => $arrInputs)
   {
-  print "<tr>\n";
-  
-  foreach($arrInputs as $keyInput => $input)
-    $arrInputs[$keyInput] = round($input, 2);
-  
-  print "<td style=\"color: #DDDDDD\" align=\"right\">&nbsp;<b>f</b>(". implode(', ', $arrInputs) .") =&nbsp;</td>\n";
+    print "<tr>\n";
 
-  $arrOutputs = $this->getOutputsByInputKey($keyInputs);
+    foreach($arrInputs as $keyInput => $input)
+      $arrInputs[$keyInput] = round($input, 2);
 
-  foreach($arrOutputs as $keyOutput => $output)
-    $arrOutputs[$keyOutput] = round($output, 2);
+    print "<td style=\"color: #DDDDDD\" align=\"right\">&nbsp;<b>f</b>(". implode(', ', $arrInputs) .") =&nbsp;</td>\n";
 
-  $arrDesiredOutputs = $this->outputs[$keyInputs];
+    $arrOutputs = $this->getOutputsByInputKey($keyInputs);
 
-  foreach($arrDesiredOutputs as $keyDesiredOutput => $desiredOutput)
-    $arrDesiredOutputs[$keyDesiredOutput] = round($desiredOutput, 2);
+    foreach($arrOutputs as $keyOutput => $output)
+      $arrOutputs[$keyOutput] = round($output, 2);
 
-  $strOutputs = implode(',', $arrOutputs);
+    $arrDesiredOutputs = $this->outputs[$keyInputs];
 
-  $strDesiredOutputs = implode(',', $arrDesiredOutputs);
+    foreach($arrDesiredOutputs as $keyDesiredOutput => $desiredOutput)
+      $arrDesiredOutputs[$keyDesiredOutput] = round($desiredOutput, 2);
 
-  $color = ($this->isTrainingCompleteByInputKey($keyInputs)) ? '#CCFF99' : '#F0807F';
-  
-  if($this->isTrainingCompleteByInputKey($keyInputs))
-    $trained++;
+    $strOutputs = implode(',', $arrOutputs);
 
-  print "<td style=\"background-color: $color\">$strOutputs</td>\n";
+    $strDesiredOutputs = implode(',', $arrDesiredOutputs);
 
-  print "<td style=\"background-color: $color\">$strDesiredOutputs</td>\n";
-  print "</tr>\n";
+    $color = ($this->isTrainingCompleteByInputKey($keyInputs)) ? '#CCFF99' : '#F0807F';
+
+    if($this->isTrainingCompleteByInputKey($keyInputs))
+      $trained++;
+
+    print "<td style=\"background-color: $color\">$strOutputs</td>\n";
+
+    print "<td style=\"background-color: $color\">$strDesiredOutputs</td>\n";
+    print "</tr>\n";
   }
 
   $trainedPerCent = round(($trained / @count($this->outputs)) * 100, 1);
@@ -1033,9 +1053,9 @@ protected function printNetworkDetails2()
 
 protected function calculateMaxTrainingLoops()
 {
-$seconds = (int)ini_get('max_execution_time');
+  $seconds = (int)ini_get('max_execution_time');
 
-$this->maxTrainingLoops = $seconds * $this->maxTrainingLoopsFactor;
+  $this->maxTrainingLoops = $seconds * $this->maxTrainingLoopsFactor;
 }
 
 // ****************************************************************************
@@ -1091,10 +1111,10 @@ public static function loadFromFile($filename = null)
 
 public function saveToFile($filename = null)
 {
-if($filename === null)
-  $filename = self::getDefaultFilename();
+  if($filename === null)
+    $filename = self::getDefaultFilename();
 
-parent::saveToFile($filename);
+  parent::saveToFile($filename);
 }
 
 // ****************************************************************************
@@ -1105,11 +1125,11 @@ parent::saveToFile($filename);
 
 public function getNumberInputs()
 {
-if(isset($this->inputs) && is_array($this->inputs))
-  if(isset($this->inputs[0]))
-    return count($this->inputs[0]);
-    
-return 0;
+  if(isset($this->inputs) && is_array($this->inputs))
+    if(isset($this->inputs[0]))
+      return count($this->inputs[0]);
+
+  return 0;
 }
 
 // ****************************************************************************
@@ -1120,10 +1140,10 @@ return 0;
 
 public function getNumberHiddenLayers()
 {
-if(isset($this->hiddenLayers) && is_array($this->hiddenLayers))
-  return count($this->hiddenLayers);
+  if(isset($this->hiddenLayers) && is_array($this->hiddenLayers))
+    return count($this->hiddenLayers);
 
-return 0;
+  return 0;
 }
 
 // ****************************************************************************
@@ -1134,11 +1154,11 @@ return 0;
 
 public function getNumberHiddens()
 {
-if(isset($this->hiddenLayers) && is_array($this->hiddenLayers))
-  if(isset($this->hiddenLayers[0]))
-    return $this->hiddenLayers[0]->getNeuronsCount();
+  if(isset($this->hiddenLayers) && is_array($this->hiddenLayers))
+    if(isset($this->hiddenLayers[0]))
+      return $this->hiddenLayers[0]->getNeuronsCount();
 
-return 0;
+  return 0;
 }
 
 // ****************************************************************************
@@ -1149,10 +1169,10 @@ return 0;
 
 public function getNumberOutputs()
 {
-if(isset($this->outputs[0]) && is_array($this->outputs[0]))
-  return count($this->outputs[0]);
+  if(isset($this->outputs[0]) && is_array($this->outputs[0]))
+    return count($this->outputs[0]);
 
-return 0;
+  return 0;
 }
 
 // ****************************************************************************
@@ -1167,11 +1187,11 @@ return 0;
 
 public function logWeightsToFile($filename)
 {
-$this->loggingWeights = TRUE;
+  $this->loggingWeights = TRUE;
 
-$this->objLoggingWeights = new ANN_Logging;
+  $this->objLoggingWeights = new ANN_Logging;
 
-$this->objLoggingWeights->setFilename($filename);
+  $this->objLoggingWeights->setFilename($filename);
 }
 
 // ****************************************************************************
@@ -1186,11 +1206,11 @@ $this->objLoggingWeights->setFilename($filename);
 
 public function logNetworkErrorsToFile($filename)
 {
-$this->loggingNetworkErrors = TRUE;
+  $this->loggingNetworkErrors = TRUE;
 
-$this->objLoggingNetworkErrors = new ANN_Logging;
+  $this->objLoggingNetworkErrors = new ANN_Logging;
 
-$this->objLoggingNetworkErrors->setFilename($filename);
+  $this->objLoggingNetworkErrors->setFilename($filename);
 }
 
 // ****************************************************************************
@@ -1204,32 +1224,32 @@ $this->objLoggingNetworkErrors->setFilename($filename);
 
 protected function logWeights()
 {
-$arrData = array();
+  $arrData = array();
 
-$arrData['E'] = $this->getNetworkError();
+  $arrData['E'] = $this->getNetworkError();
 
-// ****** HiddenLayers ****************
+  // ****** HiddenLayers ****************
 
-foreach($this->hiddenLayers as $keyLayer => $objHiddenLayer)
-{
-$arrNeurons = $objHiddenLayer->getNeurons();
+  foreach($this->hiddenLayers as $keyLayer => $objHiddenLayer)
+  {
+    $arrNeurons = $objHiddenLayer->getNeurons();
 
-foreach($arrNeurons as $keyNeuron => $objNeuron)
-  foreach($objNeuron->getWeights() as $keyWeight => $weight)
-      $arrData["H$keyLayer-N$keyNeuron-W$keyWeight"] = round($weight, 5);
-}
+    foreach($arrNeurons as $keyNeuron => $objNeuron)
+      foreach($objNeuron->getWeights() as $keyWeight => $weight)
+          $arrData["H$keyLayer-N$keyNeuron-W$keyWeight"] = round($weight, 5);
+  }
 
-// ****** OutputLayer *****************
+  // ****** OutputLayer *****************
 
-$arrNeurons = $this->outputLayer->getNeurons();
+  $arrNeurons = $this->outputLayer->getNeurons();
 
-foreach($arrNeurons as $keyNeuron => $objNeuron)
-  foreach($objNeuron->getWeights() as $keyWeight => $weight)
-      $arrData["O-N$keyNeuron-W$keyWeight"] = round($weight, 5);
+  foreach($arrNeurons as $keyNeuron => $objNeuron)
+    foreach($objNeuron->getWeights() as $keyWeight => $weight)
+        $arrData["O-N$keyNeuron-W$keyWeight"] = round($weight, 5);
 
-// ************************************
+  // ************************************
 
-$this->objLoggingWeights->logData($arrData);
+  $this->objLoggingWeights->logData($arrData);
 }
 
 // ****************************************************************************
@@ -1241,12 +1261,13 @@ $this->objLoggingWeights->logData($arrData);
 
 protected function logNetworkErrors()
 {
-$arrData = array();
+  $arrData = array();
 
-$arrData['network error'] = $this->getNetworkError();
-$arrData['learning rate'] = $this->learningRate;
+  $arrData['network error'] = $this->getNetworkError();
 
-$this->objLoggingNetworkErrors->logData($arrData);
+  $arrData['learning rate'] = $this->learningRate;
+
+  $this->objLoggingNetworkErrors->logData($arrData);
 }
 
 // ****************************************************************************
@@ -1259,15 +1280,15 @@ $this->objLoggingNetworkErrors->logData($arrData);
 
 protected function getNetworkError()
 {
-$error = 0;
+  $error = 0;
 
-$arrOutputs = $this->getOutputs();
+  $arrOutputs = $this->getOutputs();
 
-foreach($this->outputs as $keyOutputs => $outputs)
-  foreach($outputs as $keyOutput => $output)
-    $error += pow($arrOutputs[$keyOutputs][$keyOutput] - $output, 2);
+  foreach($this->outputs as $keyOutputs => $outputs)
+    foreach($outputs as $keyOutput => $output)
+      $error += pow($arrOutputs[$keyOutputs][$keyOutput] - $output, 2);
 
-return $error / 2;
+  return $error / 2;
 }
 
 // ****************************************************************************
@@ -1282,28 +1303,28 @@ return $error / 2;
 
 public function trainByHost($username, $password, $host)
 {
-if(!extension_loaded('curl'))
-  throw new ANN_Exception('Curl extension is not installed or active on this system');
+  if(!extension_loaded('curl'))
+    throw new ANN_Exception('Curl extension is not installed or active on this system');
 
-$ch = curl_init();
+  $ch = curl_init();
 
-settype($username, 'string');
-settype($password, 'string');
-settype($host, 'string');
+  settype($username, 'string');
+  settype($password, 'string');
+  settype($host, 'string');
 
-curl_setopt($ch, CURLOPT_URL, $host);
-curl_setopt($ch, CURLOPT_POST, TRUE);
-curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=trainbyhost&username=$username&password=$password&network=". serialize($this));
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_URL, $host);
+  curl_setopt($ch, CURLOPT_POST, TRUE);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=trainbyhost&username=$username&password=$password&network=". serialize($this));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-$result = curl_exec($ch);
+  $result = curl_exec($ch);
 
-curl_close($ch);
+  curl_close($ch);
 
-$network = @unserialize($result);
+  $network = @unserialize($result);
 
-if($network instanceof ANN_Network)
-  return $network;
+  if($network instanceof ANN_Network)
+    return $network;
 }
 
 // ****************************************************************************
@@ -1317,22 +1338,22 @@ if($network instanceof ANN_Network)
 
 public function saveToHost($username, $password, $host)
 {
-if(!extension_loaded('curl'))
-  throw new ANN_Exception('Curl extension is not installed or active on this system');
+  if(!extension_loaded('curl'))
+    throw new ANN_Exception('Curl extension is not installed or active on this system');
 
-$ch = curl_init();
+  $ch = curl_init();
 
-settype($username, 'string');
-settype($password, 'string');
-settype($host, 'string');
+  settype($username, 'string');
+  settype($password, 'string');
+  settype($host, 'string');
 
-curl_setopt($ch, CURLOPT_URL, $host);
-curl_setopt($ch, CURLOPT_POST, TRUE);
-curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=savetohost&username=$username&password=$password&network=". serialize($this));
+  curl_setopt($ch, CURLOPT_URL, $host);
+  curl_setopt($ch, CURLOPT_POST, TRUE);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=savetohost&username=$username&password=$password&network=". serialize($this));
 
-curl_exec($ch);
+  curl_exec($ch);
 
-curl_close($ch);
+  curl_close($ch);
 }
 
 // ****************************************************************************
@@ -1347,28 +1368,28 @@ curl_close($ch);
 
 public static function loadFromHost($username, $password, $host)
 {
-if(!extension_loaded('curl'))
-  throw new ANN_Exception('Curl extension is not installed or active on this system');
+  if(!extension_loaded('curl'))
+    throw new ANN_Exception('Curl extension is not installed or active on this system');
 
-$ch = curl_init();
+  $ch = curl_init();
 
-settype($username, 'string');
-settype($password, 'string');
-settype($host, 'string');
+  settype($username, 'string');
+  settype($password, 'string');
+  settype($host, 'string');
 
-curl_setopt($ch, CURLOPT_URL, $host);
-curl_setopt($ch, CURLOPT_POST, TRUE);
-curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=loadfromhost&username=$username&password=$password");
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_URL, $host);
+  curl_setopt($ch, CURLOPT_POST, TRUE);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=loadfromhost&username=$username&password=$password");
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-$result = curl_exec($ch);
+  $result = curl_exec($ch);
 
-curl_close($ch);
+  curl_close($ch);
 
-$network = unserialize(trim($result));
+  $network = unserialize(trim($result));
 
-if($network instanceof ANN_Network)
-  return $network;
+  if($network instanceof ANN_Network)
+    return $network;
 }
 
 // ****************************************************************************
@@ -1379,15 +1400,16 @@ if($network instanceof ANN_Network)
 
 protected function detectOutputType()
 {
-foreach($this->outputs as $arrOutputs)
-  foreach($arrOutputs as $output)
-    if($output < 1 && $output > 0)
-    {
-      $this->setOutputType('linear');
-      return;
-    }
-  
-$this->setOutputType('binary');
+  foreach($this->outputs as $arrOutputs)
+    foreach($arrOutputs as $output)
+      if($output < 1 && $output > 0)
+      {
+        $this->setOutputType('linear');
+
+        return;
+      }
+
+  $this->setOutputType('binary');
 }
 
 // ****************************************************************************
@@ -1407,27 +1429,27 @@ $this->setOutputType('binary');
 
 protected function adjustLearningRate()
 {
-if(!$this->dynamicLearningRate)
-  return;
+  if(!$this->dynamicLearningRate)
+    return;
 
-$this->networkErrorCurrent = $this->getNetworkError();
+  $this->networkErrorCurrent = $this->getNetworkError();
 
-if($this->networkErrorCurrent >= $this->networkErrorPrevious)
-{
-$this->learningRate *= 1.01;
+  if($this->networkErrorCurrent >= $this->networkErrorPrevious)
+  {
+    $this->learningRate *= 1.01;
 
-if($this->learningRate > 0.9)
-  $this->learningRate = 0.5;
-}
-else
-{
-$this->learningRate *= 0.99;
+    if($this->learningRate > 0.9)
+      $this->learningRate = 0.5;
+  }
+  else
+  {
+    $this->learningRate *= 0.99;
 
-if($this->learningRate < 0.5)
-  $this->learningRate = 0.5;
-}
+    if($this->learningRate < 0.5)
+      $this->learningRate = 0.5;
+  }
 
-$this->networkErrorPrevious = $this->networkErrorCurrent;
+  $this->networkErrorPrevious = $this->networkErrorCurrent;
 }
 
 // ****************************************************************************
@@ -1440,10 +1462,10 @@ $this->networkErrorPrevious = $this->networkErrorCurrent;
 
 public function setDynamicLearningRate($dynamicLearningRate = TRUE)
 {
-if(!is_bool($dynamicLearningRate))
-  throw new ANN_Exception('$dynamicLearningRate must be boolean');
+  if(!is_bool($dynamicLearningRate))
+    throw new ANN_Exception('$dynamicLearningRate must be boolean');
 
-$this->dynamicLearningRate = $dynamicLearningRate;
+  $this->dynamicLearningRate = $dynamicLearningRate;
 }
 
 // ****************************************************************************
@@ -1456,10 +1478,10 @@ $this->dynamicLearningRate = $dynamicLearningRate;
 
 public function setWeightDecayMode($weightDecayMode = TRUE)
 {
-if(!is_bool($weightDecayMode))
-  throw new ANN_Exception('$weightDecayMode must be boolean');
+  if(!is_bool($weightDecayMode))
+    throw new ANN_Exception('$weightDecayMode must be boolean');
 
-$this->weightDecayMode = $weightDecayMode;
+  $this->weightDecayMode = $weightDecayMode;
 }
 
 // ****************************************************************************
@@ -1472,12 +1494,12 @@ $this->weightDecayMode = $weightDecayMode;
 
 public function setWeightDecay($weightDecay = 0.05)
 {
-if($weightDecay < 0.03 || $weightDecay > 0.05)
-  throw new ANN_Exception('$weightDecay must be between 0.03 and 0.05');
+  if($weightDecay < 0.03 || $weightDecay > 0.05)
+    throw new ANN_Exception('$weightDecay must be between 0.03 and 0.05');
 
-$this->weightDecay = $weightDecay;
+  $this->weightDecay = $weightDecay;
 
-$this->weightDecayMode = TRUE;
+  $this->weightDecayMode = TRUE;
 }
 
 // ****************************************************************************
@@ -1494,24 +1516,24 @@ $this->weightDecayMode = TRUE;
 
 public function setBackpropagationAlgorithm($algorithm = self::ALGORITHM_BACKPROPAGATION)
 {
-if(!is_int($algorithm))
-  throw new ANN_Exception('$algorithm must be integer');
+  if(!is_int($algorithm))
+    throw new ANN_Exception('$algorithm must be integer');
 
-$this->backpropagationAlgorithm = $algorithm;
+  $this->backpropagationAlgorithm = $algorithm;
 
-switch($algorithm)
-{
-case self::ALGORITHM_RPROP:
-case self::ALGORITHM_RPROPMINUS:
-case self::ALGORITHM_RPROPPLUS:
-case self::ALGORITHM_IRPROPMINUS:
-case self::ALGORITHM_IRPROPPLUS:
-case self::ALGORITHM_ILR:
+  switch($algorithm)
+  {
+    case self::ALGORITHM_RPROP:
+    case self::ALGORITHM_RPROPMINUS:
+    case self::ALGORITHM_RPROPPLUS:
+    case self::ALGORITHM_IRPROPMINUS:
+    case self::ALGORITHM_IRPROPPLUS:
+    case self::ALGORITHM_ILR:
 
-$this->dynamicLearningRate = FALSE;
+      $this->dynamicLearningRate = FALSE;
 
-break;
-}
+      break;
+  }
 }
 
 // ****************************************************************************
@@ -1528,12 +1550,12 @@ break;
 
 public function setQuickPropMaxWeightChangeFactor($quickPropMaxWeightChangeFactor = 2.25)
 {
-if($quickPropMaxWeightChangeFactor < 1.75 || $quickPropMaxWeightChangeFactor > 2.25)
-  throw new ANN_Exception('$quickPropMaxWeightChangeFactor must be between 1.75 and 2.25');
+  if($quickPropMaxWeightChangeFactor < 1.75 || $quickPropMaxWeightChangeFactor > 2.25)
+    throw new ANN_Exception('$quickPropMaxWeightChangeFactor must be between 1.75 and 2.25');
 
-$this->quickPropMaxWeightChangeFactor = $quickPropMaxWeightChangeFactor;
+  $this->quickPropMaxWeightChangeFactor = $quickPropMaxWeightChangeFactor;
 
-$this->backpropagationAlorigthm = self::QUICKPROP;
+  $this->backpropagationAlorigthm = self::QUICKPROP;
 }
 
 // ****************************************************************************
@@ -1546,10 +1568,10 @@ $this->backpropagationAlorigthm = self::QUICKPROP;
 
 public function setOutputErrorTolerance($outputErrorTolerance = 0.02)
 {
-if($outputErrorTolerance < 0 || $outputErrorTolerance > 0.1)
-  throw new ANN_Exception('$outputErrorTolerance must be between 0 and 0.1');
+  if($outputErrorTolerance < 0 || $outputErrorTolerance > 0.1)
+    throw new ANN_Exception('$outputErrorTolerance must be between 0 and 0.1');
 
-$this->outputErrorTolerance = $outputErrorTolerance;
+  $this->outputErrorTolerance = $outputErrorTolerance;
 }
 
 // ****************************************************************************

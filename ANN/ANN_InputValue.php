@@ -87,7 +87,9 @@ public function __construct($min, $max, $override = FALSE)
     throw new ANN_Exception('Constraints: $override should be boolean');
 
   $this->min = $min;
+  
   $this->max = $max;
+  
   $this->override = $override;
 }
 

@@ -155,7 +155,8 @@ public static function random($min = 0, $max = 10)
 
 public static function sign($value)
 {
-  if($value >= 0) return 1;
+  if($value >= 0)
+    return 1;
 
   return -1;
 }
@@ -169,8 +170,11 @@ public static function sign($value)
 
 public static function linearSaturated($x)
 {
-  if($x < -1) return -1;
-  if($x > 1) return 1;
+  if($x < -1)
+    return -1;
+    
+  if($x > 1)
+    return 1;
 
   return $x;
 }
@@ -185,8 +189,11 @@ public static function linearSaturated($x)
 
 public static function linearSaturated01($x)
 {
-  if($x < -1) $x = -1;
-  if($x > 1)  $x = 1;
+  if($x < -1)
+    $x = -1;
+    
+  if($x > 1)
+    $x = 1;
 
   return ($x + 1) / 2;
 }
