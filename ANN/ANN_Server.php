@@ -91,10 +91,10 @@ public function __construct($dir = 'networks')
 protected function onPost()
 {
   if(!isset($_POST['username']))
-    $_POST['username']='';
+    $_POST['username'] = '';
 
   if(!isset($_POST['password']))
-    $_POST['password']='';
+    $_POST['password'] = '';
 
   $this->login = $this->checkLogin($_POST['username'], $_POST['password']);
 
