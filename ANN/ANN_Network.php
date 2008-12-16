@@ -90,6 +90,7 @@ protected $dynamicLearningRate = FALSE;
 protected $networkActivated = FALSE;
 protected $trainingCompleteArray = array();
 protected $numberOfNeuronsPerLayer = 0;
+protected $outputErrorTolerance = 0.02;
 private $networkErrorCurrent = 10;
 private $networkErrorPrevious = 10;
 public $momentum = 0.95;
@@ -412,7 +413,11 @@ public function train()
     throw new ANN_Exception('No Outputs defined. Use ANN_Network::setOutputs().');
 
   if($this->isTrainingComplete())
-    return 0;
+  {
+    $this->trained = TRUE;
+    
+    return $this->trained;
+  }
 
   $starttime = date('U');
   
@@ -584,8 +589,14 @@ protected function isTrainingComplete()
 
     foreach($this->outputs as $key1 => $output)
       foreach($output as $key2 => $value)
-        if(round($value, 2) != round($outputs[$key1][$key2], 2))
+      {
+        $value = round($value, 2);
+      
+        $value_output = round($outputs[$key1][$key2], 2);
+      
+        if($value > $value_output + $this->outputErrorTolerance || $value < $value_output - $this->outputErrorTolerance)
           return FALSE;
+      }
 
     return TRUE;
   break;
@@ -634,8 +645,14 @@ protected function isTrainingCompleteByInputKey($keyInput)
   case 'linear':
 
       foreach($this->outputs[$keyInput] as $key2 => $value)
-        if(round($value, 2) != round($outputs[$key2], 2))
+      {
+        $value = round($value, 2);
+        
+        $value_output = round($outputs[$key2], 2);
+      
+        if($value > $value_output + $this->outputErrorTolerance || $value < $value_output - $this->outputErrorTolerance)
           return FALSE;
+      }
 
     return TRUE;
   break;
@@ -894,6 +911,13 @@ protected function printNetworkDetails1()
   print "</tr>\n";
 
   print "<tr>\n";
+  print "<td style=\"color: #DDDDDD\">Output error tolerance</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">+/- "
+        .$this->outputErrorTolerance
+        ."</td>\n";
+  print "</tr>\n";
+
+  print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Total loops</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .number_format($this->totalLoops, 0, '.', ',')
@@ -955,6 +979,7 @@ protected function printNetworkDetails1()
 
 /**
  * @uses getOutputsByInputKey()
+ * @uses isTrainingCompleteByInputKey()
  */
 
 protected function printNetworkDetails2()
@@ -978,7 +1003,7 @@ protected function printNetworkDetails2()
   foreach($arrInputs as $keyInput => $input)
     $arrInputs[$keyInput] = round($input, 2);
   
-  print "<td style=\"color: #DDDDDD\" align=\"right\">&nbsp;f(". implode(',', $arrInputs) .") =&nbsp;</td>\n";
+  print "<td style=\"color: #DDDDDD\" align=\"right\">&nbsp;<b>f</b>(". implode(', ', $arrInputs) .") =&nbsp;</td>\n";
 
   $arrOutputs = $this->getOutputsByInputKey($keyInputs);
 
@@ -994,9 +1019,9 @@ protected function printNetworkDetails2()
 
   $strDesiredOutputs = implode(',', $arrDesiredOutputs);
 
-  $color = ($strOutputs == $strDesiredOutputs) ? '#CCFF99' : '#F0807F';
+  $color = ($this->isTrainingCompleteByInputKey($keyInputs)) ? '#CCFF99' : '#F0807F';
   
-  if($strOutputs == $strDesiredOutputs)
+  if($this->isTrainingCompleteByInputKey($keyInputs))
     $trained++;
 
   print "<td style=\"background-color: $color\">$strOutputs</td>\n";
@@ -1502,7 +1527,7 @@ break;
 // ****************************************************************************
 
 /**
- * Parameter setting for QiuckProp algorithm
+ * Parameter setting for QuickProp algorithm
  *
  * EXPERIMENTAL
  *
@@ -1519,6 +1544,22 @@ if($quickPropMaxWeightChangeFactor < 1.75 || $quickPropMaxWeightChangeFactor > 2
 $this->quickPropMaxWeightChangeFactor = $quickPropMaxWeightChangeFactor;
 
 $this->backpropagationAlorigthm = self::QUICKPROP;
+}
+
+// ****************************************************************************
+
+/**
+ * Setting the percentage of output error in comparison to the desired output
+ *
+ * @param float $outputErrorTolerance (Default: 0.02)
+ */
+
+public function setOutputErrorTolerance($outputErrorTolerance = 0.02)
+{
+if($outputErrorTolerance < 0 || $outputErrorTolerance > 0.1)
+  throw new ANN_Exception('$outputErrorTolerance must be between 0 and 0.1');
+
+$this->outputErrorTolerance = $outputErrorTolerance;
 }
 
 // ****************************************************************************
