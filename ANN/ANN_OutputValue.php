@@ -52,100 +52,100 @@ final class ANN_OutputValue extends ANN_Filesystem
  * @ignore
  */
 
-protected $min;
-protected $max;
-protected $override = FALSE;
+protected $floatMin;
+protected $floatMax;
+protected $boolOverride = FALSE;
 
 /**#@-*/
 
 // ****************************************************************************
 
 /**
- * @param float $min
- * @param float $max
- * @param boolean $override (Default: FALSE)
+ * @param float $floatMin
+ * @param float $floatMax
+ * @param boolean $boolOverride (Default: FALSE)
  * @throws ANN_Exception
  *
- * If $override is FALSE, an exception will be thrown if getOutputValue() will
- * be called with outranged values. If $override is TRUE, no exception will be
- * thrown in this case, but lower values are replaced by $min and upper values
- * are replaced by $max.
+ * If $boolOverride is FALSE, an exception will be thrown if getOutputValue() will
+ * be called with outranged values. If $boolOverride is TRUE, no exception will be
+ * thrown in this case, but lower values are replaced by $floatMin and upper values
+ * are replaced by $floatMax.
  */
 
-public function __construct($min, $max, $override = FALSE)
+public function __construct($floatMin, $floatMax, $boolOverride = FALSE)
 {
-  if(!is_float($min) && !is_integer($min))
-    throw new ANN_Exception('Constraints: $min must be a float number');
+  if(!is_float($floatMin) && !is_integer($floatMin))
+    throw new ANN_Exception('Constraints: $floatMin must be a float number');
 
-  if(!is_float($max) && !is_integer($max))
-    throw new ANN_Exception('Constraints: $min must be a float number');
+  if(!is_float($floatMax) && !is_integer($floatMax))
+    throw new ANN_Exception('Constraints: $floatMin must be a float number');
 
-  if($min > $max)
-    throw new ANN_Exception('Constraints: $min should be lower than $max');
+  if($floatMin > $floatMax)
+    throw new ANN_Exception('Constraints: $floatMin should be lower than $floatMax');
 
-  if(!is_bool($override))
-    throw new ANN_Exception('Constraints: $override must be boolean');
+  if(!is_bool($boolOverride))
+    throw new ANN_Exception('Constraints: $boolOverride must be boolean');
 
-  $this->min = $min;
+  $this->floatMin = $floatMin;
   
-  $this->max = $max;
+  $this->floatMax = $floatMax;
   
-  $this->override = $override;
+  $this->boolOverride = $boolOverride;
 }
 
 // ****************************************************************************
 
 /**
- * @param float $value
+ * @param float $floatValue
  * @return float (0..1)
  * @uses calculateOutputValue()
  * @throws ANN_Exception
  */
 
-public function getOutputValue($value)
+public function getOutputValue($floatValue)
 {
-  if(!$this->override && $value < $this->min)
-    throw new ANN_Exception('Constraints: $value should be between '. $this->min .' and '. $this->max);
+  if(!$this->boolOverride && $floatValue < $this->floatMin)
+    throw new ANN_Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
 
-  if(!$this->override && $value > $this->max)
-    throw new ANN_Exception('Constraints: $value should be between '. $this->min .' and '. $this->max);
+  if(!$this->boolOverride && $floatValue > $this->floatMax)
+    throw new ANN_Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
 
-  if($this->override && $value < $this->min)
-    $value = $this->min;
+  if($this->boolOverride && $floatValue < $this->floatMin)
+    $floatValue = $this->floatMin;
 
-  if($this->override && $value > $this->max)
-    $value = $this->max;
+  if($this->boolOverride && $floatValue > $this->floatMax)
+    $floatValue = $this->floatMax;
 
-  if($value >= $this->min && $value <= $this->max)
-    return $this->calculateOutputValue($value);
+  if($floatValue >= $this->floatMin && $floatValue <= $this->floatMax)
+    return $this->calculateOutputValue($floatValue);
 }
 
 // ****************************************************************************
 
 /**
- * @param float $value (0..1)
+ * @param float $floatValue (0..1)
  * @return float
  * @throws ANN_Exception
  */
 
-public function getRealOutputValue($value)
+public function getRealOutputValue($floatValue)
 {
-  if($value < 0 || $value > 1)
-    throw new ANN_Exception('Constraints: $value should be between 0 and 1');
+  if($floatValue < 0 || $floatValue > 1)
+    throw new ANN_Exception('Constraints: $floatValue should be between 0 and 1');
 
-  return $value * ($this->max - $this->min) + $this->min;
+  return $floatValue * ($this->floatMax - $this->floatMin) + $this->floatMin;
 }
 
 // ****************************************************************************
 
 /**
- * @param float $value
+ * @param float $floatValue
  * @return float
  */
 
-protected function calculateOutputValue($value)
+protected function calculateOutputValue($floatValue)
 {
-  return ($value - $this->min) / ($this->max - $this->min);
+  return ($floatValue - $this->floatMin) / ($this->floatMax - $this->floatMin);
 }
 
 // ****************************************************************************

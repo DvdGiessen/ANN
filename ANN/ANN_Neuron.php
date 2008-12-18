@@ -55,67 +55,67 @@ final class ANN_Neuron
  * @ignore
  */
  
-protected $inputs = null;
-protected $weights = null;
-protected $output = null;
-protected $delta = 0;
-protected $network = null;
-protected $deltaFactor = 0.1;
+protected $arrInputs = null;
+protected $arrWeights = null;
+protected $arrOutput = null;
+protected $floatDelta = 0;
+protected $objNetwork = null;
+protected $floatDeltaFactor = 0.1;
 protected $errorWeightDerivative = 0;
-protected $learningRate = 0;
+protected $floatLearningRate = 0;
 
 /**#@-*/
 
 // ****************************************************************************
 
 /**
- * @param ANN_Network $network
+ * @param ANN_Network $objNetwork
  */
 
-public function __construct(ANN_Network $network)
+public function __construct(ANN_Network $objNetwork)
 {
-  $this->network = $network;
+  $this->objNetwork = $objNetwork;
   
-  $this->learningRate = ANN_Maths::random(400, 600) / 1000;
+  $this->floatLearningRate = ANN_Maths::random(400, 600) / 1000;
 }
 
 // ****************************************************************************
 
 /**
- * @param array $inputs
+ * @param array $arrInputs
  * @uses initialiseWeights()
  */
 
-public function setInputs($inputs)
+public function setInputs($arrInputs)
 {
-	$inputs[] = 1; // bias
+	$arrInputs[] = 1; // bias
 		
-	$this->inputs = $inputs;
+	$this->arrInputs = $arrInputs;
 
-	if(!$this->weights)
+	if(!$this->arrWeights)
 		$this->initialiseWeights();
 }
 	
 // ****************************************************************************
 
 /**
- * @param array $output
+ * @param array $arrOutput
  */
 
-protected function setOutput($output)
+protected function setOutput($arrOutput)
 {
-  $this->output = $output;
+  $this->arrOutput = $arrOutput;
 }
 	
 // ****************************************************************************
 
 /**
- * @param float $delta
+ * @param float $floatDelta
  */
 
-public function setDelta($delta)
+public function setDelta($floatDelta)
 {
-	$this->delta = round($delta, ANN_Maths::PRECISION);
+	$this->floatDelta = round($floatDelta, ANN_Maths::PRECISION);
 }
 	
 // ****************************************************************************
@@ -126,7 +126,7 @@ public function setDelta($delta)
 
 protected function getInputs()
 {
-	return $this->inputs;
+	return $this->arrInputs;
 }
 	
 // ****************************************************************************
@@ -137,19 +137,19 @@ protected function getInputs()
 
 public function getWeights()
 {
-	return $this->weights;
+	return $this->arrWeights;
 }
 
 // ****************************************************************************
 
 /**
- * @param integer $keyNeuron
+ * @param integer $intKeyNeuron
  * @return float
  */
 
-public function getWeight($keyNeuron)
+public function getWeight($intKeyNeuron)
 {
-	return $this->weights[$keyNeuron];
+	return $this->arrWeights[$intKeyNeuron];
 }
 
 // ****************************************************************************
@@ -160,7 +160,7 @@ public function getWeight($keyNeuron)
 
 public function getOutput()
 {
-	return $this->output;
+	return $this->arrOutput;
 }
 
 // ****************************************************************************
@@ -171,7 +171,7 @@ public function getOutput()
 
 public function getDeltaWithMomentum()
 {
-	return $this->network->momentum * $this->delta;
+	return $this->objNetwork->floatMomentum * $this->floatDelta;
 }
 
 // ****************************************************************************
@@ -182,7 +182,7 @@ public function getDeltaWithMomentum()
 
 public function getDelta()
 {
-	return $this->delta;
+	return $this->floatDelta;
 }
 
 // ****************************************************************************
@@ -193,8 +193,8 @@ public function getDelta()
 
 protected function initialiseWeights()
 {
-	foreach ($this->inputs as $k => $input)
-		$this->weights[$k] = ANN_Maths::random(-500, 500) / 1000;
+	foreach ($this->arrInputs as $intKey => $floatInput)
+		$this->arrWeights[$intKey] = ANN_Maths::random(-500, 500) / 1000;
 }
 	
 // ****************************************************************************
@@ -208,13 +208,13 @@ protected function initialiseWeights()
 
 public function activate()
 {
-	$sum = 0;
+	$floatSum = 0;
 		
-	foreach ($this->inputs as $k => $input)
-		$sum += $input * $this->weights[$k];
+	foreach ($this->arrInputs as $intKey => $floatInput)
+		$floatSum += $floatInput * $this->arrWeights[$intKey];
 
 //  $this->setOutput(ANN_tanh_1_2($sum));
-  $this->setOutput(ANN_Maths::sigmoid($sum));
+  $this->setOutput(ANN_Maths::sigmoid($floatSum));
 //  $this->setOutput(ANN_Maths::tangensHyperbolicus01($sum));
 //  $this->setOutput(ANN_Maths::linearSaturated01($sum));
 }
@@ -223,19 +223,19 @@ public function activate()
 
 public function adjustWeights()
 {
-	foreach ($this->weights as $k => $weight)
-		$this->weights[$k] += round($this->inputs[$k] * $this->delta, ANN_Maths::PRECISION);
+	foreach ($this->arrWeights as $intKey => $floatWeight)
+		$this->arrWeights[$intKey] += round($this->arrInputs[$intKey] * $this->floatDelta, ANN_Maths::PRECISION);
 }
 
 // ****************************************************************************
 
 /**
- * @param float $deltaFactor
+ * @param float $floatDeltaFactor
  */
 
-public function setDeltaFactor($deltaFactor)
+public function setDeltaFactor($floatDeltaFactor)
 {
-  $this->deltaFactor = $deltaFactor;
+  $this->floatDeltaFactor = $floatDeltaFactor;
 }
 
 // ****************************************************************************
@@ -246,7 +246,7 @@ public function setDeltaFactor($deltaFactor)
 
 public function getDeltaFactor()
 {
-  return $this->deltaFactor;
+  return $this->floatDeltaFactor;
 }
 
 // ****************************************************************************
@@ -258,8 +258,6 @@ public function getDeltaFactor()
 
 public function updateErrorWeightDerivative($errorWeightDerivative)
 {
-  $return = $this->errorWeightDerivative;
-  
   $this->errorWeightDerivative = $errorWeightDerivative;
   
   return $this->errorWeightDerivative;
@@ -295,12 +293,12 @@ public function getErrorWeightDerivative()
 
 public function adjustLearningRatePlus()
 {
-  $learningRate = $this->learningRate + 0.02;
+  $floatLearningRate = $this->floatLearningRate + 0.02;
   
-  if($learningRate < 0.6)
-    $this->learningRate = $learningRate;
+  if($floatLearningRate < 0.6)
+    $this->floatLearningRate = $floatLearningRate;
 
-  return $this->learningRate;
+  return $this->floatLearningRate;
 }
 
 // ****************************************************************************
@@ -311,12 +309,12 @@ public function adjustLearningRatePlus()
 
 public function adjustLearningRateMinus()
 {
-  $learningRate = $this->learningRate - 0.02;
+  $floatLearningRate = $this->floatLearningRate - 0.02;
 
-  if($learningRate > 0.4)
-    $this->learningRate = $learningRate;
+  if($floatLearningRate > 0.4)
+    $this->floatLearningRate = $floatLearningRate;
 
-  return $this->learningRate;
+  return $this->floatLearningRate;
 }
 
 // ****************************************************************************
@@ -327,7 +325,7 @@ public function adjustLearningRateMinus()
 
 public function getLearningRate()
 {
-  return $this->learningRate;
+  return $this->floatLearningRate;
 }
 
 // ****************************************************************************

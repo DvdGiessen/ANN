@@ -55,42 +55,43 @@ final class ANN_Layer
  * @ignore
  */
 
-protected $neurons = array();
-protected $outputs = array();
-protected $network = null;
-protected $nextLayer = null;
+protected $arrNeurons   = array();
+protected $arrOutputs   = array();
+protected $arrInputs    = array();
+protected $objNetwork   = null;
+protected $objNextLayer = null;
 
 /**#@-*/
 
 // ****************************************************************************
 
 /**
- * @param ANN_Network $network
- * @param integer $numberOfNeurons
- * @param ANN_Layer $nextLayer (Default: null)
+ * @param ANN_Network $objNetwork
+ * @param integer $intNumberOfNeurons
+ * @param ANN_Layer $objNextLayer (Default: null)
  * @uses createNeurons()
  */
 
-public function __construct(ANN_Network $network, $numberOfNeurons, ANN_Layer $nextLayer = null)
+public function __construct(ANN_Network $objNetwork, $intNumberOfNeurons, ANN_Layer $objNextLayer = null)
 {
-  $this->network = $network;
+  $this->objNetwork = $objNetwork;
 
-  $this->nextLayer = $nextLayer;
+  $this->objNextLayer = $objNextLayer;
 
-  $this->createNeurons($numberOfNeurons);
+  $this->createNeurons($intNumberOfNeurons);
 }
 	
 // ****************************************************************************
 
 /**
- * @param array $inputs
+ * @param array $arrInputs
  * @uses ANN_Neuron::setInputs()
  */
 
-public function setInputs($inputs)
+public function setInputs($arrInputs)
 {
-	foreach ($this->neurons as $neuron)
-		$neuron->setInputs($inputs);
+	foreach ($this->arrNeurons as $objNeuron)
+		$objNeuron->setInputs($arrInputs);
 }
 	
 // ****************************************************************************
@@ -101,7 +102,7 @@ public function setInputs($inputs)
 
 public function getNeurons()
 {
-	return $this->neurons;
+	return $this->arrNeurons;
 }
 
 // ****************************************************************************
@@ -112,7 +113,7 @@ public function getNeurons()
 
 public function getNeuronsCount()
 {
-	return count($this->neurons);
+	return count($this->arrNeurons);
 }
 
 // ****************************************************************************
@@ -123,7 +124,7 @@ public function getNeuronsCount()
 
 protected function getInputs()
 {
-	return $this->inputs;
+	return $this->arrInputs;
 }
 	
 // ****************************************************************************
@@ -134,7 +135,7 @@ protected function getInputs()
 
 public function getOutputs()
 {
-	return $this->outputs;
+	return $this->arrOutputs;
 }
 
 // ****************************************************************************
@@ -146,26 +147,25 @@ public function getOutputs()
 
 public function getThresholdOutputs()
 {
-  $return_outputs = array();
+  $arrReturnOutputs = array();
 
-  foreach($this->outputs as $key => $output)
-    $return_outputs[$key] = ANN_Maths::threshold($output);
+  foreach($this->arrOutputs as $intKey => $floatOutput)
+    $arrReturnOutputs[$intKey] = ANN_Maths::threshold($floatOutput);
   
-  return $return_outputs;
+  return $arrReturnOutputs;
 }
 
 // ****************************************************************************
 
 /**
- * @param integer $numberOfNeurons
- * @param boolean $outputLayer  (Default:  FALSE)
+ * @param integer $intNumberOfNeurons
  * @uses ANN_Neuron::__construct()
  */
 
-protected function createNeurons($numberOfNeurons)
+protected function createNeurons($intNumberOfNeurons)
 {
-	for ($i = 0; $i < $numberOfNeurons; $i++)
-		$this->neurons[] = new ANN_Neuron($this->network);
+	for ($intIndex = 0; $intIndex < $intNumberOfNeurons; $intIndex++)
+		$this->arrNeurons[] = new ANN_Neuron($this->objNetwork);
 }
 	
 // ****************************************************************************
@@ -177,11 +177,11 @@ protected function createNeurons($numberOfNeurons)
 
 public function activate()
 {
-	foreach ($this->neurons as $k => $neuron)
+	foreach ($this->arrNeurons as $intKey => $objNeuron)
   {
-		$neuron->activate();
+		$objNeuron->activate();
 
-  	$this->outputs[$k] = $neuron->getOutput();
+  	$this->arrOutputs[$intKey] = $objNeuron->getOutput();
 	}
 }
 	
@@ -198,45 +198,45 @@ public function activate()
 
 public function calculateHiddenDeltas()
 {
-	$delta = 0;
+	$floatDelta = 0;
 
-	foreach ($this->neurons as $keyNeuron => $neuron)
+	foreach ($this->arrNeurons as $intKeyNeuron => $objNeuron)
   {
-    switch($this->network->backpropagationAlgorithm)
+    switch($this->objNetwork->intBackpropagationAlgorithm)
     {
-    case ANN_Network::ALGORITHM_BACKPROPAGATION:
-      $delta = $this->calculateDeltaByBackpropagation($keyNeuron);
+      case ANN_Network::ALGORITHM_BACKPROPAGATION:
+        $floatDelta = $this->calculateDeltaByBackpropagation($intKeyNeuron);
 
-      if($this->network->weightDecayMode)
-        $delta -= $neuron->getDeltaWithMomentum() * $this->network->weightDecay;
+        if($this->objNetwork->boolWeightDecayMode)
+          $floatDelta -= $objNeuron->getDeltaWithMomentum() * $this->objNetwork->floatWeightDecay;
 
-      $delta *= $this->network->learningRate;
-      break;
+        $floatDelta *= $this->objNetwork->floatLearningRate;
+        break;
 
-    case ANN_Network::ALGORITHM_ILR:
-      $delta = $this->calculateDeltaByILR($keyNeuron, $neuron);
+      case ANN_Network::ALGORITHM_ILR:
+        $floatDelta = $this->calculateDeltaByILR($intKeyNeuron, $objNeuron);
 
-      if($this->network->weightDecayMode)
-        $delta -= $neuron->getDeltaWithMomentum() * $this->network->weightDecay;
-      break;
+        if($this->objNetwork->boolWeightDecayMode)
+          $floatDelta -= $objNeuron->getDeltaWithMomentum() * $this->objNetwork->floatWeightDecay;
+        break;
 
-    case ANN_Network::ALGORITHM_QUICKPROP:
-      $delta = $this->calculateDeltaByQuickProp($keyNeuron, $neuron);
-      break;
+      case ANN_Network::ALGORITHM_QUICKPROP:
+        $floatDelta = $this->calculateDeltaByQuickProp($intKeyNeuron, $objNeuron);
+        break;
 
-    case ANN_Network::ALGORITHM_RPROP:
-      $delta = $this->calculateDeltaByRProp($keyNeuron, $neuron);
-      break;
+      case ANN_Network::ALGORITHM_RPROP:
+        $floatDelta = $this->calculateDeltaByRProp($intKeyNeuron, $objNeuron);
+        break;
     }
 
-		$neuron->setDelta($delta);
+		$objNeuron->setDelta($floatDelta);
 	}
 }
 	
 // ****************************************************************************
 
 /**
- * @param integer $keyNeuron
+ * @param integer $intKeyNeuron
  * @return float
  * @uses ANN_Neuron::getOutput()
  * @uses ANN_Neuron::getDeltaWithMomentum()
@@ -244,18 +244,18 @@ public function calculateHiddenDeltas()
  * @uses ANN_Layer::getNeurons()
  */
 
-protected function calculateDeltaByBackpropagation($keyNeuron)
+protected function calculateDeltaByBackpropagation($intKeyNeuron)
 {
-	$neuronsNextLayer = $this->nextLayer->getNeurons();
+	$arrNeuronsNextLayer = $this->objNextLayer->getNeurons();
 
-  $sum = 0;
+  $floatSum = 0;
 
-	foreach ($neuronsNextLayer as $neuronNextLayer)
-    $sum += $neuronNextLayer->getWeight($keyNeuron) * $neuronNextLayer->getDeltaWithMomentum();
+	foreach ($arrNeuronsNextLayer as $objNeuronNextLayer)
+    $floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDeltaWithMomentum();
 
-  $output = $this->neurons[$keyNeuron]->getOutput();
+  $floatOutput = $this->arrNeurons[$intKeyNeuron]->getOutput();
 
-  return $output * (1 - $output) * $sum;
+  return $floatOutput * (1 - $floatOutput) * $floatSum;
 }
 
 // ****************************************************************************
@@ -265,46 +265,46 @@ protected function calculateDeltaByBackpropagation($keyNeuron)
  *
  * EXPERIMENTAL
  *
- * @param integer $keyNeuron
- * @param ANN_Neuron $neuron
+ * @param integer $intKeyNeuron
+ * @param ANN_Neuron $objNeuron
  * @return float
  * @uses calculateDeltaByBackpropagation()
  * @uses ANN_Neuron::getDeltaWithMomentum()
  */
 
-protected function calculateDeltaByQuickProp($keyNeuron, ANN_Neuron $neuron)
+protected function calculateDeltaByQuickProp($intKeyNeuron, ANN_Neuron $objNeuron)
 {
- if($this->network->firstLoopOfTraining)
-    return $this->calculateDeltaByBackpropagation($keyNeuron, $neuron, $nextLayer);
+ if($this->objNetwork->boolFirstLoopOfTraining)
+    return $this->calculateDeltaByBackpropagation($intKeyNeuron, $objNeuron, $objNextLayer);
 
-  $deltaPrevious = $neuron->getDeltaWithMomentum();
+  $floatDeltaPrevious = $objNeuron->getDeltaWithMomentum();
 
-  if(($deltaPrevious - $delta) != 0)
+  if(($floatDeltaPrevious - $floatDelta) != 0)
   {
-    if(($deltaPrevious > 0 && $delta > 0) || ($deltaPrevious < 0 && $delta < 0))
+    if(($floatDeltaPrevious > 0 && $floatDelta > 0) || ($floatDeltaPrevious < 0 && $floatDelta < 0))
     {
-      $quickPropDelta = ($delta / ($deltaPrevious - $delta)) * $deltaPrevious;
+      $floatQuickPropDelta = ($floatDelta / ($floatDeltaPrevious - $floatDelta)) * $floatDeltaPrevious;
     }
     else
     {
-      return $delta;
+      return $floatDelta;
     }
 
-    $maxDelta = $this->network->quickPropMaxWeightChangeFactor * $deltaPrevious;
+    $floatMaxDelta = $this->objNetwork->floatQuickPropMaxWeightChangeFactor * $floatDeltaPrevious;
 
-    if($quickPropDelta > $maxDelta)
-      $quickPropDelta = $maxDelta;
+    if($floatQuickPropDelta > $floatMaxDelta)
+      $floatQuickPropDelta = $floatMaxDelta;
 
-    if($quickPropDelta < $delta)
-      return $delta;
+    if($floatQuickPropDelta < $floatDelta)
+      return $floatDelta;
 
-    if(is_nan($quickPropDelta))
-      return $delta;
+    if(is_nan($floatQuickPropDelta))
+      return $floatDelta;
 
-    return $quickPropDelta;
+    return $floatQuickPropDelta;
   }
 
-  return $delta;
+  return $floatDelta;
 }
 
 // ****************************************************************************
@@ -314,8 +314,8 @@ protected function calculateDeltaByQuickProp($keyNeuron, ANN_Neuron $neuron)
  *
  * EXPERIMENTAL
  *
- * @param integer $keyNeuron
- * @param ANN_Neuron $neuron
+ * @param integer $intKeyNeuron
+ * @param ANN_Neuron $objNeuron
  * @return float
  * @uses calculateDeltaByBackpropagation()
  * @uses ANN_Neuron::adjustLearningRateMinus()
@@ -324,30 +324,30 @@ protected function calculateDeltaByQuickProp($keyNeuron, ANN_Neuron $neuron)
  * @uses ANN_Neuron::getErrorWeightDerivative()
  */
 
-protected function calculateDeltaByILR($keyNeuron, ANN_Neuron $neuron)
+protected function calculateDeltaByILR($intKeyNeuron, ANN_Neuron $objNeuron)
 {
-  $delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron);
+  $floatDelta = $this->calculateDeltaByBackpropagation($intKeyNeuron, $objNeuron);
 
-  if($this->network->firstEpochOfTraining)
+  if($this->objNetwork->boolFirstEpochOfTraining)
   {
-    $neuron->setErrorWeightDerivative($delta);
+    $objNeuron->setErrorWeightDerivative($floatDelta);
 
-    return $delta * 0.5;
+    return $floatDelta * 0.5;
   }
 
-  // $delta1 = $neuron->updateErrorWeightDerivative($delta);
+  // $floatDelta1 = $objNeuron->updateErrorWeightDerivative($floatDelta);
 
-  $delta1 = $neuron->getErrorWeightDerivative();
+  $floatDelta1 = $objNeuron->getErrorWeightDerivative();
 
-  $neuron->setErrorWeightDerivative($delta);
+  $objNeuron->setErrorWeightDerivative($floatDelta);
 
-  if($delta * $delta1 > 0)
+  if($floatDelta * $floatDelta1 > 0)
   {
-    return $delta * $neuron->adjustLearningRatePlus();
+    return $floatDelta * $objNeuron->adjustLearningRatePlus();
   }
   else
   {
-    return $delta * $neuron->adjustLearningRateMinus();
+    return $floatDelta * $objNeuron->adjustLearningRateMinus();
   }
 }
 
@@ -358,8 +358,8 @@ protected function calculateDeltaByILR($keyNeuron, ANN_Neuron $neuron)
  *
  * EXPERIMENTAL
  *
- * @param integer $keyNeuron
- * @param ANN_Neuron $neuron
+ * @param integer $intKeyNeuron
+ * @param ANN_Neuron $objNeuron
  * @return float
  * @uses ANN_Maths::sign()
  * @uses calculateDeltaByBackpropagation()
@@ -370,39 +370,39 @@ protected function calculateDeltaByILR($keyNeuron, ANN_Neuron $neuron)
  * @uses ANN_Neuron::setErrorWeightDerivative()
  */
 
-protected function calculateDeltaByRProp($keyNeuron, ANN_Neuron $neuron)
+protected function calculateDeltaByRProp($intKeyNeuron, ANN_Neuron $objNeuron)
 {
-  $delta = $this->calculateDeltaByBackpropagation($keyNeuron, $neuron);
+  $floatDelta = $this->calculateDeltaByBackpropagation($intKeyNeuron, $objNeuron);
 
   /*
-  if($this->network->firstEpochOfTraining)
+  if($this->objNetwork->boolFirstEpochOfTraining)
   {
-  $neuron->setErrorWeightDerivative($delta);
+    $objNeuron->setErrorWeightDerivative($floatDelta);
 
-  return $delta;
+    return $floatDelta;
   }
   */
 
   $debug = TRUE;
 
-  $delta1 = $neuron->getErrorWeightDerivative();
+  $floatDelta1 = $objNeuron->getErrorWeightDerivative();
 
-  $neuron->setErrorWeightDerivative($delta);
+  $objNeuron->setErrorWeightDerivative($floatDelta);
 
-  $deltaFactor = 0;
+  $floatDeltaFactor = 0;
 
-  $deltaFactor1 = $neuron->getDeltaFactor();
+  $floatDeltaFactor1 = $objNeuron->getDeltaFactor();
 
   $learningRatePlus = 1.2;
   $learningRateMinus = 0.5;
 
-  $deltaMax = 50;
-  $deltaMin = 0.000001;
+  $floatDeltaMax = 50;
+  $floatDeltaMin = 0.000001;
 
-  $delta_mul_delta1 = $delta * $delta1;
+  $floatDelta_mul_delta1 = $floatDelta * $floatDelta1;
 
   if($debug)
-    print "k = $keyNeuron, D = $delta, D(t-1) = $delta1, sign() = ". ANN_Maths::sign($delta_mul_delta1) .", DF(t-1) = $deltaFactor1";
+    print "k = $intKeyNeuron, D = $floatDelta, D(t-1) = $floatDelta1, sign() = ". ANN_Maths::sign($floatDelta_mul_delta1) .", DF(t-1) = $floatDeltaFactor1";
 
   if($debug)
   {
@@ -413,60 +413,63 @@ protected function calculateDeltaByRProp($keyNeuron, ANN_Neuron $neuron)
 
   // ************************************
 
-  if($delta_mul_delta1 > 0)
+  if($floatDelta_mul_delta1 > 0)
   {
-    $deltaFactor = min($deltaFactor1 * $learningRatePlus, $deltaMax);
+    $floatDeltaFactor = min($floatDeltaFactor1 * $learningRatePlus, $floatDeltaMax);
 
-    $neuron->setDeltaFactor($deltaFactor);
+    $objNeuron->setDeltaFactor($floatDeltaFactor);
 
-    if($debug && $delta != 0)
-      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)). "<br>\n";
+    if($debug && $floatDelta != 0)
+      print ", D(t) = ". (ANN_maths::sign($floatDelta) * abs($floatDeltaFactor)). "<br>\n";
 
-    if($debug && $delta == 0)
+    if($debug && $floatDelta == 0)
       print ", D(t) = 0<br>\n";
 
     if($debug)
-      if($counter > 1000) exit;
+      if($counter > 1000)
+        exit;
 
-    return ANN_maths::sign($delta) * abs($deltaFactor);
+    return ANN_maths::sign($floatDelta) * abs($floatDeltaFactor);
   }
 
   // ************************************
 
-  if($delta_mul_delta1 < 0)
+  if($floatDelta_mul_delta1 < 0)
   {
-    $deltaFactor = max($deltaFactor1 * $learningRateMinus, $deltaMin);
+    $floatDeltaFactor = max($floatDeltaFactor1 * $learningRateMinus, $floatDeltaMin);
 
-    $neuron->setDeltaFactor($deltaFactor);
+    $objNeuron->setDeltaFactor($floatDeltaFactor);
 
-    if($debug && $delta != 0)
-      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)) ."<br>\n";
+    if($debug && $floatDelta != 0)
+      print ", D(t) = ". (ANN_maths::sign($floatDelta) * abs($floatDeltaFactor)) ."<br>\n";
 
-    if($debug && $delta == 0)
+    if($debug && $floatDelta == 0)
       print ", D(t) = 0<br>\n";
 
     if($debug)
-      if($counter > 1000) exit;
+      if($counter > 1000)
+        exit;
 
-    return ANN_maths::sign($delta) * abs($deltaFactor);
+    return ANN_maths::sign($floatDelta) * abs($floatDeltaFactor);
   }
 
   // ************************************
 
-  if($delta_mul_delta1 == 0)
+  if($floatDelta_mul_delta1 == 0)
   {
-    $deltaFactor = $deltaFactor1;
+    $floatDeltaFactor = $floatDeltaFactor1;
 
-    if($debug && $delta != 0)
-      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)). "<br>\n";
+    if($debug && $floatDelta != 0)
+      print ", D(t) = ". (ANN_maths::sign($floatDelta) * abs($floatDeltaFactor)). "<br>\n";
 
-    if($debug && $delta == 0)
+    if($debug && $floatDelta == 0)
       print ", D(t) = 0<br>\n";
 
     if($debug)
-      if($counter > 1000) exit;
+      if($counter > 1000)
+        exit;
 
-    return ANN_maths::sign($delta) * abs($deltaFactor);
+    return ANN_maths::sign($floatDelta) * abs($floatDeltaFactor);
   }
 
   // ************************************
@@ -475,7 +478,7 @@ protected function calculateDeltaByRProp($keyNeuron, ANN_Neuron $neuron)
 // ****************************************************************************
 
 /**
- * @param array $desiredOutputs
+ * @param array $arrDesiredOutputs
  * @uses calculateOutputDeltaByBackpropagation()
  * @uses calculateOutputDeltaByRProp()
  * @uses calculateOutputDeltaByILR()
@@ -483,38 +486,41 @@ protected function calculateDeltaByRProp($keyNeuron, ANN_Neuron $neuron)
  * @uses ANN_Neuron::setDelta()
  */
 
-public function calculateOutputDeltas($desiredOutputs)
+public function calculateOutputDeltas($arrDesiredOutputs)
 {
-	foreach ($this->neurons as $keyNeuron => $neuron)
+	foreach ($this->arrNeurons as $intKeyNeuron => $objNeuron)
   {
-    switch($this->network->backpropagationAlgorithm)
+    switch($this->objNetwork->intBackpropagationAlgorithm)
     {
-    case ANN_Network::ALGORITHM_BACKPROPAGATION:
-      $delta = $this->calculateOutputDeltaByBackpropagation($desiredOutputs[$keyNeuron], $neuron);
-      break;
+      case ANN_Network::ALGORITHM_BACKPROPAGATION:
+        $floatDelta = $this->calculateOutputDeltaByBackpropagation($arrDesiredOutputs[$intKeyNeuron], $objNeuron);
+        break;
 
-    case ANN_Network::ALGORITHM_ILR:
-      $delta = $this->calculateOutputDeltaByILR($desiredOutputs[$keyNeuron], $neuron);
-      break;
+      case ANN_Network::ALGORITHM_ILR:
+        $floatDelta = $this->calculateOutputDeltaByILR($arrDesiredOutputs[$intKeyNeuron], $objNeuron);
+        break;
 
-    case ANN_Network::ALGORITHM_RPROP:
-      $delta = $this->calculateOutputDeltaByRProp($desiredOutputs[$keyNeuron], $neuron);
-      break;
+      case ANN_Network::ALGORITHM_RPROP:
+        $floatDelta = $this->calculateOutputDeltaByRProp($arrDesiredOutputs[$intKeyNeuron], $objNeuron);
+        break;
 
-    case ANN_Network::ALGORITHM_QUICKPROP:
-      $delta = $this->calculateOutputDeltaByQuickProp($desiredOutputs[$keyNeuron], $neuron);
-      break;
+      case ANN_Network::ALGORITHM_QUICKPROP:
+        $floatDelta = $this->calculateOutputDeltaByQuickProp($arrDesiredOutputs[$intKeyNeuron], $objNeuron);
+        break;
+        
+      default:
+        $floatDelta = 0;
     }
 
-	  $neuron->setDelta($delta);
+	  $objNeuron->setDelta($floatDelta);
 	}
 }
 	
 // ****************************************************************************
 
 /**
- * @param float $desiredOutput
- * @param ANN_Neuron $neuron
+ * @param float $floatDesiredOutput
+ * @param ANN_Neuron $objNeuron
  * @return float
  * @uses calculateOutputDeltaByBackpropagation()
  * @uses ANN_Neuron::adjustLearningRateMinus()
@@ -522,30 +528,30 @@ public function calculateOutputDeltas($desiredOutputs)
  * @uses ANN_Neuron::updateErrorWeightDerivative()
  */
 
-protected function calculateOutputDeltaByILR($desiredOutput, ANN_Neuron $neuron)
+protected function calculateOutputDeltaByILR($floatDesiredOutput, ANN_Neuron $objNeuron)
 {
-  $delta = $this->calculateOutputDeltaByBackpropagation($desiredOutput, $neuron);
+  $floatDelta = $this->calculateOutputDeltaByBackpropagation($floatDesiredOutput, $objNeuron);
 
-  if($this->network->firstEpochOfTraining)
+  if($this->objNetwork->boolFirstEpochOfTraining)
   {
-    $neuron->setErrorWeightDerivative($delta);
+    $objNeuron->setErrorWeightDerivative($floatDelta);
 
-    return $delta * 0.5;
+    return $floatDelta * 0.5;
   }
 
-  // $delta1 = $neuron->updateErrorWeightDerivative($delta);
+  // $floatDelta1 = $objNeuron->updateErrorWeightDerivative($floatDelta);
 
-  $delta1 = $neuron->getErrorWeightDerivative();
+  $floatDelta1 = $objNeuron->getErrorWeightDerivative();
 
-  $neuron->setErrorWeightDerivative($delta);
+  $objNeuron->setErrorWeightDerivative($floatDelta);
 
-  if($delta * $delta1 > 0)
+  if($floatDelta * $floatDelta1 > 0)
   {
-    return $delta * $neuron->adjustLearningRatePlus();
+    return $floatDelta * $objNeuron->adjustLearningRatePlus();
   }
   else
   {
-    return $delta * $neuron->adjustLearningRateMinus();
+    return $floatDelta * $objNeuron->adjustLearningRateMinus();
   }
 }
 
@@ -556,8 +562,8 @@ protected function calculateOutputDeltaByILR($desiredOutput, ANN_Neuron $neuron)
  *
  * EXPERIMENTAL
  *
- * @param float $desiredOutput
- * @param ANN_Neuron $neuron
+ * @param float $floatDesiredOutput
+ * @param ANN_Neuron $objNeuron
  * @return float
  * @uses ANN_Maths::sign()
  * @uses calculateOutputDeltaByBackpropagation()
@@ -568,37 +574,37 @@ protected function calculateOutputDeltaByILR($desiredOutput, ANN_Neuron $neuron)
  * @uses ANN_Neuron::setErrorWeightDerivative()
  */
 
-protected function calculateOutputDeltaByRProp($desiredOutput, ANN_Neuron $neuron)
+protected function calculateOutputDeltaByRProp($floatDesiredOutput, ANN_Neuron $objNeuron)
 {
-  $delta = $this->calculateOutputDeltaByBackpropagation($desiredOutput, $neuron);
+  $floatDelta = $this->calculateOutputDeltaByBackpropagation($floatDesiredOutput, $objNeuron);
 
-  if($this->network->firstEpochOfTraining)
+  if($this->objNetwork->boolFirstEpochOfTraining)
   {
-    $neuron->setErrorWeightDerivative($delta);
+    $objNeuron->setErrorWeightDerivative($floatDelta);
 
-    return $delta;
+    return $floatDelta;
   }
 
   $debug = FALSE;
 
-  $delta1 = $neuron->getErrorWeightDerivative();
+  $floatDelta1 = $objNeuron->getErrorWeightDerivative();
 
-  $neuron->setErrorWeightDerivative($delta);
+  $objNeuron->setErrorWeightDerivative($floatDelta);
 
-  $deltaFactor = 0;
+  $floatDeltaFactor = 0;
 
-  // $deltaFactor1 = $neuron->getDeltaFactor();
+  // $floatDeltaFactor1 = $objNeuron->getDeltaFactor();
 
   $learningRatePlus = 1.2;
   $learningRateMinus = 0.5;
 
-  $deltaMax = 50;
-  $deltaMin = 0.000001;
+  $floatDeltaMax = 50;
+  $floatDeltaMin = 0.000001;
 
-  $delta_mul_delta1 = $delta * $delta1;
+  $floatDelta_mul_delta1 = $floatDelta * $floatDelta1;
 
   if($debug)
-    print "k = $keyNeuron, D = $delta, D(t-1) = $delta1, sign() = ". ANN_Maths::sign($delta_mul_delta1) .", DF(t-1) = $deltaFactor1";
+    print "k = $intKeyNeuron, D = $floatDelta, D(t-1) = $floatDelta1, sign() = ". ANN_Maths::sign($floatDelta_mul_delta1) .", DF(t-1) = $floatDeltaFactor1";
 
   if($debug)
   {
@@ -609,42 +615,44 @@ protected function calculateOutputDeltaByRProp($desiredOutput, ANN_Neuron $neuro
 
   // ************************************
 
-  if($delta_mul_delta1 > 0)
+  if($floatDelta_mul_delta1 > 0)
   {
-    $deltaFactor = min($delta * $learningRatePlus, $deltaMax);
+    $floatDeltaFactor = min($floatDelta * $learningRatePlus, $floatDeltaMax);
 
-    // $neuron->setDeltaFactor($deltaFactor);
+    // $objNeuron->setDeltaFactor($floatDeltaFactor);
 
-    if($debug && $delta != 0)
-      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)). "<br>\n";
+    if($debug && $floatDelta != 0)
+      print ", D(t) = ". (ANN_maths::sign($floatDelta) * abs($floatDeltaFactor)). "<br>\n";
 
-    if($debug && $delta == 0)
+    if($debug && $floatDelta == 0)
       print ", D(t) = 0<br>\n";
 
     if($debug)
-      if($counter > 1000) exit;
+      if($counter > 1000)
+        exit;
 
-    return $deltaFactor;
+    return $floatDeltaFactor;
   }
 
   // ************************************
 
-  if($delta_mul_delta1 < 0)
+  if($floatDelta_mul_delta1 < 0)
   {
-    $deltaFactor = max($delta * $learningRateMinus, $deltaMin);
+    $floatDeltaFactor = max($floatDelta * $learningRateMinus, $floatDeltaMin);
 
-    // $neuron->setDeltaFactor($deltaFactor);
+    // $objNeuron->setDeltaFactor($floatDeltaFactor);
 
-    if($debug && $delta != 0)
-      print ", D(t) = ". (ANN_maths::sign($delta) * abs($deltaFactor)) ."<br>\n";
+    if($debug && $floatDelta != 0)
+      print ", D(t) = ". (ANN_maths::sign($floatDelta) * abs($floatDeltaFactor)) ."<br>\n";
 
-    if($debug && $delta == 0)
+    if($debug && $floatDelta == 0)
       print ", D(t) = 0<br>\n";
 
     if($debug)
-      if($counter > 1000) exit;
+      if($counter > 1000)
+        exit;
 
-    return $deltaFactor;
+    return $floatDeltaFactor;
   }
 
   // ************************************
@@ -657,22 +665,22 @@ protected function calculateOutputDeltaByRProp($desiredOutput, ANN_Neuron $neuro
 // ****************************************************************************
 
 /**
- * @param float $desiredOutput
+ * @param float $floatDesiredOutput
  * @uses ANN_Neuron::getOutput()
  * @uses ANN_Neuron::setDelta()
  * @uses ANN_Neuron::getDeltaWithMomentum()
  */
 
-protected function calculateOutputDeltaByBackpropagation($desiredOutput, ANN_Neuron $neuron)
+protected function calculateOutputDeltaByBackpropagation($floatDesiredOutput, ANN_Neuron $objNeuron)
 {
-  $output = $neuron->getOutput();
+  $output = $objNeuron->getOutput();
 
-	$delta = $output * ($desiredOutput - $output) * (1 - $output);
+	$floatDelta = $output * ($floatDesiredOutput - $output) * (1 - $output);
 
-  if($this->network->weightDecayMode)
-    $delta -= $neuron->getDeltaWithMomentum() * $this->network->weightDecay;
+  if($this->objNetwork->boolWeightDecayMode)
+    $floatDelta -= $objNeuron->getDeltaWithMomentum() * $this->objNetwork->floatWeightDecay;
 
-  return $delta;
+  return $floatDelta;
 }
 
 // ****************************************************************************
@@ -682,15 +690,15 @@ protected function calculateOutputDeltaByBackpropagation($desiredOutput, ANN_Neu
  *
  * EXPERIMENTAL
  *
- * @param float $desiredOutput
- * @param ANN_Neuron $neuron
+ * @param float $floatDesiredOutput
+ * @param ANN_Neuron $objNeuron
  * @return float
  * @uses calculateOutputDeltaByBackpropagation()
  */
 
-protected function calculateOutputDeltaByQuickProp($desiredOutput, ANN_Neuron $neuron)
+protected function calculateOutputDeltaByQuickProp($floatDesiredOutput, ANN_Neuron $objNeuron)
 {
-  return $this->calculateOutputDeltaByBackpropagation($desiredOutput, $neuron);
+  return $this->calculateOutputDeltaByBackpropagation($floatDesiredOutput, $objNeuron);
 }
 
 // ****************************************************************************
@@ -701,8 +709,8 @@ protected function calculateOutputDeltaByQuickProp($desiredOutput, ANN_Neuron $n
 
 public function adjustWeights()
 {
-	foreach ($this->neurons as $neuron)
-		$neuron->adjustWeights();
+	foreach ($this->arrNeurons as $objNeuron)
+		$objNeuron->adjustWeights();
 }
 
 // ****************************************************************************

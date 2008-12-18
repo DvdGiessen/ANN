@@ -55,42 +55,41 @@ class ANN_Network extends ANN_Filesystem
  * @ignore
  */
  
-protected $outputLayer = array();
-protected $hiddenLayers = array();
-protected $inputs = null;
-protected $outputs = null;
-protected $countHiddenLayers = null;
-protected $outputType = 'binary'; // binary or linear
-protected $totalLoops = 0;
-protected $totalTrainings = 0;
-protected $totalActivations = 0;
-protected $totalActivationsRequests = 0;
-protected $numberOfHiddenLayers = null;
-protected $numberOfHiddenLayersDec = null; // decremented value
-protected $maxTrainingLoops;
-protected $maxTrainingLoopsFactor = 230;
-protected $numberEpoch = 0;
-protected $loggingWeights = FALSE;
-protected $loggingNetworkErrors = FALSE;
-protected $trained = FALSE;
-protected $trainingTime = 0; // Seconds
+protected $objOutputLayer = null;
+protected $arrHiddenLayers = array();
+protected $arrInputs = null;
+protected $arrOutputs = null;
+protected $strOutputType = 'binary'; // binary or linear
+protected $intTotalLoops = 0;
+protected $intTotalTrainings = 0;
+protected $intTotalActivations = 0;
+protected $intTotalActivationsRequests = 0;
+protected $intNumberOfArrayHiddenLayers = null;
+protected $intNumberOfArrayHiddenLayersDec = null; // decremented value
+protected $intMaxTrainingLoops;
+protected $intMaxTrainingLoopsFactor = 230;
+protected $intNumberEpoch = 0;
+protected $boolLoggingWeights = FALSE;
+protected $boolLoggingNetworkErrors = FALSE;
+protected $boolTrained = FALSE;
+protected $intTrainingTime = 0; // Seconds
 protected $objLoggingWeights = null;
 protected $objLoggingNetworkErrors = null;
-protected $dynamicLearningRate = FALSE;
-protected $networkActivated = FALSE;
-protected $trainingCompleteArray = array();
-protected $numberOfNeuronsPerLayer = 0;
-protected $outputErrorTolerance = 0.02;
-private $networkErrorCurrent = 10;
-private $networkErrorPrevious = 10;
-public $momentum = 0.95;
-public $learningRate = 0.5;
-public $weightDecayMode = FALSE;
-public $weightDecay = 0.05;
-public $firstLoopOfTraining = TRUE;
-public $firstEpochOfTraining = TRUE;
-public $quickPropMaxWeightChangeFactor = 0;
-public $backpropagationAlgorithm = self::ALGORITHM_BACKPROPAGATION;
+protected $boolDynamicLearningRate = FALSE;
+protected $boolNetworkActivated = FALSE;
+protected $arrTrainingComplete = array();
+protected $intNumberOfNeuronsPerLayer = 0;
+protected $floatOutputErrorTolerance = 0.02;
+private $floatNetworkErrorCurrent = 10;
+private $floatNetworkErrorPrevious = 10;
+public $floatMomentum = 0.95;
+public $floatLearningRate = 0.5;
+public $boolWeightDecayMode = FALSE;
+public $floatWeightDecay = 0.05;
+public $boolFirstLoopOfTraining = TRUE;
+public $boolFirstEpochOfTraining = TRUE;
+public $floatQuickPropMaxWeightChangeFactor = 0;
+public $intBackpropagationAlgorithm = self::ALGORITHM_BACKPROPAGATION;
 
 /**#@-*/
 
@@ -146,9 +145,9 @@ const ALGORITHM_ILR = 8;
 // ****************************************************************************
 
 /**
- * @param integer $numberOfHiddenLayers (Default: 1)
- * @param integer $numberOfNeuronsPerLayer  (Default: 10)
- * @param integer $numberOfOutputs  (Default: 1)
+ * @param integer $intNumberOfArrayHiddenLayers (Default: 1)
+ * @param integer $intNumberOfNeuronsPerLayer  (Default: 10)
+ * @param integer $intNumberOfArrayOutputs  (Default: 1)
  * @uses ANN_Exception::__construct()
  * @uses calculateMaxTrainingLoops()
  * @uses createHiddenLayers()
@@ -156,26 +155,26 @@ const ALGORITHM_ILR = 8;
  * @throws ANN_Exception
  */
 
-public function __construct($numberOfHiddenLayers = 2, $numberOfNeuronsPerLayer = 4, $numberOfOutputs = 1)
+public function __construct($intNumberOfArrayHiddenLayers = 2, $intNumberOfNeuronsPerLayer = 4, $intNumberOfArrayOutputs = 1)
 {
-  if(!is_integer($numberOfHiddenLayers) && $numberOfHiddenLayers < 2)
-    throw new ANN_Exception('Constraints: $numberOfHiddenLayers must be a positiv integer >= 2');
+  if(!is_integer($intNumberOfArrayHiddenLayers) && $intNumberOfArrayHiddenLayers < 2)
+    throw new ANN_Exception('Constraints: $intNumberOfArrayHiddenLayers must be a positiv integer >= 2');
 
-  if(!is_integer($numberOfNeuronsPerLayer) && $numberOfNeuronsPerLayer < 1)
-    throw new ANN_Exception('Constraints: $numberOfNeuronsPerLayer must be a positiv integer number > 1');
+  if(!is_integer($intNumberOfNeuronsPerLayer) && $intNumberOfNeuronsPerLayer < 1)
+    throw new ANN_Exception('Constraints: $intNumberOfNeuronsPerLayer must be a positiv integer number > 1');
 
-  if(!is_integer($numberOfOutputs) && $numberOfOutputs < 1)
-    throw new ANN_Exception('Constraints: $numberOfOutputs must be a positiv integer number > 1');
+  if(!is_integer($intNumberOfArrayOutputs) && $intNumberOfArrayOutputs < 1)
+    throw new ANN_Exception('Constraints: $intNumberOfArrayOutputs must be a positiv integer number > 1');
 
-	$this->createOutputLayer($numberOfOutputs);
+	$this->createOutputLayer($intNumberOfArrayOutputs);
 	
-	$this->createHiddenLayers($numberOfHiddenLayers, $numberOfNeuronsPerLayer);
+	$this->createHiddenLayers($intNumberOfArrayHiddenLayers, $intNumberOfNeuronsPerLayer);
 
-	$this->numberOfHiddenLayers = $numberOfHiddenLayers;
+	$this->intNumberOfArrayHiddenLayers = $intNumberOfArrayHiddenLayers;
 
-  $this->numberOfHiddenLayersDec = $this->numberOfHiddenLayers - 1;
+  $this->intNumberOfArrayHiddenLayersDec = $this->intNumberOfArrayHiddenLayers - 1;
   
-  $this->numberOfNeuronsPerLayer = $numberOfNeuronsPerLayer;
+  $this->intNumberOfNeuronsPerLayer = $intNumberOfNeuronsPerLayer;
   
   $this->calculateMaxTrainingLoops();
 }
@@ -183,58 +182,93 @@ public function __construct($numberOfHiddenLayers = 2, $numberOfNeuronsPerLayer 
 // ****************************************************************************
 
 /**
- * @param array $inputs
+ * @param array $arrInputs
  */
 
-public function setInputs($inputs)
+protected function setInputs($arrInputs)
 {
-  if(!is_array($inputs))
-    throw new ANN_Exception('Constraints: $inputs should be an array');
+  if(!is_array($arrInputs))
+    throw new ANN_Exception('Constraints: $arrInputs should be an array');
 
-  $this->inputs = $inputs;
+  $this->arrInputs = $arrInputs;
   
-  $this->numberEpoch = count($inputs);
+  $this->intNumberEpoch = count($arrInputs);
   
   $this->nextIndexInputToTrain = 0;
   
-  $this->networkActivated = FALSE;
+  $this->boolNetworkActivated = FALSE;
 }
 
 // ****************************************************************************
 
 /**
- * @param array $outputs
+ * @param array $arrOutputs
  * @uses ANN_Exception::__construct()
  * @uses detectOutputType()
  * @uses ANN_Layer::getNeuronsCount()
  * @throws ANN_Exception
  */
 
-public function setOutputs($outputs)
+protected function setOutputs($arrOutputs)
 {
-  if(isset($outputs[0]) && is_array($outputs[0]))
-    if(count($outputs[0]) != $this->outputLayer->getNeuronsCount())
-      throw new ANN_Exception('Count of Outputs doesn\'t fit to number of outputs on instantiation of ANN_Network');
+  if(isset($arrOutputs[0]) && is_array($arrOutputs[0]))
+    if(count($arrOutputs[0]) != $this->objOutputLayer->getNeuronsCount())
+      throw new ANN_Exception('Count of arrOutputs doesn\'t fit to number of arrOutputs on instantiation of ANN_Network');
 
-  $this->outputs = $outputs;
+  $this->arrOutputs = $arrOutputs;
   
   $this->detectOutputType();
   
-  $this->networkActivated = FALSE;
+  $this->boolNetworkActivated = FALSE;
 }
 
 // ****************************************************************************
 
 /**
- * @param array $inputs
+ * Set Values for training or using network
+ *
+ * Set Values of inputs and outputs for training or just inputs for using
+ * already trained network.
+ *
+ * <code>
+ * $objNetwork = new ANN_Network(2, 4, 1);
+ *
+ * $objValues = new ANN_Values;
+ *
+ * $objValues->train()
+ *           ->input(0.12, 0.11, 0.15)
+ *           ->output(0.56);
+ *
+ * $objNetwork->setValues($objValues);
+ * </code>
+ *
+ * @param ANN_Values $objValues
+ * @uses ANN_Values::getInputsArray()
+ * @uses ANN_Values::getOutputsArray()
+ * @uses setInputs()
+ * @uses setOutputs()
+ * @since 2.0.6
+ */
+
+public function setValues(ANN_Values $objValues)
+{
+  $this->setInputs($objValues->getInputsArray());
+
+  $this->setOutputs($objValues->getOutputsArray());
+}
+
+// ****************************************************************************
+
+/**
+ * @param array $arrInputs
  * @uses ANN_Layer::setInputs()
  */
 
-protected function setInputsToTrain($inputs)
+protected function setInputsToTrain($arrInputs)
 {
-  $this->hiddenLayers[0]->setInputs($inputs);
+  $this->arrHiddenLayers[0]->setInputs($arrInputs);
   
-  $this->networkActivated = FALSE;
+  $this->boolNetworkActivated = FALSE;
 }
 	
 // ****************************************************************************
@@ -249,35 +283,35 @@ protected function setInputsToTrain($inputs)
 
 public function getOutputs()
 {
-  $returnOutputs = array();
+  $returnarrOutputs = array();
 
-  $countInputs = $this->getCountInputs();
+  $countarrInputs = $this->getCountInputs();
 
-	for ($i = 0; $i < $countInputs; $i++)
+	for ($i = 0; $i < $countarrInputs; $i++)
 	{
-    $this->setInputsToTrain($this->inputs[$i]);
+    $this->setInputsToTrain($this->arrInputs[$i]);
 
     $this->activate();
 
-    switch($this->outputType)
+    switch($this->strOutputType)
     {
       case 'linear':
-        $returnOutputs[] = $this->outputLayer->getOutputs();
+        $returnarrOutputs[] = $this->objOutputLayer->getOutputs();
         break;
 
       case 'binary':
-        $returnOutputs[] = $this->outputLayer->getThresholdOutputs();
+        $returnarrOutputs[] = $this->objOutputLayer->getThresholdOutputs();
         break;
     }
   }
 
-	return $returnOutputs;
+	return $returnarrOutputs;
 }
 
 // ****************************************************************************
 
 /**
- * @param integer $keyInput
+ * @param integer $intKeyInput
  * @return array
  * @uses activate()
  * @uses ANN_Layer::getOutputs()
@@ -285,60 +319,60 @@ public function getOutputs()
  * @uses setInputsToTrain()
  */
 
-public function getOutputsByInputKey($keyInput)
+public function getOutputsByInputKey($intKeyInput)
 {
-	$this->setInputsToTrain($this->inputs[$keyInput]);
+	$this->setInputsToTrain($this->arrInputs[$intKeyInput]);
 
   $this->activate();
 
-  switch($this->outputType)
+  switch($this->strOutputType)
   {
     case 'linear':
-      return $this->outputLayer->getOutputs();
+      return $this->objOutputLayer->getOutputs();
 
     case 'binary':
-      return $this->outputLayer->getThresholdOutputs();
+      return $this->objOutputLayer->getThresholdOutputs();
   }
 }
 
 // ****************************************************************************
 
 /**
- * @param integer $numberOfHiddenLayers
- * @param integer $numberOfNeuronsPerLayer
+ * @param integer $intNumberOfArrayHiddenLayers
+ * @param integer $intNumberOfNeuronsPerLayer
  * @uses ANN_Layer::__construct()
  */
 
-protected function createHiddenLayers($numberOfHiddenLayers, $numberOfNeuronsPerLayer)
+protected function createHiddenLayers($intNumberOfArrayHiddenLayers, $intNumberOfNeuronsPerLayer)
 {
-  $layerId = $numberOfHiddenLayers;
+  $layerId = $intNumberOfArrayHiddenLayers;
 
-  for ($i = 0; $i < $numberOfHiddenLayers; $i++)
+  for ($i = 0; $i < $intNumberOfArrayHiddenLayers; $i++)
   {
     $layerId--;
 
     if($i == 0)
-      $nextLayer = $this->outputLayer;
+      $nextLayer = $this->objOutputLayer;
 
     if($i > 0)
-      $nextLayer = $this->hiddenLayers[$layerId+1];
+      $nextLayer = $this->arrHiddenLayers[$layerId+1];
 
-    $this->hiddenLayers[$layerId] = new ANN_Layer($this, $numberOfNeuronsPerLayer, $nextLayer);
+    $this->arrHiddenLayers[$layerId] = new ANN_Layer($this, $intNumberOfNeuronsPerLayer, $nextLayer);
   }
 
-  ksort($this->hiddenLayers);
+  ksort($this->arrHiddenLayers);
 }
 	
 // ****************************************************************************
 
 /**
- * @param integer $numberOfOutputs
+ * @param integer $intNumberOfArrayOutputs
  * @uses ANN_Layer::__construct()
  */
 
-protected function createOutputLayer($numberOfOutputs)
+protected function createOutputLayer($intNumberOfArrayOutputs)
 {
-	$this->outputLayer = new ANN_Layer($this, $numberOfOutputs);
+	$this->objOutputLayer = new ANN_Layer($this, $intNumberOfArrayOutputs);
 }
 	
 // ****************************************************************************
@@ -351,27 +385,27 @@ protected function createOutputLayer($numberOfOutputs)
 
 protected function activate()
 {
-  $this->totalActivationsRequests++;
+  $this->intTotalActivationsRequests++;
 
-  if($this->networkActivated)
+  if($this->boolNetworkActivated)
     return;
 
-	for ($i = 0; $i < $this->numberOfHiddenLayersDec; $i++)
+	for ($i = 0; $i < $this->intNumberOfArrayHiddenLayersDec; $i++)
   {
-		$this->hiddenLayers[$i]->activate();
+		$this->arrHiddenLayers[$i]->activate();
 			
-		$this->hiddenLayers[$i + 1]->setInputs($this->hiddenLayers[$i]->getOutputs());
+		$this->arrHiddenLayers[$i + 1]->setInputs($this->arrHiddenLayers[$i]->getOutputs());
 	}
 		
-	$this->hiddenLayers[$i]->activate();
+	$this->arrHiddenLayers[$i]->activate();
 	
-	$this->outputLayer->setInputs($this->hiddenLayers[$i]->getOutputs());
+	$this->objOutputLayer->setInputs($this->arrHiddenLayers[$i]->getOutputs());
 		
-	$this->outputLayer->activate();
+	$this->objOutputLayer->activate();
 	
-	$this->networkActivated = TRUE;
+	$this->boolNetworkActivated = TRUE;
 	
-  $this->totalActivations++;
+  $this->intTotalActivations++;
 }
 	
 // ****************************************************************************
@@ -396,42 +430,42 @@ protected function activate()
 
 public function train()
 {
-  if(!$this->inputs)
-    throw new ANN_Exception('No Inputs defined. Use ANN_Network::setInputs().');
+  if(!$this->arrInputs)
+    throw new ANN_Exception('No arrInputs defined. Use ANN_Network::setValues().');
 
-  if(!$this->outputs)
-    throw new ANN_Exception('No Outputs defined. Use ANN_Network::setOutputs().');
+  if(!$this->arrOutputs)
+    throw new ANN_Exception('No arrOutputs defined. Use ANN_Network::setValues().');
 
   if($this->isTrainingComplete())
   {
-    $this->trained = TRUE;
+    $this->boolTrained = TRUE;
     
-    return $this->trained;
+    return $this->boolTrained;
   }
 
   $starttime = date('U');
   
   $this->getNextIndexInputsToTrain(TRUE);
 
-  $this->firstLoopOfTraining = TRUE;
+  $this->boolFirstLoopOfTraining = TRUE;
   
-  $this->firstEpochOfTraining = TRUE;
+  $this->boolFirstEpochOfTraining = TRUE;
 
-  for ($i = 0; $i < $this->maxTrainingLoops; $i++)
+  for ($i = 0; $i < $this->intMaxTrainingLoops; $i++)
   {
     $j = $this->getNextIndexInputsToTrain();
 
-    $this->setInputsToTrain($this->inputs[$j]);
+    $this->setInputsToTrain($this->arrInputs[$j]);
 
-    if(!($this->trainingCompleteArray[$j] = $this->isTrainingCompleteByInputKey($j)))
-      $this->training($this->outputs[$j]);
+    if(!($this->arrTrainingComplete[$j] = $this->isTrainingCompleteByInputKey($j)))
+      $this->training($this->arrOutputs[$j]);
 
     if($this->isEpoch())
     {
-      if($this->loggingWeights)
+      if($this->boolLoggingWeights)
         $this->logWeights();
 
-      if($this->loggingNetworkErrors)
+      if($this->boolLoggingNetworkErrors)
         $this->logNetworkErrors();
 
       if($this->isTrainingCompleteByEpoch())
@@ -439,39 +473,40 @@ public function train()
         
       $this->adjustLearningRate();
 
-      $this->firstEpochOfTraining = FALSE;
+      $this->boolFirstEpochOfTraining = FALSE;
     }
 
-    $this->firstLoopOfTraining = FALSE;
+    $this->boolFirstLoopOfTraining = FALSE;
   }
 
   $stoptime = date('U');
 
-  $this->totalLoops += $i;
+  $this->intTotalLoops += $i;
 
-  $this->trainingTime += $stoptime - $starttime;
+  $this->intTrainingTime += $stoptime - $starttime;
   
-  $this->trained = $this->isTrainingComplete();
+  $this->boolTrained = $this->isTrainingComplete();
   
-  return $this->trained;
+  return $this->boolTrained;
 }
 	
 // ****************************************************************************
 
 /**
- * @param boolean $reset (Default: FALSE)
+ * @param boolean $boolReset (Default: FALSE)
  * @return integer
  */
 
-protected function getNextIndexInputsToTrain($reset = FALSE)
+protected function getNextIndexInputsToTrain($boolReset = FALSE)
 {
   static $arrIndex = array();
 
   static $index = -1;
 
-  if($reset)
+  if($boolReset)
   {
-    $arrIndex = array_keys($this->inputs);
+    $arrIndex = array_keys($this->arrInputs);
+
     $index = -1;
 
     return;
@@ -482,6 +517,7 @@ protected function getNextIndexInputsToTrain($reset = FALSE)
   if(!isset($arrIndex[$index]))
   {
     shuffle($arrIndex);
+
     $index = 0;
   }
 
@@ -496,7 +532,7 @@ protected function getNextIndexInputsToTrain($reset = FALSE)
 
 public function getTotalLoops()
 {
-  return $this->totalLoops;
+  return $this->intTotalLoops;
 }
 
 // ****************************************************************************
@@ -511,7 +547,7 @@ protected function isEpoch()
 
   $countLoop++;
 
-  if($countLoop >= $this->numberEpoch)
+  if($countLoop >= $this->intNumberEpoch)
   {
     $countLoop = 0;
 
@@ -526,41 +562,41 @@ protected function isEpoch()
 /**
  * Setting the learning rate disables dynamic learning rate automatically.
  *
- * @param float $learningRate (Default: 0.5) (0.1 .. 0.9)
+ * @param float $floatLearningRate (Default: 0.5) (0.1 .. 0.9)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setLearningRate($learningRate = 0.5)
+public function setLearningRate($floatLearningRate = 0.5)
 {
-  if(!is_float($learningRate))
-    throw new ANN_Exception('$learningRate should be between 0.1 and 0.9');
+  if(!is_float($floatLearningRate))
+    throw new ANN_Exception('$floatLearningRate should be between 0.1 and 0.9');
 
-  if($learningRate <= 0 || $learningRate >= 1)
-    throw new ANN_Exception('$learningRate should be between 0.1 and 0.9');
+  if($floatLearningRate <= 0 || $floatLearningRate >= 1)
+    throw new ANN_Exception('$floatLearningRate should be between 0.1 and 0.9');
 
-  $this->learningRate = $learningRate;
+  $this->floatLearningRate = $floatLearningRate;
   
-  $this->dynamicLearningRate = FALSE;
+  $this->boolDynamicLearningRate = FALSE;
 }
 
 // ****************************************************************************
 
 /**
- * @param float $momentum (Default: 0.95) (0 .. 1)
+ * @param float $floatMomentum (Default: 0.95) (0 .. 1)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setMomentum($momentum = 0.95)
+public function setMomentum($floatMomentum = 0.95)
 {
-  if(!is_float($momentum) && !is_integer($momentum))
-    throw new ANN_Exception('$learningRate should be between 0 and 1');
+  if(!is_float($floatMomentum) && !is_integer($floatMomentum))
+    throw new ANN_Exception('$floatLearningRate should be between 0 and 1');
 
-  if($momentum <= 0 || $momentum > 1)
-    throw new ANN_Exception('$learningRate should be between 0 and 1');
+  if($floatMomentum <= 0 || $floatMomentum > 1)
+    throw new ANN_Exception('$floatLearningRate should be between 0 and 1');
 
-  $this->momentum = $momentum;
+  $this->floatMomentum = $floatMomentum;
 }
 
 // ****************************************************************************
@@ -572,20 +608,20 @@ public function setMomentum($momentum = 0.95)
 
 protected function isTrainingComplete()
 {
-  $outputs = $this->getOutputs();
+  $arrOutputs = $this->getOutputs();
 
-  switch($this->outputType)
+  switch($this->strOutputType)
   {
     case 'linear':
 
-      foreach($this->outputs as $key1 => $output)
-        foreach($output as $key2 => $value)
+      foreach($this->arrOutputs as $intKey1 => $output)
+        foreach($output as $intKey2 => $value)
         {
           $value = round($value, 2);
 
-          $value_output = round($outputs[$key1][$key2], 2);
+          $value_output = round($arrOutputs[$intKey1][$intKey2], 2);
 
-          if($value > $value_output + $this->outputErrorTolerance || $value < $value_output - $this->outputErrorTolerance)
+          if($value > $value_output + $this->floatOutputErrorTolerance || $value < $value_output - $this->floatOutputErrorTolerance)
             return FALSE;
         }
 
@@ -593,9 +629,9 @@ protected function isTrainingComplete()
 
     case 'binary':
 
-      foreach($this->outputs as $key1 => $output)
-        foreach($output as $key2 => $value)
-          if($value != $outputs[$key1][$key2])
+      foreach($this->arrOutputs as $intKey1 => $output)
+        foreach($output as $intKey2 => $value)
+          if($value != $arrOutputs[$intKey1][$intKey2])
             return FALSE;
 
       return TRUE;
@@ -610,7 +646,7 @@ protected function isTrainingComplete()
 
 protected function isTrainingCompleteByEpoch()
 {
-  foreach($this->trainingCompleteArray as $trainingComplete)
+  foreach($this->arrTrainingComplete as $trainingComplete)
     if(!$trainingComplete)
       return FALSE;
     
@@ -620,26 +656,29 @@ protected function isTrainingCompleteByEpoch()
 // ****************************************************************************
 
 /**
- * @param integer $keyInput
+ * @param integer $intKeyInput
  * @return boolean
  * @uses getOutputsByInputKey()
  */
 
-protected function isTrainingCompleteByInputKey($keyInput)
+protected function isTrainingCompleteByInputKey($intKeyInput)
 {
-  $outputs = $this->getOutputsByInputKey($keyInput);
+  $arrOutputs = $this->getOutputsByInputKey($intKeyInput);
 
-  switch($this->outputType)
+  if(!isset($this->arrOutputs[$intKeyInput]))
+    return TRUE;
+
+  switch($this->strOutputType)
   {
     case 'linear':
 
-        foreach($this->outputs[$keyInput] as $key2 => $value)
+        foreach($this->arrOutputs[$intKeyInput] as $intKey2 => $value)
         {
           $value = round($value, 2);
 
-          $value_output = round($outputs[$key2], 2);
+          $value_output = round($arrOutputs[$intKey2], 2);
 
-          if($value > $value_output + $this->outputErrorTolerance || $value < $value_output - $this->outputErrorTolerance)
+          if($value > $value_output + $this->floatOutputErrorTolerance || $value < $value_output - $this->floatOutputErrorTolerance)
             return FALSE;
         }
 
@@ -647,8 +686,8 @@ protected function isTrainingCompleteByInputKey($keyInput)
 
     case 'binary':
 
-        foreach($this->outputs[$keyInput] as $key2 => $value)
-          if($value != $outputs[$key2])
+        foreach($this->arrOutputs[$intKeyInput] as $intKey2 => $value)
+          if($value != $arrOutputs[$intKey2])
             return FALSE;
 
       return TRUE;
@@ -663,8 +702,8 @@ protected function isTrainingCompleteByInputKey($keyInput)
 
 protected function getCountInputs()
 {
-  if(isset($this->inputs) && is_array($this->inputs))
-    return count($this->inputs);
+  if(isset($this->arrInputs) && is_array($this->arrInputs))
+    return count($this->arrInputs);
 
   return 0;
 }
@@ -672,7 +711,7 @@ protected function getCountInputs()
 // ****************************************************************************
 
 /**
- * @param array $outputs
+ * @param array $arrOutputs
  * @uses activate()
  * @uses ANN_Layer::calculateHiddenDeltas()
  * @uses ANN_Layer::adjustWeights()
@@ -680,23 +719,23 @@ protected function getCountInputs()
  * @uses getNetworkError()
  */
 
-protected function training($outputs)
+protected function training($arrOutputs)
 {
 	$this->activate();
 	
-	$this->outputLayer->calculateOutputDeltas($outputs);
+	$this->objOutputLayer->calculateOutputDeltas($arrOutputs);
 
-	for ($i = $this->numberOfHiddenLayersDec; $i >= 0; $i--)
-		$this->hiddenLayers[$i]->calculateHiddenDeltas();
+	for ($i = $this->intNumberOfArrayHiddenLayersDec; $i >= 0; $i--)
+		$this->arrHiddenLayers[$i]->calculateHiddenDeltas();
 		
-	$this->outputLayer->adjustWeights();
+	$this->objOutputLayer->adjustWeights();
 		
-	for ($i = $this->numberOfHiddenLayersDec; $i >= 0; $i--)
-		$this->hiddenLayers[$i]->adjustWeights();
+	for ($i = $this->intNumberOfArrayHiddenLayersDec; $i >= 0; $i--)
+		$this->arrHiddenLayers[$i]->adjustWeights();
 		
-	$this->totalTrainings++;
+	$this->intTotalTrainings++;
 
-  $this->networkActivated = FALSE;
+  $this->boolNetworkActivated = FALSE;
 }
 
 // ****************************************************************************
@@ -713,32 +752,32 @@ protected static function getDefaultFilename()
 // ****************************************************************************
 
 /**
- * @param string $type (Default:  'linear') (linear or binary)
+ * @param string $strType (Default:  'linear') ('linear' or 'binary')
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-protected function setOutputType($type = 'linear')
+protected function setOutputType($strType = 'linear')
 {
-  settype($type, 'string');
+  settype($strType, 'string');
 
-  switch($type)
+  switch($strType)
   {
     case 'linear':
     case 'binary':
-      $this->outputType = $type;
+      $this->strOutputType = $strType;
       break;
 
     default:
-      throw new ANN_Exception('$type must be "linear" or "binary"');
+      throw new ANN_Exception('$strType must be "linear" or "binary"');
   }
 }
 
 // ****************************************************************************
 
 /**
- * @param integer $level (0, 1, 2) (Default: 0)
- * @uses ANN_Neuron::getLearningRate()
+ * @param integer $intLevel (0, 1, 2) (Default: 2)
+ * @uses ANN_Neuron::getfloatLearningRate()
  * @uses ANN_Neuron::getDeltaFactor()
  * @uses ANN_Neuron::getDelta()
  * @uses ANN_Neuron::getWeights()
@@ -749,45 +788,45 @@ protected function setOutputType($type = 'linear')
  * @uses printNetworkDetails2()
  */
 
-public function printNetwork($level = 0)
+public function printNetwork($intLevel = 2)
 {
-  if($level >= 1)
+  if($intLevel >= 1)
     $this->printNetworkDetails1();
 
-  $countColumns = max($this->numberOfNeuronsPerLayer, $this->getNumberInputs(), $this->getNumberOutputs());
+  $countColumns = max($this->intNumberOfNeuronsPerLayer, $this->getNumberInputs(), $this->getNumberOutputs());
 
   print "<table border=\"1\" style=\"background-color: #AAAAAA; border-width: 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Input-Layer</td>\n";
 
-  foreach($this->inputs[0] as $key => $input)
+  foreach($this->arrInputs[0] as $intKey => $input)
   {
     print "<td style=\"background-color: #CCCCCC\">"
-            ."<b>Input ". ($key + 1) ."</b></td>\n";
+            ."<b>Input ". ($intKey + 1) ."</b></td>\n";
   }
   
-  for($i = $this->getNumberInputs()+1; $i <= $countColumns; $i++)
+  for($i = $this->getNumberInputs() + 1; $i <= $countColumns; $i++)
     print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
 
   print "</tr>\n";
 
 
-foreach($this->hiddenLayers as $idx => $hiddenLayer)
+foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
 {
   print "<tr>\n";
-  print "<td style=\"color: #DDDDDD\">Hidden-Layer ". ($idx+1) ."</td>\n";
+  print "<td style=\"color: #DDDDDD\">Hidden-Layer ". ($intIndex + 1) ."</td>\n";
 
-  foreach($hiddenLayer->getNeurons() as $neuron)
-    print "<td style=\"background-color: #CCCCCC\"><b>Inputs:</b> ". (count($neuron->getWeights())-1) ." + BIAS<br />"
-          ."<b>Delta:</b> ". round($neuron->getDelta(),4) ."<br />"
-          .(($this->backpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<b>Delta factor:</b> '. $neuron->getDeltaFactor() .'<br />' : '')
-          .(($this->backpropagationAlgorithm == self::ALGORITHM_ILR) ? '<b>Learning rate:</b> '. $neuron->getLearningRate() .'<br />' : '')
-          ."<b>Weights:</b><br />"
-          .implode('<br />', $neuron->getWeights())
-          ."</td>\n";
+  foreach($objHiddenLayer->getNeurons() as $objNeuron)
+    print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
+          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 4) ."</p>"
+          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<p><b>Delta factor</b><br /> '. $objNeuron->getDeltaFactor() .'</p>' : '')
+          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p><b>Learning rate</b><br /> '. $objNeuron->getfloatLearningRate() .'</p>' : '')
+          ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
+          .implode('<br />', $objNeuron->getWeights())
+          ."</p></td>\n";
 
-  for($i = $this->numberOfNeuronsPerLayer+1; $i <= $countColumns; $i++)
+  for($i = $this->intNumberOfNeuronsPerLayer + 1; $i <= $countColumns; $i++)
     print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
 
 
@@ -797,31 +836,31 @@ foreach($this->hiddenLayers as $idx => $hiddenLayer)
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\" rowspan=\"2\">Output-Layer</td>\n";
 
-  foreach($this->outputLayer->getNeurons() as $neuron)
-    print "<td style=\"background-color: #CCCCCC\"><b>Inputs:</b> ". (count($neuron->getWeights())-1) ." + BIAS<br />"
-          ."<b>Delta:</b> ". round($neuron->getDelta(),4) ."<br />"
-          .(($this->backpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<b>Delta factor:</b> '. $neuron->getDeltaFactor() .'<br />' : '')
-          .(($this->backpropagationAlgorithm == self::ALGORITHM_ILR) ? '<b>Learning rate:</b> '. $neuron->getLearningRate() .'<br />' : '')
-          ."<b>Weights:</b><br />"
-          .implode('<br />', $neuron->getWeights())
-          ."</td>\n";
+  foreach($this->objOutputLayer->getNeurons() as $objNeuron)
+    print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
+          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 4) ."</p>"
+          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<p><b>Delta factor</b><br /> '. $objNeuron->getDeltaFactor() .'</p>' : '')
+          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p><b>Learning rate</b><br /> '. $objNeuron->getfloatLearningRate() .'</p>' : '')
+          ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
+          .implode('<br />', $objNeuron->getWeights())
+          ."</p></td>\n";
 
-  for($i = $this->getNumberOutputs()+1; $i <= $countColumns; $i++)
+  for($i = $this->getNumberOutputs() + 1; $i <= $countColumns; $i++)
     print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
 
   print "</tr>\n";
   print "<tr>\n";
 
-  foreach($this->outputLayer->getNeurons() as $key => $neuron)
-    print "<td style=\"background-color: #CCCCCC\"><b>Output ". ($key+1) ."</b></td>\n";
+  foreach($this->objOutputLayer->getNeurons() as $intKey => $objNeuron)
+    print "<td style=\"background-color: #CCCCCC\"><b>Output ". ($intKey + 1) ."</b></td>\n";
 
-  for($i = $this->getNumberOutputs()+1; $i <= $countColumns; $i++)
+  for($i = $this->getNumberOutputs() + 1; $i <= $countColumns; $i++)
     print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
 
   print "<tr>\n";
   print "</table>\n";
   
-  if($level >= 2)
+  if($intLevel >= 2)
     $this->printNetworkDetails2();
 }
 
@@ -838,7 +877,7 @@ protected function printNetworkDetails1()
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Detected output type</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .$this->outputType
+        .$this->strOutputType
         ."</td>\n";
   print "</tr>\n";
 
@@ -846,7 +885,7 @@ protected function printNetworkDetails1()
   print "<td style=\"color: #DDDDDD\">Backpropagation algorithm</td>\n";
   print "<td style=\"background-color: #CCCCCC\">";
 
-  switch($this->backpropagationAlgorithm)
+  switch($this->intBackpropagationAlgorithm)
   {
     case self::ALGORITHM_BACKPROPAGATION :
       print 'Back propagation';
@@ -892,16 +931,16 @@ protected function printNetworkDetails1()
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Momentum</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .$this->momentum
+        .$this->floatMomentum
         ."</td>\n";
   print "</tr>\n";
 
-  if($this->backpropagationAlgorithm == self::ALGORITHM_BACKPROPAGATION)
+  if($this->intBackpropagationAlgorithm == self::ALGORITHM_BACKPROPAGATION)
   {
     print "<tr>\n";
     print "<td style=\"color: #DDDDDD\">Learning rate</td>\n";
     print "<td style=\"background-color: #CCCCCC\">"
-          .$this->learningRate
+          .$this->floatLearningRate
           ."</td>\n";
     print "</tr>\n";
   }
@@ -909,7 +948,7 @@ protected function printNetworkDetails1()
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Weight decay</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .(($this->weightDecayMode) ? $this->weightDecay : 'Off')
+        .(($this->boolWeightDecayMode) ? $this->floatWeightDecay : 'Off')
         ."</td>\n";
   print "</tr>\n";
 
@@ -923,63 +962,63 @@ protected function printNetworkDetails1()
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Output error tolerance</td>\n";
   print "<td style=\"background-color: #CCCCCC\">+/- "
-        .$this->outputErrorTolerance
+        .$this->floatOutputErrorTolerance
         ."</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Total loops</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .number_format($this->totalLoops, 0, '.', ',')
+        .number_format($this->intTotalLoops, 0, '.', ',')
         ." loops</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Total trainings</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .number_format($this->totalTrainings, 0, '.', ',')
+        .number_format($this->intTotalTrainings, 0, '.', ',')
         ." trainings</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Total activations</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .number_format($this->totalActivations, 0, '.', ',')
+        .number_format($this->intTotalActivations, 0, '.', ',')
         ." activations</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Total activation requests</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .number_format($this->totalActivationsRequests, 0, '.', ',')
+        .number_format($this->intTotalActivationsRequests, 0, '.', ',')
         ." activation requests</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Epoch</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .$this->numberEpoch
+        .$this->intNumberEpoch
         ." loops</td>\n";
   print "</tr>\n";
 
-  $trainingTime = ($this->trainingTime > 0) ? $this->trainingTime : 1;
+  $intTrainingTime = ($this->intTrainingTime > 0) ? $this->intTrainingTime : 1;
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Training time</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .$this->trainingTime ." seconds = ". round($trainingTime / 60,1) ." minutes</td>\n";
+        .$this->intTrainingTime ." seconds = ". round($intTrainingTime / 60, 1) ." minutes</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Loops / second</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .round($this->totalLoops / $trainingTime) ." loops / second</td>\n";
+        .round($this->intTotalLoops / $intTrainingTime) ." loops / second</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Training finished</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .(($this->trained) ? 'Yes' : 'No') ."</td>\n";
+        .(($this->boolTrained) ? 'Yes' : 'No') ."</td>\n";
   print "</tr>\n";
 
   print "</table>\n<br />\n";
@@ -994,7 +1033,7 @@ protected function printNetworkDetails1()
 
 protected function printNetworkDetails2()
 {
-  $trained = 0;
+  $boolTrained = 0;
 
   print "<br />\n";
 
@@ -1003,49 +1042,81 @@ protected function printNetworkDetails2()
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Input</td>\n";
   print "<td style=\"color: #DDDDDD\">Output</td>\n";
-  print "<td style=\"color: #DDDDDD\">Desired output</td>\n";
+
+  if(!$this->boolTrained)
+  {
+    print "<td style=\"color: #DDDDDD\">Desired output</td>\n";
+    print "<td style=\"color: #DDDDDD\">Differences</td>\n";
+  }
+  
   print "</tr>\n";
 
-  foreach($this->inputs as $keyInputs => $arrInputs)
+  foreach($this->arrInputs as $intKeyInputs => $arrInputs)
   {
     print "<tr>\n";
 
-    foreach($arrInputs as $keyInput => $input)
-      $arrInputs[$keyInput] = round($input, 2);
+    foreach($arrInputs as $intKeyInput => $input)
+      $arrInputs[$intKeyInput] = round($input, 2);
 
     print "<td style=\"color: #DDDDDD\" align=\"right\">&nbsp;<b>f</b>(". implode(', ', $arrInputs) .") =&nbsp;</td>\n";
 
-    $arrOutputs = $this->getOutputsByInputKey($keyInputs);
+    $arrOutputs = $this->getOutputsByInputKey($intKeyInputs);
 
-    foreach($arrOutputs as $keyOutput => $output)
-      $arrOutputs[$keyOutput] = round($output, 2);
+    foreach($arrOutputs as $intKeyOutput => $output)
+      $arrOutputs[$intKeyOutput] = round($output, 2);
 
-    $arrDesiredOutputs = $this->outputs[$keyInputs];
+    if(!$this->boolTrained)
+    {
+      $arrDesiredOutputs = $this->arrOutputs[$intKeyInputs];
 
-    foreach($arrDesiredOutputs as $keyDesiredOutput => $desiredOutput)
-      $arrDesiredOutputs[$keyDesiredOutput] = round($desiredOutput, 2);
+      foreach($arrDesiredOutputs as $intKeyDesiredOutput => $desiredOutput)
+        $arrDesiredOutputs[$intKeyDesiredOutput] = round($desiredOutput, 2);
 
-    $strOutputs = implode(',', $arrOutputs);
+      foreach($arrDesiredOutputs as $intKeyOutput => $desiredOutput)
+        $arrDesiredOutputsDifferences[$intKeyOutput] = abs($arrDesiredOutputs[$intKeyOutput] - $arrOutputs[$intKeyOutput]);
 
-    $strDesiredOutputs = implode(',', $arrDesiredOutputs);
+      $strDesiredArrayOutputs = implode(',', $arrDesiredOutputs);
 
-    $color = ($this->isTrainingCompleteByInputKey($keyInputs)) ? '#CCFF99' : '#F0807F';
+      $strDesiredArrayOutputsDifferences = implode(',', $arrDesiredOutputsDifferences);
+    }
 
-    if($this->isTrainingCompleteByInputKey($keyInputs))
-      $trained++;
+    $strArrayOutputs = implode(',', $arrOutputs);
 
-    print "<td style=\"background-color: $color\">$strOutputs</td>\n";
+    if(!$this->boolTrained)
+    {
+      $color = ($this->isTrainingCompleteByInputKey($intKeyInputs)) ? '#CCFF99' : '#F0807F';
+    }
+    else
+    {
+      $color = '#00AACC';
+    }
 
-    print "<td style=\"background-color: $color\">$strDesiredOutputs</td>\n";
+    if($this->isTrainingCompleteByInputKey($intKeyInputs))
+      $boolTrained++;
+
+    print "<td style=\"background-color: $color\">$strArrayOutputs</td>\n";
+
+    if(!$this->boolTrained)
+    {
+      print "<td style=\"background-color: $color\">$strDesiredArrayOutputs</td>\n";
+
+      print "<td style=\"background-color: $color\">$strDesiredArrayOutputsDifferences</td>\n";
+    }
+    
     print "</tr>\n";
   }
 
-  $trainedPerCent = round(($trained / @count($this->outputs)) * 100, 1);
+  $boolTrainedPerCent = round(($boolTrained / @count($this->arrOutputs)) * 100, 1);
 
-  print "<tr>\n";
-  print "<td colspan=\"3\">$trainedPerCent per cent trained patterns</td>\n";
-  print "</tr>\n";
+  if(!$this->boolTrained)
+  {
+    print "<tr>\n";
 
+    print "<td colspan=\"3\">$boolTrainedPerCent per cent trained patterns</td>\n";
+
+    print "</tr>\n";
+  }
+  
   print "</table>\n";
 }
 
@@ -1055,21 +1126,21 @@ protected function calculateMaxTrainingLoops()
 {
   $seconds = (int)ini_get('max_execution_time');
 
-  $this->maxTrainingLoops = $seconds * $this->maxTrainingLoopsFactor;
+  $this->intMaxTrainingLoops = $seconds * $this->intMaxTrainingLoopsFactor;
 }
 
 // ****************************************************************************
 
 /**
- * @param integer $maxTrainingLoopsFactor (Default: 230)
+ * @param integer $intMaxTrainingLoopsFactor (Default: 230)
  */
 
-public function setMaxTrainingLoopsFactor($maxTrainingLoopsFactor = 230)
+public function setMaxTrainingLoopsFactor($intMaxTrainingLoopsFactor = 230)
 {
-  if(!is_int($maxTrainingLoopsFactor) && $maxTrainingLoopsFactor > 0)
-    throw new ANN_Exception('Constraints: $maxTrainingLoopsFactor should be an positive integer');
+  if(!is_int($intMaxTrainingLoopsFactor) && $intMaxTrainingLoopsFactor > 0)
+    throw new ANN_Exception('Constraints: $intMaxTrainingLoopsFactor should be an positive integer');
 
-  $this->maxTrainingLoopsFactor = $maxTrainingLoopsFactor;
+  $this->intMaxTrainingLoopsFactor = $intMaxTrainingLoopsFactor;
 }
 
 // ****************************************************************************
@@ -1082,39 +1153,39 @@ public function __wakeup()
 {
   $this->calculateMaxTrainingLoops();
 
-  $this->networkActivated = FALSE;
+  $this->boolNetworkActivated = FALSE;
 }
 
 // ****************************************************************************
 
 /**
- * @param string $filename (Default: null)
+ * @param string $strFilename (Default: null)
  * @uses parent::loadFromFile()
  * @uses self::getDefaultFilename()
  */
 
-public static function loadFromFile($filename = null)
+public static function loadFromFile($strFilename = null)
 {
-  if($filename === null)
-    $filename = self::getDefaultFilename();
+  if($strFilename === null)
+    $strFilename = self::getDefaultFilename();
   
-  return parent::loadFromFile($filename);
+  return parent::loadFromFile($strFilename);
 }
 
 // ****************************************************************************
 
 /**
- * @param string $filename (Default: null)
+ * @param string $strFilename (Default: null)
  * @uses parent::saveToFile()
  * @uses self::getDefaultFilename()
  */
 
-public function saveToFile($filename = null)
+public function saveToFile($strFilename = null)
 {
-  if($filename === null)
-    $filename = self::getDefaultFilename();
+  if($strFilename === null)
+    $strFilename = self::getDefaultFilename();
 
-  parent::saveToFile($filename);
+  parent::saveToFile($strFilename);
 }
 
 // ****************************************************************************
@@ -1125,9 +1196,9 @@ public function saveToFile($filename = null)
 
 public function getNumberInputs()
 {
-  if(isset($this->inputs) && is_array($this->inputs))
-    if(isset($this->inputs[0]))
-      return count($this->inputs[0]);
+  if(isset($this->arrInputs) && is_array($this->arrInputs))
+    if(isset($this->arrInputs[0]))
+      return count($this->arrInputs[0]);
 
   return 0;
 }
@@ -1140,8 +1211,8 @@ public function getNumberInputs()
 
 public function getNumberHiddenLayers()
 {
-  if(isset($this->hiddenLayers) && is_array($this->hiddenLayers))
-    return count($this->hiddenLayers);
+  if(isset($this->arrHiddenLayers) && is_array($this->arrHiddenLayers))
+    return count($this->arrHiddenLayers);
 
   return 0;
 }
@@ -1154,9 +1225,9 @@ public function getNumberHiddenLayers()
 
 public function getNumberHiddens()
 {
-  if(isset($this->hiddenLayers) && is_array($this->hiddenLayers))
-    if(isset($this->hiddenLayers[0]))
-      return $this->hiddenLayers[0]->getNeuronsCount();
+  if(isset($this->arrHiddenLayers) && is_array($this->arrHiddenLayers))
+    if(isset($this->arrHiddenLayers[0]))
+      return $this->arrHiddenLayers[0]->getNeuronsCount();
 
   return 0;
 }
@@ -1169,8 +1240,8 @@ public function getNumberHiddens()
 
 public function getNumberOutputs()
 {
-  if(isset($this->outputs[0]) && is_array($this->outputs[0]))
-    return count($this->outputs[0]);
+  if(isset($this->arrOutputs[0]) && is_array($this->arrOutputs[0]))
+    return count($this->arrOutputs[0]);
 
   return 0;
 }
@@ -1180,18 +1251,18 @@ public function getNumberOutputs()
 /**
  * Log weights while training in CSV format
  *
- * @param string $filename
+ * @param string $strFilename
  * @uses ANN_Logging::__construct()
  * @uses ANN_Logging::setFilename()
  */
 
-public function logWeightsToFile($filename)
+public function logWeightsToFile($strFilename)
 {
-  $this->loggingWeights = TRUE;
+  $this->boolLoggingWeights = TRUE;
 
   $this->objLoggingWeights = new ANN_Logging;
 
-  $this->objLoggingWeights->setFilename($filename);
+  $this->objLoggingWeights->setFilename($strFilename);
 }
 
 // ****************************************************************************
@@ -1199,18 +1270,18 @@ public function logWeightsToFile($filename)
 /**
  * Log network errors while training in CSV format
  *
- * @param string $filename
+ * @param string $strFilename
  * @uses ANN_Logging::__construct()
  * @uses ANN_Logging::setFilename()
  */
 
-public function logNetworkErrorsToFile($filename)
+public function logNetworkErrorsToFile($strFilename)
 {
-  $this->loggingNetworkErrors = TRUE;
+  $this->boolLoggingNetworkErrors = TRUE;
 
   $this->objLoggingNetworkErrors = new ANN_Logging;
 
-  $this->objLoggingNetworkErrors->setFilename($filename);
+  $this->objLoggingNetworkErrors->setFilename($strFilename);
 }
 
 // ****************************************************************************
@@ -1228,24 +1299,24 @@ protected function logWeights()
 
   $arrData['E'] = $this->getNetworkError();
 
-  // ****** HiddenLayers ****************
+  // ****** arrHiddenLayers ****************
 
-  foreach($this->hiddenLayers as $keyLayer => $objHiddenLayer)
+  foreach($this->arrHiddenLayers as $intKeyLayer => $objHiddenLayer)
   {
     $arrNeurons = $objHiddenLayer->getNeurons();
 
-    foreach($arrNeurons as $keyNeuron => $objNeuron)
-      foreach($objNeuron->getWeights() as $keyWeight => $weight)
-          $arrData["H$keyLayer-N$keyNeuron-W$keyWeight"] = round($weight, 5);
+    foreach($arrNeurons as $intKeyNeuron => $objNeuron)
+      foreach($objNeuron->getWeights() as $intKeyWeight => $weight)
+          $arrData["H$intKeyLayer-N$intKeyNeuron-W$intKeyWeight"] = round($weight, 5);
   }
 
-  // ****** OutputLayer *****************
+  // ****** objOutputLayer *****************
 
-  $arrNeurons = $this->outputLayer->getNeurons();
+  $arrNeurons = $this->objOutputLayer->getNeurons();
 
-  foreach($arrNeurons as $keyNeuron => $objNeuron)
-    foreach($objNeuron->getWeights() as $keyWeight => $weight)
-        $arrData["O-N$keyNeuron-W$keyWeight"] = round($weight, 5);
+  foreach($arrNeurons as $intKeyNeuron => $objNeuron)
+    foreach($objNeuron->getWeights() as $intKeyWeight => $weight)
+        $arrData["O-N$intKeyNeuron-W$intKeyWeight"] = round($weight, 5);
 
   // ************************************
 
@@ -1265,7 +1336,7 @@ protected function logNetworkErrors()
 
   $arrData['network error'] = $this->getNetworkError();
 
-  $arrData['learning rate'] = $this->learningRate;
+  $arrData['learning rate'] = $this->floatLearningRate;
 
   $this->objLoggingNetworkErrors->logData($arrData);
 }
@@ -1280,116 +1351,116 @@ protected function logNetworkErrors()
 
 protected function getNetworkError()
 {
-  $error = 0;
+  $floatError = 0;
 
-  $arrOutputs = $this->getOutputs();
+  $arrNetworkOutputs = $this->getOutputs();
+  
+  foreach($this->arrOutputs as $intKeyOutputs => $arrDesiredOutputs)
+    foreach($arrDesiredOutputs as $intKeyOutput => $floatDesiredOutput)
+      $floatError += pow($arrNetworkOutputs[$intKeyOutputs][$intKeyOutput] - $floatDesiredOutput, 2);
 
-  foreach($this->outputs as $keyOutputs => $outputs)
-    foreach($outputs as $keyOutput => $output)
-      $error += pow($arrOutputs[$keyOutputs][$keyOutput] - $output, 2);
-
-  return $error / 2;
+  return $floatError / 2;
 }
 
 // ****************************************************************************
 
 /**
- * @param string $username
- * @param string $password
- * @param string $host
+ * @param string $strUsername
+ * @param string $strPassword
+ * @param string $strHost
  * @return ANN_Network
  * @throws ANN_Exception
  */
 
-public function trainByHost($username, $password, $host)
+public function trainByHost($strUsername, $strPassword, $strHost)
 {
   if(!extension_loaded('curl'))
     throw new ANN_Exception('Curl extension is not installed or active on this system');
 
-  $ch = curl_init();
+  $handleCurl = curl_init();
 
-  settype($username, 'string');
-  settype($password, 'string');
-  settype($host, 'string');
+  settype($strUsername, 'string');
+  settype($strPassword, 'string');
+  settype($strHost, 'string');
 
-  curl_setopt($ch, CURLOPT_URL, $host);
-  curl_setopt($ch, CURLOPT_POST, TRUE);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=trainbyhost&username=$username&password=$password&network=". serialize($this));
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($handleCurl, CURLOPT_URL, $strHost);
+  curl_setopt($handleCurl, CURLOPT_POST, TRUE);
+  curl_setopt($handleCurl, CURLOPT_POSTFIELDS, "mode=trainbyhost&username=$strUsername&password=$strPassword&network=". serialize($this));
+  curl_setopt($handleCurl, CURLOPT_RETURNTRANSFER, 1);
 
-  $result = curl_exec($ch);
+  $strResult = curl_exec($handleCurl);
 
-  curl_close($ch);
+  curl_close($handleCurl);
 
-  $network = @unserialize($result);
+  $objNetwork = @unserialize($strResult);
 
-  if($network instanceof ANN_Network)
-    return $network;
+  if($objNetwork instanceof ANN_Network)
+    return $objNetwork;
 }
 
 // ****************************************************************************
 
 /**
- * @param string $username
- * @param string $password
- * @param string $host
+ * @param string $strUsername
+ * @param string $strPassword
+ * @param string $strHost
  * @throws ANN_Exception
  */
 
-public function saveToHost($username, $password, $host)
+public function saveToHost($strUsername, $strPassword, $strHost)
 {
   if(!extension_loaded('curl'))
     throw new ANN_Exception('Curl extension is not installed or active on this system');
 
-  $ch = curl_init();
+  $handleCurl = curl_init();
 
-  settype($username, 'string');
-  settype($password, 'string');
-  settype($host, 'string');
+  settype($strUsername, 'string');
+  settype($strPassword, 'string');
+  settype($strHost,     'string');
 
-  curl_setopt($ch, CURLOPT_URL, $host);
-  curl_setopt($ch, CURLOPT_POST, TRUE);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=savetohost&username=$username&password=$password&network=". serialize($this));
+  curl_setopt($handleCurl, CURLOPT_URL, $strHost);
+  curl_setopt($handleCurl, CURLOPT_POST, TRUE);
+  curl_setopt($handleCurl, CURLOPT_POSTFIELDS, "mode=savetohost&username=$strUsername&password=$strPassword&network=". serialize($this));
 
-  curl_exec($ch);
+  curl_exec($handleCurl);
 
-  curl_close($ch);
+  curl_close($handleCurl);
 }
 
 // ****************************************************************************
 
 /**
- * @param string $username
- * @param string $password
- * @param string $host
+ * @param string $strUsername
+ * @param string $strPassword
+ * @param string $strHost
  * @return ANN_Network
  * @throws ANN_Exception
  */
 
-public static function loadFromHost($username, $password, $host)
+public static function loadFromHost($strUsername, $strPassword, $strHost)
 {
   if(!extension_loaded('curl'))
     throw new ANN_Exception('Curl extension is not installed or active on this system');
 
-  $ch = curl_init();
+  $handleCurl = curl_init();
 
-  settype($username, 'string');
-  settype($password, 'string');
-  settype($host, 'string');
+  settype($strUsername, 'string');
+  settype($strPassword, 'string');
+  settype($strHost,     'string');
 
-  curl_setopt($ch, CURLOPT_URL, $host);
-  curl_setopt($ch, CURLOPT_POST, TRUE);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, "mode=loadfromhost&username=$username&password=$password");
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($handleCurl, CURLOPT_URL, $strHost);
+  curl_setopt($handleCurl, CURLOPT_POST, TRUE);
+  curl_setopt($handleCurl, CURLOPT_POSTFIELDS, "mode=loadfromhost&username=$strUsername&password=$strPassword");
+  curl_setopt($handleCurl, CURLOPT_RETURNTRANSFER, 1);
 
-  $result = curl_exec($ch);
+  $strResult = curl_exec($handleCurl);
 
-  curl_close($ch);
+  curl_close($handleCurl);
 
-  $network = unserialize(trim($result));
+  $objNetwork = unserialize(trim($strResult));
 
-  if($network instanceof ANN_Network)
-    return $network;
+  if($objNetwork instanceof ANN_Network)
+    return $objNetwork;
 }
 
 // ****************************************************************************
@@ -1400,9 +1471,9 @@ public static function loadFromHost($username, $password, $host)
 
 protected function detectOutputType()
 {
-  foreach($this->outputs as $arrOutputs)
-    foreach($arrOutputs as $output)
-      if($output < 1 && $output > 0)
+  foreach($this->arrOutputs as $arrOutputs)
+    foreach($arrOutputs as $floatOutput)
+      if($floatOutput < 1 && $floatOutput > 0)
       {
         $this->setOutputType('linear');
 
@@ -1429,77 +1500,77 @@ protected function detectOutputType()
 
 protected function adjustLearningRate()
 {
-  if(!$this->dynamicLearningRate)
+  if(!$this->boolDynamicLearningRate)
     return;
 
-  $this->networkErrorCurrent = $this->getNetworkError();
+  $this->floatNetworkErrorCurrent = $this->getNetworkError();
 
-  if($this->networkErrorCurrent >= $this->networkErrorPrevious)
+  if($this->floatNetworkErrorCurrent >= $this->floatNetworkErrorPrevious)
   {
-    $this->learningRate *= 1.01;
+    $this->floatLearningRate *= 1.01;
 
-    if($this->learningRate > 0.9)
-      $this->learningRate = 0.5;
+    if($this->floatLearningRate > 0.9)
+      $this->floatLearningRate = 0.5;
   }
   else
   {
-    $this->learningRate *= 0.99;
+    $this->floatLearningRate *= 0.99;
 
-    if($this->learningRate < 0.5)
-      $this->learningRate = 0.5;
+    if($this->floatLearningRate < 0.5)
+      $this->floatLearningRate = 0.5;
   }
 
-  $this->networkErrorPrevious = $this->networkErrorCurrent;
+  $this->floatNetworkErrorPrevious = $this->floatNetworkErrorCurrent;
 }
 
 // ****************************************************************************
 
 /**
- * @param boolean $dynamicLearningRate (Default: TRUE)
+ * @param boolean $boolDynamicLearningRate (Default: TRUE)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setDynamicLearningRate($dynamicLearningRate = TRUE)
+public function setDynamicLearningRate($boolDynamicLearningRate = TRUE)
 {
-  if(!is_bool($dynamicLearningRate))
-    throw new ANN_Exception('$dynamicLearningRate must be boolean');
+  if(!is_bool($boolDynamicLearningRate))
+    throw new ANN_Exception('$boolDynamicLearningRate must be boolean');
 
-  $this->dynamicLearningRate = $dynamicLearningRate;
+  $this->boolDynamicLearningRate = $boolDynamicLearningRate;
 }
 
 // ****************************************************************************
 
 /**
- * @param boolean $weightDecayMode (Default: TRUE)
+ * @param boolean $boolWeightDecayMode (Default: TRUE)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setWeightDecayMode($weightDecayMode = TRUE)
+public function setWeightDecayMode($boolWeightDecayMode = TRUE)
 {
-  if(!is_bool($weightDecayMode))
-    throw new ANN_Exception('$weightDecayMode must be boolean');
+  if(!is_bool($boolWeightDecayMode))
+    throw new ANN_Exception('$boolWeightDecayMode must be boolean');
 
-  $this->weightDecayMode = $weightDecayMode;
+  $this->boolWeightDecayMode = $boolWeightDecayMode;
 }
 
 // ****************************************************************************
 
 /**
- * @param float $weightDecay (Default: 0.05)
+ * @param float $floatWeightDecay (Default: 0.05)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setWeightDecay($weightDecay = 0.05)
+public function setWeightDecay($floatWeightDecay = 0.05)
 {
-  if($weightDecay < 0.03 || $weightDecay > 0.05)
-    throw new ANN_Exception('$weightDecay must be between 0.03 and 0.05');
+  if($floatWeightDecay < 0.03 || $floatWeightDecay > 0.05)
+    throw new ANN_Exception('$floatWeightDecay must be between 0.03 and 0.05');
 
-  $this->weightDecay = $weightDecay;
+  $this->floatWeightDecay = $floatWeightDecay;
 
-  $this->weightDecayMode = TRUE;
+  $this->boolWeightDecayMode = TRUE;
 }
 
 // ****************************************************************************
@@ -1509,19 +1580,19 @@ public function setWeightDecay($weightDecay = 0.05)
  *
  * EXPERIMENTAL
  *
- * @param integer $algorithm (Default: self::ALGORITHM_BACKPROPAGATION)
+ * @param integer $intAlgorithm (Default: self::ALGORITHM_BACKPROPAGATION)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setBackpropagationAlgorithm($algorithm = self::ALGORITHM_BACKPROPAGATION)
+public function setBackpropagationAlgorithm($intAlgorithm = self::ALGORITHM_BACKPROPAGATION)
 {
-  if(!is_int($algorithm))
-    throw new ANN_Exception('$algorithm must be integer');
+  if(!is_int($intAlgorithm))
+    throw new ANN_Exception('$intAlgorithm must be integer');
 
-  $this->backpropagationAlgorithm = $algorithm;
+  $this->intBackpropagationAlgorithm = $intAlgorithm;
 
-  switch($algorithm)
+  switch($intAlgorithm)
   {
     case self::ALGORITHM_RPROP:
     case self::ALGORITHM_RPROPMINUS:
@@ -1530,7 +1601,7 @@ public function setBackpropagationAlgorithm($algorithm = self::ALGORITHM_BACKPRO
     case self::ALGORITHM_IRPROPPLUS:
     case self::ALGORITHM_ILR:
 
-      $this->dynamicLearningRate = FALSE;
+      $this->boolDynamicLearningRate = FALSE;
 
       break;
   }
@@ -1543,17 +1614,17 @@ public function setBackpropagationAlgorithm($algorithm = self::ALGORITHM_BACKPRO
  *
  * EXPERIMENTAL
  *
- * @param float $quickPropMaxWeightChangeFactor (Default: 2.25)
+ * @param float $floatQuickPropMaxWeightChangeFactor (Default: 2.25)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setQuickPropMaxWeightChangeFactor($quickPropMaxWeightChangeFactor = 2.25)
+public function setQuickPropMaxWeightChangeFactor($floatQuickPropMaxWeightChangeFactor = 2.25)
 {
-  if($quickPropMaxWeightChangeFactor < 1.75 || $quickPropMaxWeightChangeFactor > 2.25)
-    throw new ANN_Exception('$quickPropMaxWeightChangeFactor must be between 1.75 and 2.25');
+  if($floatQuickPropMaxWeightChangeFactor < 1.75 || $floatQuickPropMaxWeightChangeFactor > 2.25)
+    throw new ANN_Exception('$floatQuickPropMaxWeightChangeFactor must be between 1.75 and 2.25');
 
-  $this->quickPropMaxWeightChangeFactor = $quickPropMaxWeightChangeFactor;
+  $this->floatQuickPropMaxWeightChangeFactor = $floatQuickPropMaxWeightChangeFactor;
 
   $this->backpropagationAlorigthm = self::QUICKPROP;
 }
@@ -1563,15 +1634,15 @@ public function setQuickPropMaxWeightChangeFactor($quickPropMaxWeightChangeFacto
 /**
  * Setting the percentage of output error in comparison to the desired output
  *
- * @param float $outputErrorTolerance (Default: 0.02)
+ * @param float $floatOutputErrorTolerance (Default: 0.02)
  */
 
-public function setOutputErrorTolerance($outputErrorTolerance = 0.02)
+public function setOutputErrorTolerance($floatOutputErrorTolerance = 0.02)
 {
-  if($outputErrorTolerance < 0 || $outputErrorTolerance > 0.1)
-    throw new ANN_Exception('$outputErrorTolerance must be between 0 and 0.1');
+  if($floatOutputErrorTolerance < 0 || $floatOutputErrorTolerance > 0.1)
+    throw new ANN_Exception('$floatOutputErrorTolerance must be between 0 and 0.1');
 
-  $this->outputErrorTolerance = $outputErrorTolerance;
+  $this->floatOutputErrorTolerance = $floatOutputErrorTolerance;
 }
 
 // ****************************************************************************

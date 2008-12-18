@@ -51,18 +51,18 @@
 
 class ANN_Maths
 {
-const PRECISION = 3;
+const PRECISION = 5;
 
 // ****************************************************************************
 
 /**
- * @param float $x
+ * @param float $floatValue
  * @return float (between near 0 and near 1)
  */
 
-public static function sigmoid($x)
+public static function sigmoid($floatValue)
 {
-  return round(1 / (1 + exp(-1 * $x)), self::PRECISION);
+  return round(1 / (1 + exp(-1 * $floatValue)), self::PRECISION);
 }
 
 // ****************************************************************************
@@ -70,37 +70,37 @@ public static function sigmoid($x)
 /**
  * First derivative of sigmoid()
  *
- * @param float $x
+ * @param float $floatValue
  * @return float (between near 0 and near 1)
  */
 
-public static function sigmoidI($x)
+public static function sigmoidI($floatValue)
 {
-  return round(self::sigmoid($x) * (1 - self::sigmoid($x)), self::PRECISION);
+  return round(self::sigmoid($floatValue) * (1 - self::sigmoid($floatValue)), self::PRECISION);
 }
 
 // ****************************************************************************
 
 /**
- * @param float $x
- * @return float (between near 0 and near 1)
+ * @param float $floatValue
+ * @return float (between near -1 and near 1)
  */
 
-public static function tangensHyperbolicus($x)
+public static function tangensHyperbolicus($floatValue)
 {
-  return round(tanh($x), self::PRECISION);
+  return round(tanh($floatValue), self::PRECISION);
 }
 
 // ****************************************************************************
 
 /**
- * @param float $x
+ * @param float $floatValue
  * @return float (between near 0 and near 1)
  */
 
-public static function tangensHyperbolicus01($x)
+public static function tangensHyperbolicus01($floatValue)
 {
-  return round((tanh($x) + 1) / 2, self::PRECISION);
+  return round((tanh($floatValue) + 1) / 2, self::PRECISION);
 }
 
 // ****************************************************************************
@@ -108,38 +108,38 @@ public static function tangensHyperbolicus01($x)
 /**
  * First derivative of tanh()
  *
- * @param float $x
+ * @param float $floatValue
  * @return float (between near 0 and near 1)
  */
 
-public static function tangensHyperbolicusI($x)
+public static function tangensHyperbolicusI($floatValue)
 {
-  return round(1 - pow(tanh($x), 2), self::PRECISION);
+  return round(1 - pow(tanh($floatValue), 2), self::PRECISION);
 }
 
 // ****************************************************************************
 
 /**
- * @param float $x
+ * @param float $floatValue
  * @return integer (0 or 1)
  */
 
-public static function threshold($x)
+public static function threshold($floatValue)
 {
-  return ($x > 0.5) ? 1 : 0;
+  return ($floatValue > 0.5) ? 1 : 0;
 }
 
 // ****************************************************************************
 
 /**
- * @param integer $min (Default:  0)
- * @param integer $max (Default:  10)
+ * @param integer $floatValueMin (Default:  0)
+ * @param integer $floatValueMax (Default:  10)
  * @return integer
  */
 
-public static function random($min = 0, $max = 10)
+public static function random($floatValueMin = 0, $floatValueMax = 10)
 {
-  return round(mt_rand($min, $max), self::PRECISION);
+  return round(mt_rand($floatValueMin, $floatValueMax), self::PRECISION);
 }
 
 // ****************************************************************************
@@ -147,15 +147,15 @@ public static function random($min = 0, $max = 10)
 /**
  * Return the sign of a number
  *
- * If $value is positiv the method returns 1 otherwise -1.
+ * If $floatValue is positiv the method returns 1 otherwise -1.
  *
- * @param float $value
+ * @param float $floatValue
  * @return integer
  */
 
-public static function sign($value)
+public static function sign($floatValue)
 {
-  if($value >= 0)
+  if($floatValue >= 0)
     return 1;
 
   return -1;
@@ -164,38 +164,38 @@ public static function sign($value)
 // ****************************************************************************
 
 /**
- * @param float $x
+ * @param float $floatValue
  * @return float (-1 .. 1)
  */
 
-public static function linearSaturated($x)
+public static function linearSaturated($floatValue)
 {
-  if($x < -1)
+  if($floatValue < -1)
     return -1;
     
-  if($x > 1)
+  if($floatValue > 1)
     return 1;
 
-  return $x;
+  return $floatValue;
 }
 
 // ****************************************************************************
 
 /**
- * @param float $x
+ * @param float $floatValue
  * @return float (0 .. 1)
  * @uses self::saturated()
  */
 
-public static function linearSaturated01($x)
+public static function linearSaturated01($floatValue)
 {
-  if($x < -1)
-    $x = -1;
+  if($floatValue < -1)
+    $floatValue = -1;
     
-  if($x > 1)
-    $x = 1;
+  if($floatValue > 1)
+    $floatValue = 1;
 
-  return ($x + 1) / 2;
+  return ($floatValue + 1) / 2;
 }
 
 // ****************************************************************************

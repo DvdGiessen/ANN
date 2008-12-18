@@ -52,9 +52,9 @@ class ANN_Logging
  * @ignore
  */
 
-protected $filename;
-protected $fileHandle;
-protected $header = FALSE;
+protected $strFilename;
+protected $handleFile;
+protected $boolHeader = FALSE;
 
 /**#@-*/
 
@@ -63,48 +63,48 @@ const SEPARATOR = ';';
 // ****************************************************************************
 
 /**
- * @param string $filename
+ * @param string $strFilename
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setFilename($filename)
+public function setFilename($strFilename)
 {
-  $this->filename = $filename;
+  $this->strFilename = $strFilename;
 
-  $this->fileHandle = @fopen($filename, 'w+');
+  $this->handleFile = @fopen($strFilename, 'w+');
 
-  if(!is_resource($this->fileHandle))
-    throw new ANN_Exception('File '. basename($filename). ' cannot be created');
+  if(!is_resource($this->handleFile))
+    throw new ANN_Exception('File '. basename($strFilename). ' cannot be created');
 }
 
 // ****************************************************************************
 
 /**
- * @param array $data
+ * @param array $arrData
  * @uses isHeader()
  * @uses logHeader()
  */
 
-public function logData($data)
+public function logData($arrData)
 {
   if(!$this->isHeader())
-    $this->logHeader($data);
+    $this->logHeader($arrData);
 
-  $strData = implode(self::SEPARATOR, $data);
+  $strData = implode(self::SEPARATOR, $arrData);
 
-  if(is_resource($this->fileHandle))
-    @fwrite($this->fileHandle, $strData, strlen($strData));
+  if(is_resource($this->handleFile))
+    @fwrite($this->handleFile, $strData, strlen($strData));
 
-  @fwrite($this->fileHandle, "\r\n", strlen("\r\n"));
+  @fwrite($this->handleFile, "\r\n", strlen("\r\n"));
 }
 
 // ****************************************************************************
 
 public function __destruct()
 {
-  if(is_resource($this->fileHandle))
-    @fclose($this->fileHandle);
+  if(is_resource($this->handleFile))
+    @fclose($this->handleFile);
 }
 
 // ****************************************************************************
@@ -115,25 +115,25 @@ public function __destruct()
 
 protected function isHeader()
 {
-  return $this->header;
+  return $this->boolHeader;
 }
 
 // ****************************************************************************
 
 /**
- * @param array $data
+ * @param array $arrData
  */
 
-protected function logHeader($data)
+protected function logHeader($arrData)
 {
-  $strData = implode(self::SEPARATOR, array_keys($data));
+  $strData = implode(self::SEPARATOR, array_keys($arrData));
 
-  if(is_resource($this->fileHandle))
-    @fwrite($this->fileHandle, $strData, strlen($strData));
+  if(is_resource($this->handleFile))
+    @fwrite($this->handleFile, $strData, strlen($strData));
 
-  @fwrite($this->fileHandle, "\r\n", strlen("\r\n"));
+  @fwrite($this->handleFile, "\r\n", strlen("\r\n"));
 
-  $this->header = TRUE;
+  $this->boolHeader = TRUE;
 }
 
 // ****************************************************************************

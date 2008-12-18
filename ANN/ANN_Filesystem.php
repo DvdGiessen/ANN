@@ -49,54 +49,55 @@
 abstract class ANN_Filesystem
 {
 /**
- * @param string $filename (Default: null)
+ * @param string $strFilename (Default: null)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function saveToFile($filename = null)
+public function saveToFile($strFilename = null)
 {
 	try
 	{
-	  $serialized = serialize($this);
+	  $strSerialized = serialize($this);
 
-    file_put_contents($filename, $serialized);
+    file_put_contents($strFilename, $strSerialized);
   }
   catch(Exception $e)
 	{
-		throw new ANN_Exception("Could not open or create $filename!");
+		throw new ANN_Exception("Could not open or create $strFilename!");
   }
 }
 
 // ****************************************************************************
 
 /**
- * @param string $filename (Default: null)
- * @return ANN_Network|ANN_InputValue|ANN_OutputValue
+ * @param string $strFilename (Default: null)
+ * @return ANN_Network|ANN_InputValue|ANN_OutputValue|ANN_Values
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public static function loadFromFile($filename = null)
+public static function loadFromFile($strFilename = null)
 {
-	if(is_file($filename) && is_readable($filename))
+	if(is_file($strFilename) && is_readable($strFilename))
   {
-    $serialized = file_get_contents($filename);
+    $strSerialized = file_get_contents($strFilename);
 
-  	if (empty($serialized))
-      throw new ANN_Exception('File '. basename($filename) .' couldn\'t be loaded (file has no object information stored)');
+  	if (empty($strSerialized))
+      throw new ANN_Exception('File '. basename($strFilename) .' couldn\'t be loaded (file has no object information stored)');
 
-		$instance = unserialize($serialized);
+		$objInstance = unserialize($strSerialized);
 		
-		if(!($instance instanceof ANN_Network)
-    && !($instance instanceof ANN_InputValue)
-    && !($instance instanceof ANN_OutputValue))
-      throw new ANN_Exception('File '. basename($filename) .' couldn\'t be opened (not ANN format)');
+		if(!($objInstance instanceof ANN_Network)
+    && !($objInstance instanceof ANN_Values)
+    && !($objInstance instanceof ANN_InputValue)
+    && !($objInstance instanceof ANN_OutputValue))
+      throw new ANN_Exception('File '. basename($strFilename) .' couldn\'t be opened (not ANN format)');
 		
-		return $instance;
+		return $objInstance;
 	}
 
-  throw new ANN_Exception('File '. basename($filename) .' couldn\'t be opened');
+  throw new ANN_Exception('File '. basename($strFilename) .' couldn\'t be opened');
 }
 
 // ****************************************************************************
