@@ -57,7 +57,7 @@ final class ANN_Neuron
  
 protected $arrInputs = null;
 protected $arrWeights = null;
-protected $arrOutput = null;
+protected $floatOutput = null;
 protected $floatDelta = 0;
 protected $objNetwork = null;
 protected $floatDeltaFactor = 0.1;
@@ -94,17 +94,6 @@ public function setInputs($arrInputs)
 
 	if(!$this->arrWeights)
 		$this->initialiseWeights();
-}
-	
-// ****************************************************************************
-
-/**
- * @param array $arrOutput
- */
-
-protected function setOutput($arrOutput)
-{
-  $this->arrOutput = $arrOutput;
 }
 	
 // ****************************************************************************
@@ -155,12 +144,12 @@ public function getWeight($intKeyNeuron)
 // ****************************************************************************
 
 /**
- * @return array
+ * @return float
  */
 
 public function getOutput()
 {
-	return $this->arrOutput;
+	return $this->floatOutput;
 }
 
 // ****************************************************************************
@@ -203,7 +192,6 @@ protected function initialiseWeights()
  * @uses ANN_Maths::linearSaturated01()
  * @uses ANN_Maths::sigmoid()
  * @uses ANN_Maths::tangensHyperbolicus01()
- * @uses setOutput()
  */
 
 public function activate()
@@ -213,10 +201,10 @@ public function activate()
 	foreach ($this->arrInputs as $intKey => $floatInput)
 		$floatSum += $floatInput * $this->arrWeights[$intKey];
 
-//  $this->setOutput(ANN_tanh_1_2($sum));
-  $this->setOutput(ANN_Maths::sigmoid($floatSum));
-//  $this->setOutput(ANN_Maths::tangensHyperbolicus01($sum));
-//  $this->setOutput(ANN_Maths::linearSaturated01($sum));
+//  $this->floatOutput = ANN_tanh_1_2($sum);
+  $this->floatOutput = ANN_Maths::sigmoid($floatSum);
+//  $this->floatOutput = ANN_Maths::tangensHyperbolicus01($sum);
+//  $this->floatOutput = ANN_Maths::linearSaturated01($sum);
 }
 	
 // ****************************************************************************
