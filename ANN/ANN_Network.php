@@ -622,11 +622,9 @@ protected function isTrainingComplete()
       foreach($this->arrOutputs as $intKey1 => $output)
         foreach($output as $intKey2 => $value)
         {
-          $value = round($value, 2);
-
-          $value_output = round($arrOutputs[$intKey1][$intKey2], 2);
-
-          if($value > $value_output + $this->floatOutputErrorTolerance || $value < $value_output - $this->floatOutputErrorTolerance)
+          $value_output = $arrOutputs[$intKey1][$intKey2];
+          
+          if(($value > round($value_output + $this->floatOutputErrorTolerance, 2)) || ($value < round($value_output - $this->floatOutputErrorTolerance, 2)))
             return FALSE;
         }
 
@@ -679,11 +677,9 @@ protected function isTrainingCompleteByInputKey($intKeyInput)
 
         foreach($this->arrOutputs[$intKeyInput] as $intKey2 => $value)
         {
-          $value = round($value, 2);
+          $value_output = $arrOutputs[$intKey2];
 
-          $value_output = round($arrOutputs[$intKey2], 2);
-
-          if($value > $value_output + $this->floatOutputErrorTolerance || $value < $value_output - $this->floatOutputErrorTolerance)
+          if(($value > round($value_output + $this->floatOutputErrorTolerance, 2)) || ($value < round($value_output - $this->floatOutputErrorTolerance, 2)))
             return FALSE;
         }
 
@@ -782,7 +778,7 @@ protected function setOutputType($intType = self::OUTPUT_LINEAR)
 
 /**
  * @param integer $intLevel (0, 1, 2) (Default: 2)
- * @uses ANN_Neuron::getfloatLearningRate()
+ * @uses ANN_Neuron::getLearningRate()
  * @uses ANN_Neuron::getDeltaFactor()
  * @uses ANN_Neuron::getDelta()
  * @uses ANN_Neuron::getWeights()
@@ -826,7 +822,7 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
           ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), ANN_Maths::PRECISION) ."</p>"
           .(($this->intBackpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<p><b>Delta factor</b><br /> '. $objNeuron->getDeltaFactor() .'</p>' : '')
-          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p><b>Learning rate</b><br /> '. $objNeuron->getfloatLearningRate() .'</p>' : '')
+          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p><b>Learning rate</b><br /> '. $objNeuron->getLearningRate() .'</p>' : '')
           ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
           .implode('<br />', $objNeuron->getWeights())
           ."</p></td>\n";
@@ -845,7 +841,7 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
           ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), ANN_Maths::PRECISION) ."</p>"
           .(($this->intBackpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<p><b>Delta factor</b><br /> '. $objNeuron->getDeltaFactor() .'</p>' : '')
-          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p><b>Learning rate</b><br /> '. $objNeuron->getfloatLearningRate() .'</p>' : '')
+          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p><b>Learning rate</b><br /> '. $objNeuron->getLearningRate() .'</p>' : '')
           ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
           .implode('<br />', $objNeuron->getWeights())
           ."</p></td>\n";
