@@ -36,7 +36,7 @@
  *
  * @author Thomas Wien <info_at_thwien_dot_de>
  * @version ANN Version 2.0 by Thomas Wien
- * @copyright Copyright (c) 2007-08 by Thomas Wien
+ * @copyright Copyright (c) 2007-09 by Thomas Wien
  * @package ANN
  */
 

@@ -39,7 +39,7 @@
  * @version ANN Version 1.0 by Eddy Young
  * @version ANN Version 2.0 by Thomas Wien
  * @copyright Copyright (c) 2002 by Eddy Young
- * @copyright Copyright (c) 2007-08 by Thomas Wien
+ * @copyright Copyright (c) 2007-09 by Thomas Wien
  * @package ANN
  */
 
