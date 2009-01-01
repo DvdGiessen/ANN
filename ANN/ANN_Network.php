@@ -619,22 +619,18 @@ protected function isTrainingComplete()
   {
     case self::OUTPUT_LINEAR:
 
-      foreach($this->arrOutputs as $intKey1 => $output)
-        foreach($output as $intKey2 => $value)
-        {
-          $value_output = $arrOutputs[$intKey1][$intKey2];
-          
-          if(($value > round($value_output + $this->floatOutputErrorTolerance, 3)) || ($value < round($value_output - $this->floatOutputErrorTolerance, 3)))
+      foreach($this->arrOutputs as $intKey1 => $arrOutput)
+        foreach($arrOutput as $intKey2 => $floatValue)
+          if(($floatValue > round($arrOutputs[$intKey1][$intKey2] + $this->floatOutputErrorTolerance, 3)) || ($floatValue < round($arrOutputs[$intKey1][$intKey2] - $this->floatOutputErrorTolerance, 3)))
             return FALSE;
-        }
 
       return TRUE;
 
     case self::OUTPUT_BINARY:
 
-      foreach($this->arrOutputs as $intKey1 => $output)
-        foreach($output as $intKey2 => $value)
-          if($value != $arrOutputs[$intKey1][$intKey2])
+      foreach($this->arrOutputs as $intKey1 => $arrOutput)
+        foreach($arrOutput as $intKey2 => $floatValue)
+          if($floatValue != $arrOutputs[$intKey1][$intKey2])
             return FALSE;
 
       return TRUE;
@@ -675,20 +671,16 @@ protected function isTrainingCompleteByInputKey($intKeyInput)
   {
     case self::OUTPUT_LINEAR:
 
-        foreach($this->arrOutputs[$intKeyInput] as $intKey2 => $value)
-        {
-          $value_output = $arrOutputs[$intKey2];
-
-          if(($value > round($value_output + $this->floatOutputErrorTolerance, 3)) || ($value < round($value_output - $this->floatOutputErrorTolerance, 3)))
+        foreach($this->arrOutputs[$intKeyInput] as $intKey => $floatValue)
+          if(($floatValue > round($arrOutputs[$intKey] + $this->floatOutputErrorTolerance, 3)) || ($floatValue < round($arrOutputs[$intKey] - $this->floatOutputErrorTolerance, 3)))
             return FALSE;
-        }
 
       return TRUE;
 
     case self::OUTPUT_BINARY:
 
-        foreach($this->arrOutputs[$intKeyInput] as $intKey2 => $value)
-          if($value != $arrOutputs[$intKey2])
+        foreach($this->arrOutputs[$intKeyInput] as $intKey => $floatValue)
+          if($floatValue != $arrOutputs[$intKey])
             return FALSE;
 
       return TRUE;
