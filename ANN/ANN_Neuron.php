@@ -115,17 +115,6 @@ public function setDelta($floatDelta)
  * @return array
  */
 
-protected function getInputs()
-{
-	return $this->arrInputs;
-}
-	
-// ****************************************************************************
-
-/**
- * @return array
- */
-
 public function getWeights()
 {
 	return $this->arrWeights;
