@@ -59,7 +59,7 @@ protected $objOutputLayer = null;
 protected $arrHiddenLayers = array();
 protected $arrInputs = null;
 protected $arrOutputs = null;
-protected $strOutputType = 'binary'; // binary or linear
+protected $intOutputType = null;
 protected $intTotalLoops = 0;
 protected $intTotalTrainings = 0;
 protected $intTotalActivations = 0;
@@ -143,6 +143,18 @@ const ALGORITHM_IRPROPPLUS = 7;
  */
 
 const ALGORITHM_ILR = 8;
+
+/**
+ * Linear output type
+ */
+
+const OUTPUT_LINEAR = 1;
+
+/**
+ * Binary output type
+ */
+
+const OUTPUT_BINARY = 2;
 
 // ****************************************************************************
 
@@ -301,13 +313,13 @@ public function getOutputs()
 
     $this->activate();
 
-    switch($this->strOutputType)
+    switch($this->intOutputType)
     {
-      case 'linear':
+      case self::OUTPUT_LINEAR:
         $arrReturnOutputs[] = $this->objOutputLayer->getOutputs();
         break;
 
-      case 'binary':
+      case self::OUTPUT_BINARY:
         $arrReturnOutputs[] = $this->objOutputLayer->getThresholdOutputs();
         break;
     }
@@ -333,12 +345,12 @@ public function getOutputsByInputKey($intKeyInput)
 
   $this->activate();
 
-  switch($this->strOutputType)
+  switch($this->intOutputType)
   {
-    case 'linear':
+    case self::OUTPUT_LINEAR:
       return $this->objOutputLayer->getOutputs();
 
-    case 'binary':
+    case self::OUTPUT_BINARY:
       return $this->objOutputLayer->getThresholdOutputs();
   }
 }
@@ -603,9 +615,9 @@ protected function isTrainingComplete()
 {
   $arrOutputs = $this->getOutputs();
   
-  switch($this->strOutputType)
+  switch($this->intOutputType)
   {
-    case 'linear':
+    case self::OUTPUT_LINEAR:
 
       foreach($this->arrOutputs as $intKey1 => $output)
         foreach($output as $intKey2 => $value)
@@ -620,7 +632,7 @@ protected function isTrainingComplete()
 
       return TRUE;
 
-    case 'binary':
+    case self::OUTPUT_BINARY:
 
       foreach($this->arrOutputs as $intKey1 => $output)
         foreach($output as $intKey2 => $value)
@@ -661,9 +673,9 @@ protected function isTrainingCompleteByInputKey($intKeyInput)
   if(!isset($this->arrOutputs[$intKeyInput]))
     return TRUE;
 
-  switch($this->strOutputType)
+  switch($this->intOutputType)
   {
-    case 'linear':
+    case self::OUTPUT_LINEAR:
 
         foreach($this->arrOutputs[$intKeyInput] as $intKey2 => $value)
         {
@@ -677,7 +689,7 @@ protected function isTrainingCompleteByInputKey($intKeyInput)
 
       return TRUE;
 
-    case 'binary':
+    case self::OUTPUT_BINARY:
 
         foreach($this->arrOutputs[$intKeyInput] as $intKey2 => $value)
           if($value != $arrOutputs[$intKey2])
@@ -745,24 +757,24 @@ protected static function getDefaultFilename()
 // ****************************************************************************
 
 /**
- * @param string $strType (Default:  'linear') ('linear' or 'binary')
+ * @param integer $intType (Default: ANN_Network::OUTPUT_LINEAR)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-protected function setOutputType($strType = 'linear')
+protected function setOutputType($intType = self::OUTPUT_LINEAR)
 {
-  settype($strType, 'string');
+  settype($intType, 'integer');
 
-  switch($strType)
+  switch($intType)
   {
-    case 'linear':
-    case 'binary':
-      $this->strOutputType = $strType;
+    case self::OUTPUT_LINEAR:
+    case self::OUTPUT_BINARY:
+      $this->intOutputType = $intType;
       break;
 
     default:
-      throw new ANN_Exception('$strType must be "linear" or "binary"');
+      throw new ANN_Exception('$strType must be ANN_Network::OUTPUT_LINEAR or ANN_Network::OUTPUT_BINARY');
   }
 }
 
@@ -870,7 +882,7 @@ protected function printNetworkDetails1()
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Detected output type</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
-        .$this->strOutputType
+        .(($this->intOutputType == self::OUTPUT_BINARY) ? 'Binary' : 'Linear')
         ."</td>\n";
   print "</tr>\n";
 
@@ -1339,7 +1351,6 @@ protected function logNetworkErrors()
 /**
  * @return float
  * @uses getOutputs()
- * @uses setOutputType()
  */
 
 protected function getNetworkError()
@@ -1468,12 +1479,12 @@ protected function detectOutputType()
     foreach($arrOutputs as $floatOutput)
       if($floatOutput < 1 && $floatOutput > 0)
       {
-        $this->setOutputType('linear');
+        $this->setOutputType(self::OUTPUT_LINEAR);
 
         return;
       }
 
-  $this->setOutputType('binary');
+  $this->setOutputType(self::OUTPUT_BINARY);
 }
 
 // ****************************************************************************
