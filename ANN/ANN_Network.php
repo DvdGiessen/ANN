@@ -160,7 +160,7 @@ const OUTPUT_BINARY = 2;
 
 /**
  * @param integer $intNumberOfHiddenLayers (Default: 1)
- * @param integer $intNumberOfNeuronsPerLayer  (Default: 10)
+ * @param integer $intNumberOfNeuronsPerLayer  (Default: 6)
  * @param integer $intNumberOfOutputs  (Default: 1)
  * @uses ANN_Exception::__construct()
  * @uses calculateMaxTrainingLoops()
@@ -169,7 +169,7 @@ const OUTPUT_BINARY = 2;
  * @throws ANN_Exception
  */
 
-public function __construct($intNumberOfHiddenLayers = 2, $intNumberOfNeuronsPerLayer = 4, $intNumberOfOutputs = 1)
+public function __construct($intNumberOfHiddenLayers = 1, $intNumberOfNeuronsPerLayer = 6, $intNumberOfOutputs = 1)
 {
   if(!is_integer($intNumberOfHiddenLayers) && $intNumberOfHiddenLayers < 2)
     throw new ANN_Exception('Constraints: $intNumberOfHiddenLayers must be a positiv integer >= 2');
