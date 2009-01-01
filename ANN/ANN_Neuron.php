@@ -213,13 +213,27 @@ public function activate()
 
 public function adjustWeights()
 {
-  $floatDelta = 0;
+  switch($this->objNetwork->intOutputType)
+  {
+    case ANN_Network::OUTPUT_BINARY:
 
-  foreach($this->arrInputs as $floatInput)
-    $floatDelta += round($floatInput * $this->floatDelta, ANN_Maths::PRECISION);
+    	foreach ($this->arrWeights as $intKey => $floatWeight)
+    		$this->arrWeights[$intKey] += round($this->arrInputs[$intKey] * $this->floatDelta, ANN_Maths::PRECISION);
 
-	foreach ($this->arrWeights as $intKey => $floatWeight)
-		$this->arrWeights[$intKey] += $floatDelta;
+      break;
+
+    case ANN_Network::OUTPUT_LINEAR:
+
+      $floatDelta = 0;
+
+      foreach($this->arrInputs as $floatInput)
+        $floatDelta += round($floatInput * $this->floatDelta, ANN_Maths::PRECISION);
+
+    	foreach ($this->arrWeights as $intKey => $floatWeight)
+    		$this->arrWeights[$intKey] += $floatDelta;
+
+      break;
+  }
 }
 
 // ****************************************************************************
