@@ -56,6 +56,25 @@ abstract class ANN_Filesystem
 
 public function saveToFile($strFilename = null)
 {
+  settype($strFilename, 'string');
+
+  if(empty($strFilename))
+		throw new ANN_Exception('Paramter $strFilename should be a filename');
+
+  $strDir = dirname($strFilename);
+  
+  if(empty($strDir))
+    $strDir = '.';
+    
+  if(!is_dir($strDir))
+		throw new ANN_Exception("Directory $strDir does not exist");
+
+  if(!is_writable($strDir))
+		throw new ANN_Exception("Directory $strDir has no writing permission");
+		
+  if(is_file($strFilename) && !is_writable($strFilename))
+		throw new ANN_Exception("File $strFilename does exist but has no writing permission");
+
 	try
 	{
 	  $strSerialized = serialize($this);
@@ -84,7 +103,7 @@ public static function loadFromFile($strFilename = null)
     $strSerialized = file_get_contents($strFilename);
 
   	if (empty($strSerialized))
-      throw new ANN_Exception('File '. basename($strFilename) .' couldn\'t be loaded (file has no object information stored)');
+      throw new ANN_Exception('File '. basename($strFilename) .' could not be loaded (file has no object information stored)');
 
 		$objInstance = unserialize($strSerialized);
 		
@@ -92,12 +111,12 @@ public static function loadFromFile($strFilename = null)
     && !($objInstance instanceof ANN_Values)
     && !($objInstance instanceof ANN_InputValue)
     && !($objInstance instanceof ANN_OutputValue))
-      throw new ANN_Exception('File '. basename($strFilename) .' couldn\'t be opened (not ANN format)');
+      throw new ANN_Exception('File '. basename($strFilename) .' could not be opened (no ANN format)');
 		
 		return $objInstance;
 	}
 
-  throw new ANN_Exception('File '. basename($strFilename) .' couldn\'t be opened');
+  throw new ANN_Exception('File '. basename($strFilename) .' could not be opened');
 }
 
 // ****************************************************************************
