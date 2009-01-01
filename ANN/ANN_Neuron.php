@@ -75,15 +75,17 @@ protected $floatLearningRate = 0;
 public function __construct(ANN_Network $objNetwork)
 {
   $this->objNetwork = $objNetwork;
-  
+
   $this->floatLearningRate = ANN_Maths::random(400, 600) / 1000;
+
+  $this->floatDelta = ANN_Maths::random(400, 900) / 1000;
 }
 
 // ****************************************************************************
 
 /**
  * @param array $arrInputs
- * @uses initialiseWeights()
+ * @uses initializeWeights()
  */
 
 public function setInputs($arrInputs)
@@ -93,7 +95,7 @@ public function setInputs($arrInputs)
 	$this->arrInputs = $arrInputs;
 
 	if(!$this->arrWeights)
-		$this->initialiseWeights();
+		$this->initializeWeights();
 }
 	
 // ****************************************************************************
@@ -180,7 +182,7 @@ public function getDelta()
  * @uses ANN_Maths::random()
  */
 
-protected function initialiseWeights()
+protected function initializeWeights()
 {
 	foreach ($this->arrInputs as $intKey => $floatInput)
 		$this->arrWeights[$intKey] = ANN_Maths::random(-500, 500) / 1000;
@@ -201,18 +203,23 @@ public function activate()
 	foreach ($this->arrInputs as $intKey => $floatInput)
 		$floatSum += $floatInput * $this->arrWeights[$intKey];
 
-//  $this->floatOutput = ANN_tanh_1_2($sum);
+//  $this->floatOutput = ANN_sigmoid($floatSum);
   $this->floatOutput = ANN_Maths::sigmoid($floatSum);
-//  $this->floatOutput = ANN_Maths::tangensHyperbolicus01($sum);
-//  $this->floatOutput = ANN_Maths::linearSaturated01($sum);
+//  $this->floatOutput = ANN_Maths::tangensHyperbolicus01($floatSum);
+//  $this->floatOutput = ANN_Maths::linearSaturated01($floatSum);
 }
 	
 // ****************************************************************************
 
 public function adjustWeights()
 {
+  $floatDelta = 0;
+
+  foreach($this->arrInputs as $floatInput)
+    $floatDelta += round($floatInput * $this->floatDelta, ANN_Maths::PRECISION);
+
 	foreach ($this->arrWeights as $intKey => $floatWeight)
-		$this->arrWeights[$intKey] += round($this->arrInputs[$intKey] * $this->floatDelta, ANN_Maths::PRECISION);
+		$this->arrWeights[$intKey] += $floatDelta;
 }
 
 // ****************************************************************************

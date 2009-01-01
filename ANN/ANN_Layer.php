@@ -57,9 +57,9 @@ final class ANN_Layer
 
 protected $arrNeurons   = array();
 protected $arrOutputs   = array();
-protected $arrInputs    = array();
 protected $objNetwork   = null;
 protected $objNextLayer = null;
+protected $intNumberOfNeurons = null;
 
 /**#@-*/
 
@@ -79,6 +79,8 @@ public function __construct(ANN_Network $objNetwork, $intNumberOfNeurons, ANN_La
   $this->objNextLayer = $objNextLayer;
 
   $this->createNeurons($intNumberOfNeurons);
+  
+  $this->intNumberOfNeurons = $intNumberOfNeurons;
 }
 	
 // ****************************************************************************
@@ -113,20 +115,9 @@ public function getNeurons()
 
 public function getNeuronsCount()
 {
-	return count($this->arrNeurons);
+	return $this->intNumberOfNeurons;
 }
 
-// ****************************************************************************
-
-/**
- * @return array
- */
-
-protected function getInputs()
-{
-	return $this->arrInputs;
-}
-	
 // ****************************************************************************
 
 /**
@@ -173,6 +164,8 @@ protected function createNeurons($intNumberOfNeurons)
 /**
  * @uses ANN_Neuron::activate()
  * @uses ANN_Neuron::getOutput()
+ * @uses ANN_Layer::setInputs()
+ * @uses ANN_Layer::activate()
  */
 
 public function activate()
@@ -182,6 +175,13 @@ public function activate()
 		$objNeuron->activate();
 
   	$this->arrOutputs[$intKey] = $objNeuron->getOutput();
+	}
+
+	if($this->objNextLayer)
+	{
+  	$this->objNextLayer->setInputs($this->arrOutputs);
+
+  	$this->objNextLayer->activate();
 	}
 }
 	

@@ -51,7 +51,7 @@
 
 class ANN_Maths
 {
-const PRECISION = 5;
+const PRECISION = 15;
 
 // ****************************************************************************
 
@@ -147,7 +147,7 @@ public static function random($floatValueMin = 0, $floatValueMax = 10)
 /**
  * Return the sign of a number
  *
- * If $floatValue is positiv the method returns 1 otherwise -1.
+ * If $floatValue is positive the method returns 1 otherwise -1.
  *
  * @param float $floatValue
  * @return integer
@@ -184,7 +184,6 @@ public static function linearSaturated($floatValue)
 /**
  * @param float $floatValue
  * @return float (0 .. 1)
- * @uses self::saturated()
  */
 
 public static function linearSaturated01($floatValue)

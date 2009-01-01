@@ -207,11 +207,15 @@ public function __wakeup()
  * Reset saved input and output values
  *
  * All internal saved input and output values will be deleted after calling reset().
+ * If train() was called before, train state does not change by calling reset().
  *
  * <code>
  * $objValues = new ANN_Values;
  *
- * $objValues->reset()
+ * $objValues->train()
+ *           ->input(0.12, 0.11, 0.15)
+ *           ->output(0.56)
+ *           ->reset()
  *           ->input(0.12, 0.11, 0.15)
  *           ->output(0.56);
  * </code>

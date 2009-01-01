@@ -64,8 +64,8 @@ protected $intTotalLoops = 0;
 protected $intTotalTrainings = 0;
 protected $intTotalActivations = 0;
 protected $intTotalActivationsRequests = 0;
-protected $intNumberOfArrayHiddenLayers = null;
-protected $intNumberOfArrayHiddenLayersDec = null; // decremented value
+protected $intNumberOfHiddenLayers = null;
+protected $intNumberOfHiddenLayersDec = null; // decremented value
 protected $intMaxTrainingLoops;
 protected $intMaxTrainingLoopsFactor = 230;
 protected $intNumberEpoch = 0;
@@ -82,6 +82,8 @@ protected $intNumberOfNeuronsPerLayer = 0;
 protected $floatOutputErrorTolerance = 0.02;
 private $floatNetworkErrorCurrent = 10;
 private $floatNetworkErrorPrevious = 10;
+private $arrInputsToTrain = array();
+private $intInputsToTrainIndex = -1;
 public $floatMomentum = 0.95;
 public $floatLearningRate = 0.5;
 public $boolWeightDecayMode = FALSE;
@@ -145,9 +147,9 @@ const ALGORITHM_ILR = 8;
 // ****************************************************************************
 
 /**
- * @param integer $intNumberOfArrayHiddenLayers (Default: 1)
+ * @param integer $intNumberOfHiddenLayers (Default: 1)
  * @param integer $intNumberOfNeuronsPerLayer  (Default: 10)
- * @param integer $intNumberOfArrayOutputs  (Default: 1)
+ * @param integer $intNumberOfOutputs  (Default: 1)
  * @uses ANN_Exception::__construct()
  * @uses calculateMaxTrainingLoops()
  * @uses createHiddenLayers()
@@ -155,24 +157,24 @@ const ALGORITHM_ILR = 8;
  * @throws ANN_Exception
  */
 
-public function __construct($intNumberOfArrayHiddenLayers = 2, $intNumberOfNeuronsPerLayer = 4, $intNumberOfArrayOutputs = 1)
+public function __construct($intNumberOfHiddenLayers = 2, $intNumberOfNeuronsPerLayer = 4, $intNumberOfOutputs = 1)
 {
-  if(!is_integer($intNumberOfArrayHiddenLayers) && $intNumberOfArrayHiddenLayers < 2)
-    throw new ANN_Exception('Constraints: $intNumberOfArrayHiddenLayers must be a positiv integer >= 2');
+  if(!is_integer($intNumberOfHiddenLayers) && $intNumberOfHiddenLayers < 2)
+    throw new ANN_Exception('Constraints: $intNumberOfHiddenLayers must be a positiv integer >= 2');
 
   if(!is_integer($intNumberOfNeuronsPerLayer) && $intNumberOfNeuronsPerLayer < 1)
     throw new ANN_Exception('Constraints: $intNumberOfNeuronsPerLayer must be a positiv integer number > 1');
 
-  if(!is_integer($intNumberOfArrayOutputs) && $intNumberOfArrayOutputs < 1)
-    throw new ANN_Exception('Constraints: $intNumberOfArrayOutputs must be a positiv integer number > 1');
+  if(!is_integer($intNumberOfOutputs) && $intNumberOfOutputs < 1)
+    throw new ANN_Exception('Constraints: $intNumberOfOutputs must be a positiv integer number > 1');
 
-	$this->createOutputLayer($intNumberOfArrayOutputs);
+	$this->createOutputLayer($intNumberOfOutputs);
 	
-	$this->createHiddenLayers($intNumberOfArrayHiddenLayers, $intNumberOfNeuronsPerLayer);
+	$this->createHiddenLayers($intNumberOfHiddenLayers, $intNumberOfNeuronsPerLayer);
 
-	$this->intNumberOfArrayHiddenLayers = $intNumberOfArrayHiddenLayers;
+	$this->intNumberOfHiddenLayers = $intNumberOfHiddenLayers;
 
-  $this->intNumberOfArrayHiddenLayersDec = $this->intNumberOfArrayHiddenLayers - 1;
+  $this->intNumberOfHiddenLayersDec = $this->intNumberOfHiddenLayers - 1;
   
   $this->intNumberOfNeuronsPerLayer = $intNumberOfNeuronsPerLayer;
   
@@ -274,38 +276,44 @@ protected function setInputsToTrain($arrInputs)
 // ****************************************************************************
 
 /**
- * @return array
+ * Get the output values
+ *
+ * Get the output values to the related input values set by setValues(). This
+ * method returns the output values as a two-dimensional array.
+ *
+ * @return array two-dimensional array
  * @uses activate()
  * @uses getCountInputs()
  * @uses ANN_Layer::getOutputs()
+ * @uses ANN_Layer::getThresholdOutputs()
  * @uses setInputsToTrain()
  */
 
 public function getOutputs()
 {
-  $returnarrOutputs = array();
+  $arrReturnOutputs = array();
 
-  $countarrInputs = $this->getCountInputs();
+  $intCountInputs = $this->getCountInputs();
 
-	for ($i = 0; $i < $countarrInputs; $i++)
+	for ($intIndex = 0; $intIndex < $intCountInputs; $intIndex++)
 	{
-    $this->setInputsToTrain($this->arrInputs[$i]);
+    $this->setInputsToTrain($this->arrInputs[$intIndex]);
 
     $this->activate();
 
     switch($this->strOutputType)
     {
       case 'linear':
-        $returnarrOutputs[] = $this->objOutputLayer->getOutputs();
+        $arrReturnOutputs[] = $this->objOutputLayer->getOutputs();
         break;
 
       case 'binary':
-        $returnarrOutputs[] = $this->objOutputLayer->getThresholdOutputs();
+        $arrReturnOutputs[] = $this->objOutputLayer->getThresholdOutputs();
         break;
     }
   }
 
-	return $returnarrOutputs;
+	return $arrReturnOutputs;
 }
 
 // ****************************************************************************
@@ -338,16 +346,16 @@ public function getOutputsByInputKey($intKeyInput)
 // ****************************************************************************
 
 /**
- * @param integer $intNumberOfArrayHiddenLayers
+ * @param integer $intNumberOfHiddenLayers
  * @param integer $intNumberOfNeuronsPerLayer
  * @uses ANN_Layer::__construct()
  */
 
-protected function createHiddenLayers($intNumberOfArrayHiddenLayers, $intNumberOfNeuronsPerLayer)
+protected function createHiddenLayers($intNumberOfHiddenLayers, $intNumberOfNeuronsPerLayer)
 {
-  $layerId = $intNumberOfArrayHiddenLayers;
+  $layerId = $intNumberOfHiddenLayers;
 
-  for ($i = 0; $i < $intNumberOfArrayHiddenLayers; $i++)
+  for ($i = 0; $i < $intNumberOfHiddenLayers; $i++)
   {
     $layerId--;
 
@@ -355,7 +363,7 @@ protected function createHiddenLayers($intNumberOfArrayHiddenLayers, $intNumberO
       $nextLayer = $this->objOutputLayer;
 
     if($i > 0)
-      $nextLayer = $this->arrHiddenLayers[$layerId+1];
+      $nextLayer = $this->arrHiddenLayers[$layerId + 1];
 
     $this->arrHiddenLayers[$layerId] = new ANN_Layer($this, $intNumberOfNeuronsPerLayer, $nextLayer);
   }
@@ -366,13 +374,13 @@ protected function createHiddenLayers($intNumberOfArrayHiddenLayers, $intNumberO
 // ****************************************************************************
 
 /**
- * @param integer $intNumberOfArrayOutputs
+ * @param integer $intNumberOfOutputs
  * @uses ANN_Layer::__construct()
  */
 
-protected function createOutputLayer($intNumberOfArrayOutputs)
+protected function createOutputLayer($intNumberOfOutputs)
 {
-	$this->objOutputLayer = new ANN_Layer($this, $intNumberOfArrayOutputs);
+	$this->objOutputLayer = new ANN_Layer($this, $intNumberOfOutputs);
 }
 	
 // ****************************************************************************
@@ -390,19 +398,8 @@ protected function activate()
   if($this->boolNetworkActivated)
     return;
 
-	for ($i = 0; $i < $this->intNumberOfArrayHiddenLayersDec; $i++)
-  {
-		$this->arrHiddenLayers[$i]->activate();
-			
-		$this->arrHiddenLayers[$i + 1]->setInputs($this->arrHiddenLayers[$i]->getOutputs());
-	}
-		
-	$this->arrHiddenLayers[$i]->activate();
-	
-	$this->objOutputLayer->setInputs($this->arrHiddenLayers[$i]->getOutputs());
-		
-	$this->objOutputLayer->activate();
-	
+  $this->arrHiddenLayers[0]->activate();
+
 	$this->boolNetworkActivated = TRUE;
 	
   $this->intTotalActivations++;
@@ -443,7 +440,7 @@ public function train()
     return $this->boolTrained;
   }
 
-  $starttime = date('U');
+  $intStartTime = date('U');
   
   $this->getNextIndexInputsToTrain(TRUE);
 
@@ -479,11 +476,11 @@ public function train()
     $this->boolFirstLoopOfTraining = FALSE;
   }
 
-  $stoptime = date('U');
+  $intStopTime = date('U');
 
   $this->intTotalLoops += $i;
 
-  $this->intTrainingTime += $stoptime - $starttime;
+  $this->intTrainingTime += $intStopTime - $intStartTime;
   
   $this->boolTrained = $this->isTrainingComplete();
   
@@ -499,29 +496,25 @@ public function train()
 
 protected function getNextIndexInputsToTrain($boolReset = FALSE)
 {
-  static $arrIndex = array();
-
-  static $index = -1;
-
   if($boolReset)
   {
-    $arrIndex = array_keys($this->arrInputs);
+    $this->arrInputsToTrain = array_keys($this->arrInputs);
 
-    $index = -1;
+    $this->intInputsToTrainIndex = -1;
 
     return;
   }
 
-  $index++;
+  $this->intInputsToTrainIndex++;
 
-  if(!isset($arrIndex[$index]))
+  if(!isset($this->arrInputsToTrain[$this->intInputsToTrainIndex]))
   {
-    shuffle($arrIndex);
+    shuffle($this->arrInputsToTrain);
 
-    $index = 0;
+    $this->intInputsToTrainIndex = 0;
   }
 
-  return $arrIndex[$index];
+  return $this->arrInputsToTrain[$this->intInputsToTrainIndex];
 }
 	
 // ****************************************************************************
@@ -609,7 +602,7 @@ public function setMomentum($floatMomentum = 0.95)
 protected function isTrainingComplete()
 {
   $arrOutputs = $this->getOutputs();
-
+  
   switch($this->strOutputType)
   {
     case 'linear':
@@ -725,12 +718,12 @@ protected function training($arrOutputs)
 	
 	$this->objOutputLayer->calculateOutputDeltas($arrOutputs);
 
-	for ($i = $this->intNumberOfArrayHiddenLayersDec; $i >= 0; $i--)
+	for ($i = $this->intNumberOfHiddenLayersDec; $i >= 0; $i--)
 		$this->arrHiddenLayers[$i]->calculateHiddenDeltas();
 		
 	$this->objOutputLayer->adjustWeights();
 		
-	for ($i = $this->intNumberOfArrayHiddenLayersDec; $i >= 0; $i--)
+	for ($i = $this->intNumberOfHiddenLayersDec; $i >= 0; $i--)
 		$this->arrHiddenLayers[$i]->adjustWeights();
 		
 	$this->intTotalTrainings++;
@@ -819,7 +812,7 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
 
   foreach($objHiddenLayer->getNeurons() as $objNeuron)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
-          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 4) ."</p>"
+          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), ANN_Maths::PRECISION) ."</p>"
           .(($this->intBackpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<p><b>Delta factor</b><br /> '. $objNeuron->getDeltaFactor() .'</p>' : '')
           .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p><b>Learning rate</b><br /> '. $objNeuron->getfloatLearningRate() .'</p>' : '')
           ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
@@ -838,7 +831,7 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
 
   foreach($this->objOutputLayer->getNeurons() as $objNeuron)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
-          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 4) ."</p>"
+          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), ANN_Maths::PRECISION) ."</p>"
           .(($this->intBackpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<p><b>Delta factor</b><br /> '. $objNeuron->getDeltaFactor() .'</p>' : '')
           .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p><b>Learning rate</b><br /> '. $objNeuron->getfloatLearningRate() .'</p>' : '')
           ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
@@ -1056,21 +1049,21 @@ protected function printNetworkDetails2()
     print "<tr>\n";
 
     foreach($arrInputs as $intKeyInput => $input)
-      $arrInputs[$intKeyInput] = round($input, 2);
+      $arrInputs[$intKeyInput] = round($input, 3);
 
     print "<td style=\"color: #DDDDDD\" align=\"right\">&nbsp;<b>f</b>(". implode(', ', $arrInputs) .") =&nbsp;</td>\n";
 
     $arrOutputs = $this->getOutputsByInputKey($intKeyInputs);
 
     foreach($arrOutputs as $intKeyOutput => $output)
-      $arrOutputs[$intKeyOutput] = round($output, 2);
+      $arrOutputs[$intKeyOutput] = round($output, 3);
 
     if(!$this->boolTrained)
     {
       $arrDesiredOutputs = $this->arrOutputs[$intKeyInputs];
 
       foreach($arrDesiredOutputs as $intKeyDesiredOutput => $desiredOutput)
-        $arrDesiredOutputs[$intKeyDesiredOutput] = round($desiredOutput, 2);
+        $arrDesiredOutputs[$intKeyDesiredOutput] = round($desiredOutput, 3);
 
       foreach($arrDesiredOutputs as $intKeyOutput => $desiredOutput)
         $arrDesiredOutputsDifferences[$intKeyOutput] = abs($arrDesiredOutputs[$intKeyOutput] - $arrOutputs[$intKeyOutput]);
