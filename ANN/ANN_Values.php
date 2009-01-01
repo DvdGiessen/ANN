@@ -57,6 +57,8 @@ protected $arrInputs  = array();
 protected $arrOutputs = array();
 protected $boolLastActionInput = FALSE;
 protected $boolTrain = FALSE;
+protected $intCountInputs = null;
+protected $intCountOutputs = null;
 
 /**#@-*/
 
@@ -95,10 +97,18 @@ public function input()
 
   $arrParameters = func_get_args();
   
+  $intCountParameters = func_num_args();
+  
   foreach($arrParameters as $floatParameter)
     if(!is_float($floatParameter) && !is_integer($floatParameter))
       throw new ANN_Exception('Each parameter should be float');
       
+  if($this->intCountInputs === null)
+    $this->intCountInputs =  $intCountParameters;
+    
+  if($this->intCountInputs != $intCountParameters)
+    throw new ANN_Exception('There should be '. $this->intCountInputs .' parameter values for input()');
+
   $this->arrInputs[] = $arrParameters;
   
   $this->boolLastActionInput = TRUE;
@@ -138,9 +148,17 @@ public function output()
 
   $arrParameters = func_get_args();
 
+  $intCountParameters = func_num_args();
+
   foreach($arrParameters as $floatParameter)
     if(!is_float($floatParameter) && !is_integer($floatParameter))
       throw new ANN_Exception('Each parameter should be float');
+
+  if($this->intCountOutputs === null)
+    $this->intCountOutputs =  $intCountParameters;
+
+  if($this->intCountOutputs != $intCountParameters)
+    throw new ANN_Exception('There should be '. $this->intCountOutputs .' parameter values for output()');
 
   $this->arrOutputs[] = $arrParameters;
 
