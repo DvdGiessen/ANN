@@ -214,6 +214,17 @@ public function getOutputsArray()
 
 // ****************************************************************************
 
+/**
+ * Unserializing ANN_Values
+ *
+ * After calling unserialize the train mode is set to false. Therefore it is
+ * possible to use a saved object of ANN_Values to use inputs not for training
+ * purposes.
+ *
+ * You would not use unserialize in your application but you can call loadFromFile()
+ * to load the saved object to your application.
+ */
+
 public function __wakeup()
 {
   $this->boolTrain = FALSE;
