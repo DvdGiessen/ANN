@@ -77,19 +77,8 @@ public function __construct(ANN_Network $objNetwork)
   $this->objNetwork = $objNetwork;
 
   $this->floatDelta = ANN_Maths::random(40000, 90000) / 100000;
-
-  switch($this->objNetwork->intBackpropagationAlgorithm)
-  {
-    case ANN_Network::ALGORITHM_ILR:
-
-      $this->floatLearningRate = ANN_Maths::random(40000, 60000) / 100000;
-
-      break;
-
-    default:
-
-      $this->floatLearningRate = $this->objNetwork->floatLearningRate;
-  }
+  
+  $this->floatLearningRate = $this->objNetwork->floatLearningRate;
 }
 
 // ****************************************************************************
@@ -335,5 +324,3 @@ public function getLearningRate()
 
 // ****************************************************************************
 }
-
-?>

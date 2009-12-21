@@ -91,58 +91,8 @@ public $floatWeightDecay = 0.05;
 public $boolFirstLoopOfTraining = TRUE;
 public $boolFirstEpochOfTraining = TRUE;
 public $floatQuickPropMaxWeightChangeFactor = 0;
-public $intBackpropagationAlgorithm = self::ALGORITHM_BACKPROPAGATION;
 
 /**#@-*/
-
-/**
- * Back propagation (default)
- */
-
-const ALGORITHM_BACKPROPAGATION = 1;
-
-/**
- * Quick propagation (EXPERIMENTAL)
- */
-
-const ALGORITHM_QUICKPROP = 2;
-
-/**
- * RProp (EXPERIMENTAL)
- */
-
-const ALGORITHM_RPROP = 3;
-
-/**
- * RProp- (EXPERIMENTAL)
- */
-
-const ALGORITHM_RPROPMINUS = 4;
-
-/**
- * RProp+ (EXPERIMENTAL)
- */
-
-const ALGORITHM_RPROPPLUS = 5;
-
-/**
- * iRProp- (EXPERIMENTAL)
- */
-
-const ALGORITHM_IRPROPMINUS = 6;
-
-/**
- * iRProp+ (EXPERIMENTAL)
- */
-
-const ALGORITHM_IRPROPPLUS = 7;
-
-
-/**
- * Individual learning rate (EXPERIMENTAL)
- */
-
-const ALGORITHM_ILR = 8;
 
 /**
  * Linear output type
@@ -813,8 +763,6 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
   foreach($objHiddenLayer->getNeurons() as $objNeuron)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
           ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), ANN_Maths::PRECISION) ."</p>"
-          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<p><b>Delta factor</b><br /> '. $objNeuron->getDeltaFactor() .'</p>' : '')
-          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p style="border: solid #FFCC33 1px;"><b>Learning rate</b><br /> '. $objNeuron->getLearningRate() .'</p>' : '')
           ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
           .implode('<br />', $objNeuron->getWeights())
           ."</p></td>\n";
@@ -832,8 +780,6 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
   foreach($this->objOutputLayer->getNeurons() as $objNeuron)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
           ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), ANN_Maths::PRECISION) ."</p>"
-          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_RPROP) ? '<p><b>Delta factor</b><br /> '. $objNeuron->getDeltaFactor() .'</p>' : '')
-          .(($this->intBackpropagationAlgorithm == self::ALGORITHM_ILR) ? '<p style="border: solid #FFCC33 1px;"><b>Learning rate</b><br /> '. $objNeuron->getLearningRate() .'</p>' : '')
           ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
           .implode('<br />', $objNeuron->getWeights())
           ."</p></td>\n";
@@ -876,42 +822,7 @@ protected function printNetworkDetails1()
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Backpropagation algorithm</td>\n";
-  print "<td style=\"background-color: #CCCCCC\">";
-
-  switch($this->intBackpropagationAlgorithm)
-  {
-    case self::ALGORITHM_BACKPROPAGATION :
-      print 'Back propagation';
-      break;
-      
-    case self::ALGORITHM_QUICKPROP :
-      print 'QuickProp';
-      break;
-      
-    case self::ALGORITHM_RPROP :
-      print 'RProp';
-      break;
-      
-    case self::ALGORITHM_RPROPPLUS :
-      print 'RProp+';
-      break;
-      
-    case self::ALGORITHM_RPROPMINUS :
-      print 'RProp-';
-      break;
-      
-    case self::ALGORITHM_IRPROPMINUS :
-      print 'iRProp-';
-      break;
-      
-    case self::ALGORITHM_IRPROPPLUS :
-      print 'iRProp+';
-      break;
-      
-    case self::ALGORITHM_ILR :
-      print 'Individual learning rate';
-      break;
-  }
+  print "<td style=\"background-color: #CCCCCC\">Back propagation";
 
   print "</td>\n";
   print "</tr>\n";
@@ -928,15 +839,12 @@ protected function printNetworkDetails1()
         ."</td>\n";
   print "</tr>\n";
 
-  if($this->intBackpropagationAlgorithm == self::ALGORITHM_BACKPROPAGATION)
-  {
-    print "<tr>\n";
-    print "<td style=\"color: #DDDDDD\">Learning rate</td>\n";
-    print "<td style=\"background-color: #CCCCCC\">"
-          .$this->floatLearningRate
-          ."</td>\n";
-    print "</tr>\n";
-  }
+  print "<tr>\n";
+  print "<td style=\"color: #DDDDDD\">Learning rate</td>\n";
+  print "<td style=\"background-color: #CCCCCC\">"
+        .$this->floatLearningRate
+        ."</td>\n";
+  print "</tr>\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Weight decay</td>\n";
@@ -1563,62 +1471,6 @@ public function setWeightDecay($floatWeightDecay = 0.05)
   $this->floatWeightDecay = $floatWeightDecay;
 
   $this->boolWeightDecayMode = TRUE;
-}
-
-// ****************************************************************************
-
-/**
- * Selecting propagation algorithm
- *
- * EXPERIMENTAL
- *
- * @param integer $intAlgorithm (Default: self::ALGORITHM_BACKPROPAGATION)
- * @uses ANN_Exception::__construct()
- * @throws ANN_Exception
- */
-
-public function setBackpropagationAlgorithm($intAlgorithm = self::ALGORITHM_BACKPROPAGATION)
-{
-  if(!is_int($intAlgorithm))
-    throw new ANN_Exception('$intAlgorithm must be integer');
-
-  $this->intBackpropagationAlgorithm = $intAlgorithm;
-
-  switch($intAlgorithm)
-  {
-    case self::ALGORITHM_RPROP:
-    case self::ALGORITHM_RPROPMINUS:
-    case self::ALGORITHM_RPROPPLUS:
-    case self::ALGORITHM_IRPROPMINUS:
-    case self::ALGORITHM_IRPROPPLUS:
-    case self::ALGORITHM_ILR:
-
-      $this->boolDynamicLearningRate = FALSE;
-
-      break;
-  }
-}
-
-// ****************************************************************************
-
-/**
- * Parameter setting for QuickProp algorithm
- *
- * EXPERIMENTAL
- *
- * @param float $floatQuickPropMaxWeightChangeFactor (Default: 2.25)
- * @uses ANN_Exception::__construct()
- * @throws ANN_Exception
- */
-
-public function setQuickPropMaxWeightChangeFactor($floatQuickPropMaxWeightChangeFactor = 2.25)
-{
-  if($floatQuickPropMaxWeightChangeFactor < 1.75 || $floatQuickPropMaxWeightChangeFactor > 2.25)
-    throw new ANN_Exception('$floatQuickPropMaxWeightChangeFactor must be between 1.75 and 2.25');
-
-  $this->floatQuickPropMaxWeightChangeFactor = $floatQuickPropMaxWeightChangeFactor;
-
-  $this->backpropagationAlorigthm = self::QUICKPROP;
 }
 
 // ****************************************************************************
