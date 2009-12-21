@@ -85,7 +85,7 @@ private $arrInputsToTrain = array();
 private $intInputsToTrainIndex = -1;
 public $intOutputType = self::OUTPUT_LINEAR;
 public $floatMomentum = 0.95;
-public $floatLearningRate = 0.5;
+public $floatLearningRate = 0.7;
 public $boolWeightDecayMode = FALSE;
 public $floatWeightDecay = 0.05;
 public $boolFirstLoopOfTraining = TRUE;
@@ -1327,7 +1327,7 @@ protected function logNetworkErrors()
 {
   $arrData = array();
 
-  $arrData['network error'] = $this->getNetworkError();
+  $arrData['network error'] = number_format($this->getNetworkError(), 8, ',', '');
 
   $arrData['learning rate'] = $this->floatLearningRate;
 
