@@ -35,7 +35,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Thomas Wien <info_at_thwien_dot_de>
- * @version ANN Version 2.0 by Thomas Wien
+ * @version ANN Version 2.1 by Thomas Wien
  * @copyright Copyright (c) 2007-09 by Thomas Wien
  * @package ANN
  */
@@ -56,14 +56,14 @@ public function __construct()
 {
   $this->strDir = dirname(__FILE__);
 
-  spl_autoload_register(array($this, 'splAutoload'));
+  spl_autoload_register(array($this, 'autoload'));
 }
 
 // ****************************************************************************
 
 public function __destruct()
 {
-  spl_autoload_unregister(array($this, 'splAutoload'));
+  spl_autoload_unregister(array($this, 'autoload'));
 }
 
 // ****************************************************************************
@@ -73,12 +73,14 @@ public function __destruct()
  * @return boolean
  */
 
-public function splAutoload($strClassname)
+public function autoload($strClassname)
 {
   settype($strClassname, 'string');
 
   if(!preg_match('/^ANN/', $strClassname))
     return FALSE;
+
+  $strClassname = preg_replace('/^ANN_/', '', $strClassname);
 
   $strFilename = $this->strDir . "/$strClassname.php";
 
@@ -96,5 +98,3 @@ public function splAutoload($strClassname)
 }
 
 $objANNLoader = new ANN_Loader;
-
-?>
