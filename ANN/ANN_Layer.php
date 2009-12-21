@@ -209,8 +209,6 @@ public function calculateHiddenDeltas()
 
         if($this->objNetwork->boolWeightDecayMode)
           $floatDelta -= $objNeuron->getDeltaWithMomentum() * $this->objNetwork->floatWeightDecay;
-
-        $floatDelta *= $this->objNetwork->floatLearningRate;
         break;
 
       case ANN_Network::ALGORITHM_ILR:
@@ -239,7 +237,7 @@ public function calculateHiddenDeltas()
  * @param integer $intKeyNeuron
  * @return float
  * @uses ANN_Neuron::getOutput()
- * @uses ANN_Neuron::getDeltaWithMomentum()
+ * @uses ANN_Neuron::getDelta()
  * @uses ANN_Neuron::getWeight()
  * @uses ANN_Layer::getNeurons()
  */
@@ -251,7 +249,7 @@ protected function calculateDeltaByBackpropagation($intKeyNeuron)
   $floatSum = 0;
 
 	foreach ($arrNeuronsNextLayer as $objNeuronNextLayer)
-    $floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDeltaWithMomentum();
+    $floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDelta();
 
   $floatOutput = $this->arrNeurons[$intKeyNeuron]->getOutput();
 
@@ -343,12 +341,14 @@ protected function calculateDeltaByILR($intKeyNeuron, ANN_Neuron $objNeuron)
 
   if($floatDelta * $floatDelta1 > 0)
   {
-    return $floatDelta * $objNeuron->adjustLearningRatePlus();
+    $objNeuron->adjustLearningRatePlus();
   }
   else
   {
-    return $floatDelta * $objNeuron->adjustLearningRateMinus();
+    $objNeuron->adjustLearningRateMinus();
   }
+  
+  return $floatDelta;
 }
 
 // ****************************************************************************
@@ -676,7 +676,7 @@ protected function calculateOutputDeltaByBackpropagation($floatDesiredOutput, AN
   $output = $objNeuron->getOutput();
 
 	$floatDelta = $output * ($floatDesiredOutput - $output) * (1 - $output);
-
+	
   if($this->objNetwork->boolWeightDecayMode)
     $floatDelta -= $objNeuron->getDeltaWithMomentum() * $this->objNetwork->floatWeightDecay;
 
