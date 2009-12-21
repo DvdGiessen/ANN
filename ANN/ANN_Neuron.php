@@ -76,9 +76,20 @@ public function __construct(ANN_Network $objNetwork)
 {
   $this->objNetwork = $objNetwork;
 
-  $this->floatLearningRate = ANN_Maths::random(400, 600) / 1000;
+  $this->floatDelta = ANN_Maths::random(40000, 90000) / 100000;
 
-  $this->floatDelta = ANN_Maths::random(400, 900) / 1000;
+  switch($this->objNetwork->intBackpropagationAlgorithm)
+  {
+    case ANN_Network::ALGORITHM_ILR:
+
+      $this->floatLearningRate = ANN_Maths::random(40000, 60000) / 100000;
+
+      break;
+
+    default:
+
+      $this->floatLearningRate = $this->objNetwork->floatLearningRate;
+  }
 }
 
 // ****************************************************************************
@@ -174,7 +185,7 @@ public function getDelta()
 protected function initializeWeights()
 {
 	foreach ($this->arrInputs as $intKey => $floatInput)
-		$this->arrWeights[$intKey] = ANN_Maths::random(-500, 500) / 1000;
+		$this->arrWeights[$intKey] = ANN_Maths::random(-50000, 50000) / 100000;
 }
 	
 // ****************************************************************************
@@ -207,7 +218,7 @@ public function adjustWeights()
     case ANN_Network::OUTPUT_BINARY:
 
     	foreach ($this->arrWeights as $intKey => $floatWeight)
-    		$this->arrWeights[$intKey] += round($this->arrInputs[$intKey] * $this->floatDelta, ANN_Maths::PRECISION);
+    		$this->arrWeights[$intKey] += round($this->floatLearningRate * $this->arrInputs[$intKey] * $this->floatDelta, ANN_Maths::PRECISION);
 
       break;
 
@@ -216,7 +227,7 @@ public function adjustWeights()
       $floatDelta = 0;
 
       foreach($this->arrInputs as $floatInput)
-        $floatDelta += round($floatInput * $this->floatDelta, ANN_Maths::PRECISION);
+        $floatDelta += round($this->floatLearningRate * $floatInput * $this->floatDelta, ANN_Maths::PRECISION);
 
     	foreach ($this->arrWeights as $intKey => $floatWeight)
     		$this->arrWeights[$intKey] += $floatDelta;
@@ -293,10 +304,8 @@ public function adjustLearningRatePlus()
 {
   $floatLearningRate = $this->floatLearningRate + 0.02;
   
-  if($floatLearningRate < 0.6)
+  if($floatLearningRate < 0.7)
     $this->floatLearningRate = $floatLearningRate;
-
-  return $this->floatLearningRate;
 }
 
 // ****************************************************************************
@@ -309,10 +318,8 @@ public function adjustLearningRateMinus()
 {
   $floatLearningRate = $this->floatLearningRate - 0.02;
 
-  if($floatLearningRate > 0.4)
+  if($floatLearningRate > 0.3)
     $this->floatLearningRate = $floatLearningRate;
-
-  return $this->floatLearningRate;
 }
 
 // ****************************************************************************
