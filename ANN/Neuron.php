@@ -289,34 +289,6 @@ public function getErrorWeightDerivative()
  * @return float
  */
 
-public function adjustLearningRatePlus()
-{
-  $floatLearningRate = $this->floatLearningRate + 0.02;
-  
-  if($floatLearningRate < 0.7)
-    $this->floatLearningRate = $floatLearningRate;
-}
-
-// ****************************************************************************
-
-/**
- * @return float
- */
-
-public function adjustLearningRateMinus()
-{
-  $floatLearningRate = $this->floatLearningRate - 0.02;
-
-  if($floatLearningRate > 0.3)
-    $this->floatLearningRate = $floatLearningRate;
-}
-
-// ****************************************************************************
-
-/**
- * @return float
- */
-
 public function getLearningRate()
 {
   return $this->floatLearningRate;

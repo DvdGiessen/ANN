@@ -74,7 +74,6 @@ protected $boolTrained = FALSE;
 protected $intTrainingTime = 0; // Seconds
 protected $objLoggingWeights = null;
 protected $objLoggingNetworkErrors = null;
-protected $boolDynamicLearningRate = FALSE;
 protected $boolNetworkActivated = FALSE;
 protected $arrTrainingComplete = array();
 protected $intNumberOfNeuronsPerLayer = 0;
@@ -382,7 +381,6 @@ protected function activate()
  * @uses logWeights()
  * @uses logNetworkErrors()
  * @uses getNextIndexInputsToTrain()
- * @uses adjustLearningRate()
  * @uses isTrainingCompleteByInputKey()
  * @throws ANN_Exception
  */
@@ -430,8 +428,6 @@ public function train()
       if($this->isTrainingCompleteByEpoch())
         break;
         
-      $this->adjustLearningRate();
-
       $this->boolFirstEpochOfTraining = FALSE;
     }
 
@@ -515,7 +511,7 @@ protected function isEpoch()
 // ****************************************************************************
 
 /**
- * Setting the learning rate disables dynamic learning rate automatically.
+ * Setting the learning rate
  *
  * @param float $floatLearningRate (Default: 0.5) (0.1 .. 0.9)
  * @uses ANN_Exception::__construct()
@@ -531,8 +527,6 @@ public function setLearningRate($floatLearningRate = 0.5)
     throw new ANN_Exception('$floatLearningRate should be between 0.1 and 0.9');
 
   $this->floatLearningRate = $floatLearningRate;
-  
-  $this->boolDynamicLearningRate = FALSE;
 }
 
 // ****************************************************************************
@@ -1381,62 +1375,6 @@ protected function detectOutputType()
       }
 
   $this->setOutputType(self::OUTPUT_BINARY);
-}
-
-// ****************************************************************************
-
-/**
- * Adjusting learning rate dynamically
- *
- * If network error of current epoch is higher than the network error of the previous
- * epoch the learning rate is adjusted by minus 1 per cent of current learning rate.
- * Otherwise the learning rate is adjusted by plus 1 per cent of current learning
- * rate. So, learning rate increases faster than decreasing does. But if learning rate
- * reaches 0.9 it switches back to 0.5 to avoid endless training. The lowest learning
- * rate is 0.5 also to avoid endless training.
- *
- * @uses getNetworkError()
- */
-
-protected function adjustLearningRate()
-{
-  if(!$this->boolDynamicLearningRate)
-    return;
-
-  $this->floatNetworkErrorCurrent = $this->getNetworkError();
-
-  if($this->floatNetworkErrorCurrent >= $this->floatNetworkErrorPrevious)
-  {
-    $this->floatLearningRate *= 1.01;
-
-    if($this->floatLearningRate > 0.9)
-      $this->floatLearningRate = 0.5;
-  }
-  else
-  {
-    $this->floatLearningRate *= 0.99;
-
-    if($this->floatLearningRate < 0.5)
-      $this->floatLearningRate = 0.5;
-  }
-
-  $this->floatNetworkErrorPrevious = $this->floatNetworkErrorCurrent;
-}
-
-// ****************************************************************************
-
-/**
- * @param boolean $boolDynamicLearningRate (Default: TRUE)
- * @uses ANN_Exception::__construct()
- * @throws ANN_Exception
- */
-
-public function setDynamicLearningRate($boolDynamicLearningRate = TRUE)
-{
-  if(!is_bool($boolDynamicLearningRate))
-    throw new ANN_Exception('$boolDynamicLearningRate must be boolean');
-
-  $this->boolDynamicLearningRate = $boolDynamicLearningRate;
 }
 
 // ****************************************************************************
