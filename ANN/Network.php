@@ -85,8 +85,6 @@ private $intInputsToTrainIndex = -1;
 public $intOutputType = self::OUTPUT_LINEAR;
 public $floatMomentum = 0.95;
 public $floatLearningRate = 0.7;
-public $boolWeightDecayMode = FALSE;
-public $floatWeightDecay = 0.05;
 public $boolFirstLoopOfTraining = TRUE;
 public $boolFirstEpochOfTraining = TRUE;
 public $floatQuickPropMaxWeightChangeFactor = 0;
@@ -841,13 +839,6 @@ protected function printNetworkDetails1()
   print "</tr>\n";
 
   print "<tr>\n";
-  print "<td style=\"color: #DDDDDD\">Weight decay</td>\n";
-  print "<td style=\"background-color: #CCCCCC\">"
-        .(($this->boolWeightDecayMode) ? $this->floatWeightDecay : 'Off')
-        ."</td>\n";
-  print "</tr>\n";
-
-  print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Network error</td>\n";
   print "<td style=\"background-color: #CCCCCC\">"
         .$this->getNetworkError()
@@ -1380,40 +1371,6 @@ protected function detectOutputType()
 // ****************************************************************************
 
 /**
- * @param boolean $boolWeightDecayMode (Default: TRUE)
- * @uses ANN_Exception::__construct()
- * @throws ANN_Exception
- */
-
-public function setWeightDecayMode($boolWeightDecayMode = TRUE)
-{
-  if(!is_bool($boolWeightDecayMode))
-    throw new ANN_Exception('$boolWeightDecayMode must be boolean');
-
-  $this->boolWeightDecayMode = $boolWeightDecayMode;
-}
-
-// ****************************************************************************
-
-/**
- * @param float $floatWeightDecay (Default: 0.05)
- * @uses ANN_Exception::__construct()
- * @throws ANN_Exception
- */
-
-public function setWeightDecay($floatWeightDecay = 0.05)
-{
-  if($floatWeightDecay < 0.03 || $floatWeightDecay > 0.05)
-    throw new ANN_Exception('$floatWeightDecay must be between 0.03 and 0.05');
-
-  $this->floatWeightDecay = $floatWeightDecay;
-
-  $this->boolWeightDecayMode = TRUE;
-}
-
-// ****************************************************************************
-
-/**
  * Setting the percentage of output error in comparison to the desired output
  *
  * @param float $floatOutputErrorTolerance (Default: 0.02)
@@ -1429,5 +1386,3 @@ public function setOutputErrorTolerance($floatOutputErrorTolerance = 0.02)
 
 // ****************************************************************************
 }
-
-?>

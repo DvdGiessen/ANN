@@ -189,10 +189,6 @@ public function activate()
 
 /**
  * @uses calculateDeltaByBackpropagation()
- * @uses calculateDeltaByQuickProp()
- * @uses calculateDeltaByRProp()
- * @uses calculateDeltaByILR()
- * @uses ANN_Neuron::getDeltaWithMomentum()
  * @uses ANN_Neuron::setDelta()
  */
 
@@ -204,9 +200,6 @@ public function calculateHiddenDeltas()
   {
 		$floatDelta = $this->calculateDeltaByBackpropagation($intKeyNeuron);
 		
-		if($this->objNetwork->boolWeightDecayMode)
-			$floatDelta -= $objNeuron->getDeltaWithMomentum() * $this->objNetwork->floatWeightDecay;
-	
 		$objNeuron->setDelta($floatDelta);
   }
 }
@@ -241,9 +234,6 @@ protected function calculateDeltaByBackpropagation($intKeyNeuron)
 /**
  * @param array $arrDesiredOutputs
  * @uses calculateOutputDeltaByBackpropagation()
- * @uses calculateOutputDeltaByRProp()
- * @uses calculateOutputDeltaByILR()
- * @uses calculateOutputDeltaByQuickProp()
  * @uses ANN_Neuron::setDelta()
  */
 
@@ -262,8 +252,6 @@ public function calculateOutputDeltas($arrDesiredOutputs)
 /**
  * @param float $floatDesiredOutput
  * @uses ANN_Neuron::getOutput()
- * @uses ANN_Neuron::setDelta()
- * @uses ANN_Neuron::getDeltaWithMomentum()
  */
 
 protected function calculateOutputDeltaByBackpropagation($floatDesiredOutput, ANN_Neuron $objNeuron)
@@ -272,9 +260,6 @@ protected function calculateOutputDeltaByBackpropagation($floatDesiredOutput, AN
 
 	$floatDelta = $output * ($floatDesiredOutput - $output) * (1 - $output);
 	
-  if($this->objNetwork->boolWeightDecayMode)
-    $floatDelta -= $objNeuron->getDeltaWithMomentum() * $this->objNetwork->floatWeightDecay;
-
   return $floatDelta;
 }
 
