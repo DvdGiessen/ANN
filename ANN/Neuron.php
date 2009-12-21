@@ -228,64 +228,6 @@ public function adjustWeights()
 // ****************************************************************************
 
 /**
- * @param float $floatDeltaFactor
- */
-
-public function setDeltaFactor($floatDeltaFactor)
-{
-  $this->floatDeltaFactor = $floatDeltaFactor;
-}
-
-// ****************************************************************************
-
-/**
- * @return float
- */
-
-public function getDeltaFactor()
-{
-  return $this->floatDeltaFactor;
-}
-
-// ****************************************************************************
-
-/**
- * @param float $errorWeightDerivative dE/dw(t)
- * @return float dE/dw(t-1)
- */
-
-public function updateErrorWeightDerivative($errorWeightDerivative)
-{
-  $this->errorWeightDerivative = $errorWeightDerivative;
-  
-  return $this->errorWeightDerivative;
-}
-
-// ****************************************************************************
-
-/**
- * @param float $errorWeightDerivative
- */
-
-public function setErrorWeightDerivative($errorWeightDerivative)
-{
-  $this->errorWeightDerivative = $errorWeightDerivative;
-}
-
-// ****************************************************************************
-
-/**
- * @return float
- */
-
-public function getErrorWeightDerivative()
-{
-  return $this->errorWeightDerivative;
-}
-
-// ****************************************************************************
-
-/**
  * @return float
  */
 
