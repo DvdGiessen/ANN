@@ -13,8 +13,10 @@ catch(Exception $e)
 {
 	print "\nCreating a new one...";
 	
-	$network = new ANN_Network(2,8,1);
+	$network = new ANN_Network(1,8,1);
 }
+
+$network->logToFile('network.log');
 
 /*
 $inputs = array(

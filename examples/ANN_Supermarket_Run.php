@@ -3,42 +3,39 @@
 ini_set('max_execution_time', 1200);
 ini_set('precision', '5');
 
-require_once('../ANN/ANN_Network.php');
+require_once('../ANN/ANN_Loader.php');
 
 try
 {
-$network = ANN_Network::loadFromFile('ANN_Supermarket_Training.dat');
+  $network = ANN_Network::loadFromFile('ANN_Supermarket_Training.dat');
 }
 catch(Exception $e)
 {
 	die('Network not found.');
 }
 
-// print_r($network); exit;
+$temperature = ANN_InputValue::loadFromFile('input_temperature.dat'); // Temperature
 
-$temperature = new ANN_InputValue(-15, 50); // Temperature
+$humidity = ANN_InputValue::loadFromFile('input_humidity.dat'); // Humidity
 
-$humidity = new ANN_InputValue(0, 100); // Humidity
+$quantity = ANN_OutputValue::loadFromFile('output_quantity.dat'); // Quantity of sold articles
 
-$quantity = new ANN_OutputLinearValue(0, 300); // Quantity of sold articles
+try
+{
+  $objValues = ANN_Values::loadFromFile('values_supermarket.dat');
+}
+catch(Exception $e)
+{
+  die('Loading of values failed');
+}
 
 
-$inputs = array(
-//	array($temperature->GetInputValue(21), $humidity->GetInputValue(35)),
-	array($temperature->GetInputValue(21), $humidity->GetInputValue(10)),
-	array($temperature->GetInputValue(30), $humidity->GetInputValue(40)),
-	array($temperature->GetInputValue(32), $humidity->GetInputValue(30)),
-	array($temperature->GetInputValue(33), $humidity->GetInputValue(20))
-);
-
-$network->setInputs($inputs);
-
-// $network->setOutputType('binary');
+$network->setValues($objValues);
 
 print_r($outputs = $network->getOutputs());
 
 foreach($outputs as $output)
-foreach($output as $value)
-print $quantity->getRealOutputValue($value).'#';
+  foreach($output as $value)
+    print $quantity->getRealOutputValue($value).'<br>';
 
 ?>

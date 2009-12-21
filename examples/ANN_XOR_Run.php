@@ -2,7 +2,7 @@
 
 ini_set('max_execution_time', 300);
 
-require_once('../ANN/ANN_Network.php');
+require_once('../ANN/ANN_Loader.php');
 
 try
 {
@@ -15,17 +15,26 @@ catch(Exception $e)
 	$network = new ANN_Network;
 }
 
-$inputs = array(
-	array(0, 0),
-	array(0, 1),
-	array(1, 0),
-	array(1, 1)
-);
+try
+{
+  $objValues = ANN_Values::loadFromFile('values_xor.dat');
+}
+catch(Exception $e)
+{
+  die('Loading of values failed');
+}
 
-$network->setInputs($inputs);
+$objValues->input(0, 1)
+          ->input(1, 1)
+          ->input(1, 0)
+          ->input(0, 0)
+          ->input(0, 1)
+          ->input(1, 1);
+
+$network->setValues($objValues);
 
 // $network->setOutputType();
 
-print_r($network->getOutputs() );
+$network->printNetwork();
 
 ?>
