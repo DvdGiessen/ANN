@@ -712,7 +712,6 @@ protected function setOutputType($intType = self::OUTPUT_LINEAR)
 
 /**
  * @param integer $intLevel (0, 1, 2) (Default: 2)
- * @uses ANN_Neuron::getDeltaFactor()
  * @uses ANN_Neuron::getDelta()
  * @uses ANN_Neuron::getWeights()
  * @uses ANN_Layer::getNeurons()

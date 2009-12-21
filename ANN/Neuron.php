@@ -149,17 +149,6 @@ public function getOutput()
  * @return float
  */
 
-public function getDeltaWithMomentum()
-{
-	return $this->objNetwork->floatMomentum * $this->floatDelta;
-}
-
-// ****************************************************************************
-
-/**
- * @return float
- */
-
 public function getDelta()
 {
 	return $this->floatDelta;
@@ -223,17 +212,6 @@ public function adjustWeights()
 
       break;
   }
-}
-
-// ****************************************************************************
-
-/**
- * @return float
- */
-
-public function getLearningRate()
-{
-  return $this->floatLearningRate;
 }
 
 // ****************************************************************************
