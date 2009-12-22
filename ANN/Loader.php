@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Artificial Neural Network - Version 2.0
+ * Artificial Neural Network - Version 2.1
  *
  * For updates and changes visit the project page at http://ann.thwien.de/
  *
