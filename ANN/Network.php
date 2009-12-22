@@ -711,7 +711,7 @@ public function printNetwork($intLevel = 2)
   print "<table border=\"1\" style=\"background-color: #AAAAAA; border-width: 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
 
   print "<tr>\n";
-  print "<td style=\"color: #DDDDDD\">Input-Layer</td>\n";
+  print "<td style=\"color: #DDDDDD; text-align: center\">Input<br />Layer</td>\n";
 
   foreach($this->arrInputs[0] as $intKey => $input)
   {
@@ -728,7 +728,7 @@ public function printNetwork($intLevel = 2)
 foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
 {
   print "<tr>\n";
-  print "<td style=\"color: #DDDDDD\">Hidden-Layer ". ($intIndex + 1) ."</td>\n";
+  print "<td style=\"color: #DDDDDD; text-align: center\">Hidden<br />Layer<br />". ($intIndex + 1) ."</td>\n";
 
   foreach($objHiddenLayer->getNeurons() as $objNeuron)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
@@ -745,7 +745,7 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
 }
 
   print "<tr>\n";
-  print "<td style=\"color: #DDDDDD\" rowspan=\"2\">Output-Layer</td>\n";
+  print "<td style=\"color: #DDDDDD; text-align: center\" rowspan=\"2\">Output<br />Layer</td>\n";
 
   foreach($this->objOutputLayer->getNeurons() as $objNeuron)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
