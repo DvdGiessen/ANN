@@ -52,5 +52,3 @@ class ANN_Exception extends Exception
 {
 
 }
-
-?>

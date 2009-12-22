@@ -150,5 +150,3 @@ protected function calculateOutputValue($floatValue)
 
 // ****************************************************************************
 }
-
-?>

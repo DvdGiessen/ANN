@@ -134,5 +134,3 @@ protected function calculateInputValue($floatValue)
 
 // ****************************************************************************
 }
-
-?>

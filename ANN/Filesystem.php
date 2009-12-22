@@ -121,5 +121,3 @@ public static function loadFromFile($strFilename = null)
 
 // ****************************************************************************
 }
-
-?>
