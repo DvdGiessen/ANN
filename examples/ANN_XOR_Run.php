@@ -1,8 +1,8 @@
 <?php
 
-ini_set('max_execution_time', 300);
+ini_set('max_execution_time', 10);
 
-require_once('../ANN/ANN_Loader.php');
+require_once('../ANN/Loader.php');
 
 try
 {
@@ -37,4 +37,6 @@ $network->setValues($objValues);
 
 $network->printNetwork();
 
-?>
+$objNetworkGraph = new ANN_NetworkGraph($network);
+
+$objNetworkGraph->saveToFile('network.png');

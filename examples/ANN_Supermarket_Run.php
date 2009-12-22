@@ -3,7 +3,7 @@
 ini_set('max_execution_time', 1200);
 ini_set('precision', '5');
 
-require_once('../ANN/ANN_Loader.php');
+require_once('../ANN/Loader.php');
 
 try
 {
@@ -38,4 +38,3 @@ foreach($outputs as $output)
   foreach($output as $value)
     print $quantity->getRealOutputValue($value).'<br>';
 
-?>

@@ -3,11 +3,10 @@
 ini_set('error_reporting', E_ALL | E_STRICT);
 ini_set('max_execution_time', 400);
 ini_set('precision', '6');
-// ini_set('xdebug.auto_trace', 'On');
 ini_set('date.timezone', 'Europe/Berlin');
 
 
-require_once '../ANN/ANN_Loader.php';
+require_once '../ANN/Loader.php';
 
 try
 {
@@ -19,8 +18,6 @@ catch(Exception $e)
 	
 	$network = new ANN_Network(1, 8, 1);
 
-	$network->setBackpropagationAlgorithm(ANN_Network::ALGORITHM_ILR);
-	
   $temperature = new ANN_InputValue(-15, 50); // Temperature
   
   $temperature->saveToFile('input_temperature.dat');
@@ -66,14 +63,6 @@ catch(Exception $e)
   unset($temperature);
 }
 
-// $network->logWeightsToFile('supermarket_weights.log.csv');
-// $network->logNetworkErrorsToFile('supermarket_error.log.csv');
-
-// $network->setMomentum(1);
-
-$network->setWeightDecayMode(FALSE);
-
-
 $temperature = ANN_InputValue::loadFromFile('input_temperature.dat'); // Temperature
 
 $humidity = ANN_InputValue::loadFromFile('input_humidity.dat'); // Humidity
@@ -91,11 +80,11 @@ catch(Exception $e)
 
 $network->setValues($objValues);
 
-$network->setOutputErrorTolerance(0.01);
+// $network->setOutputErrorTolerance(0.01);
 
 // $network->logNetworkErrorsToFile('network_errors.csv');
 
-$network->setLearningRate(0.3);
+// $network->setLearningRate(0.3);
 
 $network->train();
 
