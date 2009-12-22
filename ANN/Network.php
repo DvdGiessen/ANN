@@ -510,12 +510,12 @@ protected function isEpoch()
 /**
  * Setting the learning rate
  *
- * @param float $floatLearningRate (Default: 0.5) (0.1 .. 0.9)
+ * @param float $floatLearningRate (Default: 0.7) (0.1 .. 0.9)
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
 
-public function setLearningRate($floatLearningRate = 0.5)
+public function setLearningRate($floatLearningRate = 0.7)
 {
   if(!is_float($floatLearningRate))
     throw new ANN_Exception('$floatLearningRate should be between 0.1 and 0.9');
