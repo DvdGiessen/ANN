@@ -258,7 +258,7 @@ protected function calculateOutputDeltaByBackpropagation($floatDesiredOutput, AN
 {
   $floatOutput = $objNeuron->getOutput();
 
-	$floatDelta = $output * ($floatDesiredOutput - $floatOutput) * (1 - $floatOutput);
+	$floatDelta = $floatOutput * ($floatDesiredOutput - $floatOutput) * (1 - $floatOutput);
 	
   return $floatDelta;
 }
