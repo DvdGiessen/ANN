@@ -92,7 +92,7 @@ public function __construct(ANN_Network $objNetwork, $intNumberOfNeurons, ANN_La
 
 public function setInputs($arrInputs)
 {
-	foreach ($this->arrNeurons as $objNeuron)
+	foreach($this->arrNeurons as $objNeuron)
 		$objNeuron->setInputs($arrInputs);
 }
 	
@@ -155,7 +155,7 @@ public function getThresholdOutputs()
 
 protected function createNeurons($intNumberOfNeurons)
 {
-	for ($intIndex = 0; $intIndex < $intNumberOfNeurons; $intIndex++)
+	for($intIndex = 0; $intIndex < $intNumberOfNeurons; $intIndex++)
 		$this->arrNeurons[] = new ANN_Neuron($this->objNetwork);
 }
 	
@@ -170,14 +170,14 @@ protected function createNeurons($intNumberOfNeurons)
 
 public function activate()
 {
-	foreach ($this->arrNeurons as $intKey => $objNeuron)
+	foreach($this->arrNeurons as $intKey => $objNeuron)
   {
 		$objNeuron->activate();
 
   	$this->arrOutputs[$intKey] = $objNeuron->getOutput();
 	}
 
-	if($this->objNextLayer)
+	if($this->objNextLayer !== null)
 	{
   	$this->objNextLayer->setInputs($this->arrOutputs);
 
@@ -196,39 +196,23 @@ public function calculateHiddenDeltas()
 {
 	$floatDelta = 0;
 
-	foreach ($this->arrNeurons as $intKeyNeuron => $objNeuron)
+  $floatSum = 0;
+	
+	$arrNeuronsNextLayer = $this->objNextLayer->getNeurons();
+	
+	foreach($this->arrNeurons as $intKeyNeuron => $objNeuron)
   {
-		$floatDelta = $this->calculateDeltaByBackpropagation($intKeyNeuron);
+		foreach($arrNeuronsNextLayer as $objNeuronNextLayer)
+    	$floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDelta();
+
+  	$floatOutput = $this->arrNeurons[$intKeyNeuron]->getOutput();
+
+  	$floatDelta = $floatOutput * (1 - $floatOutput) * $floatSum;
 		
 		$objNeuron->setDelta($floatDelta);
   }
 }
 	
-// ****************************************************************************
-
-/**
- * @param integer $intKeyNeuron
- * @return float
- * @uses ANN_Neuron::getOutput()
- * @uses ANN_Neuron::getDelta()
- * @uses ANN_Neuron::getWeight()
- * @uses ANN_Layer::getNeurons()
- */
-
-protected function calculateDeltaByBackpropagation($intKeyNeuron)
-{
-	$arrNeuronsNextLayer = $this->objNextLayer->getNeurons();
-
-  $floatSum = 0;
-
-	foreach ($arrNeuronsNextLayer as $objNeuronNextLayer)
-    $floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDelta();
-
-  $floatOutput = $this->arrNeurons[$intKeyNeuron]->getOutput();
-
-  return $floatOutput * (1 - $floatOutput) * $floatSum;
-}
-
 // ****************************************************************************
 
 /**
@@ -239,30 +223,16 @@ protected function calculateDeltaByBackpropagation($intKeyNeuron)
 
 public function calculateOutputDeltas($arrDesiredOutputs)
 {
-	foreach ($this->arrNeurons as $intKeyNeuron => $objNeuron)
+	foreach($this->arrNeurons as $intKeyNeuron => $objNeuron)
   {
-	  $floatDelta = $this->calculateOutputDeltaByBackpropagation($arrDesiredOutputs[$intKeyNeuron], $objNeuron);
-	
+	  $floatOutput = $objNeuron->getOutput();
+
+		$floatDelta = $floatOutput * ($arrDesiredOutputs[$intKeyNeuron] - $floatOutput) * (1 - $floatOutput);
+	  
 	  $objNeuron->setDelta($floatDelta);
 	}
 }
 	
-// ****************************************************************************
-
-/**
- * @param float $floatDesiredOutput
- * @uses ANN_Neuron::getOutput()
- */
-
-protected function calculateOutputDeltaByBackpropagation($floatDesiredOutput, ANN_Neuron $objNeuron)
-{
-  $floatOutput = $objNeuron->getOutput();
-
-	$floatDelta = $floatOutput * ($floatDesiredOutput - $floatOutput) * (1 - $floatOutput);
-	
-  return $floatDelta;
-}
-
 // ****************************************************************************
 
 /**
@@ -271,7 +241,7 @@ protected function calculateOutputDeltaByBackpropagation($floatDesiredOutput, AN
 
 public function adjustWeights()
 {
-	foreach ($this->arrNeurons as $objNeuron)
+	foreach($this->arrNeurons as $objNeuron)
 		$objNeuron->adjustWeights();
 }
 
