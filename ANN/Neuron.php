@@ -106,7 +106,7 @@ public function setInputs($arrInputs)
 
 public function setDelta($floatDelta)
 {
-	$this->floatDelta = round($floatDelta, ANN_Maths::PRECISION);
+	$this->floatDelta = $floatDelta;
 }
 	
 // ****************************************************************************
@@ -169,9 +169,7 @@ protected function initializeWeights()
 // ****************************************************************************
 
 /**
- * @uses ANN_Maths::linearSaturated01()
  * @uses ANN_Maths::sigmoid()
- * @uses ANN_Maths::tangensHyperbolicus01()
  */
 
 public function activate()
@@ -181,10 +179,7 @@ public function activate()
 	foreach ($this->arrInputs as $intKey => $floatInput)
 		$floatSum += $floatInput * $this->arrWeights[$intKey];
 
-//  $this->floatOutput = ANN_sigmoid($floatSum);
   $this->floatOutput = ANN_Maths::sigmoid($floatSum);
-//  $this->floatOutput = ANN_Maths::tangensHyperbolicus01($floatSum);
-//  $this->floatOutput = ANN_Maths::linearSaturated01($floatSum);
 }
 	
 // ****************************************************************************
@@ -196,7 +191,7 @@ public function adjustWeights()
     case ANN_Network::OUTPUT_BINARY:
 
     	foreach ($this->arrWeights as $intKey => $floatWeight)
-    		$this->arrWeights[$intKey] += round($this->floatLearningRate * $this->arrInputs[$intKey] * $this->floatDelta, ANN_Maths::PRECISION);
+    		$this->arrWeights[$intKey] += $this->floatLearningRate * $this->arrInputs[$intKey] * $this->floatDelta;
 
       break;
 
@@ -205,7 +200,7 @@ public function adjustWeights()
       $floatDelta = 0;
 
       foreach($this->arrInputs as $floatInput)
-        $floatDelta += round($this->floatLearningRate * $floatInput * $this->floatDelta, ANN_Maths::PRECISION);
+        $floatDelta += $this->floatLearningRate * $floatInput * $this->floatDelta;
 
     	foreach ($this->arrWeights as $intKey => $floatWeight)
     		$this->arrWeights[$intKey] += $floatDelta;

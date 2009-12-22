@@ -51,8 +51,6 @@
 
 class ANN_Maths
 {
-const PRECISION = 15;
-
 // ****************************************************************************
 
 /**
@@ -62,21 +60,7 @@ const PRECISION = 15;
 
 public static function sigmoid($floatValue)
 {
-  return round(1 / (1 + exp(-1 * $floatValue)), self::PRECISION);
-}
-
-// ****************************************************************************
-
-/**
- * First derivative of sigmoid()
- *
- * @param float $floatValue
- * @return float (between near 0 and near 1)
- */
-
-public static function sigmoidI($floatValue)
-{
-  return round(self::sigmoid($floatValue) * (1 - self::sigmoid($floatValue)), self::PRECISION);
+  return 1 / (1 + exp(-1 * $floatValue));
 }
 
 // ****************************************************************************
@@ -88,33 +72,7 @@ public static function sigmoidI($floatValue)
 
 public static function tangensHyperbolicus($floatValue)
 {
-  return round(tanh($floatValue), self::PRECISION);
-}
-
-// ****************************************************************************
-
-/**
- * @param float $floatValue
- * @return float (between near 0 and near 1)
- */
-
-public static function tangensHyperbolicus01($floatValue)
-{
-  return round((tanh($floatValue) + 1) / 2, self::PRECISION);
-}
-
-// ****************************************************************************
-
-/**
- * First derivative of tanh()
- *
- * @param float $floatValue
- * @return float (between near 0 and near 1)
- */
-
-public static function tangensHyperbolicusI($floatValue)
-{
-  return round(1 - pow(tanh($floatValue), 2), self::PRECISION);
+  return tanh($floatValue);
 }
 
 // ****************************************************************************
@@ -139,65 +97,8 @@ public static function threshold($floatValue)
 
 public static function random($floatValueMin = 0, $floatValueMax = 10)
 {
-  return round(mt_rand($floatValueMin, $floatValueMax), self::PRECISION);
-}
-
-// ****************************************************************************
-
-/**
- * Return the sign of a number
- *
- * If $floatValue is positive the method returns 1 otherwise -1.
- *
- * @param float $floatValue
- * @return integer
- */
-
-public static function sign($floatValue)
-{
-  if($floatValue >= 0)
-    return 1;
-
-  return -1;
-}
-
-// ****************************************************************************
-
-/**
- * @param float $floatValue
- * @return float (-1 .. 1)
- */
-
-public static function linearSaturated($floatValue)
-{
-  if($floatValue < -1)
-    return -1;
-    
-  if($floatValue > 1)
-    return 1;
-
-  return $floatValue;
-}
-
-// ****************************************************************************
-
-/**
- * @param float $floatValue
- * @return float (0 .. 1)
- */
-
-public static function linearSaturated01($floatValue)
-{
-  if($floatValue < -1)
-    $floatValue = -1;
-    
-  if($floatValue > 1)
-    $floatValue = 1;
-
-  return ($floatValue + 1) / 2;
+  return mt_rand($floatValueMin, $floatValueMax);
 }
 
 // ****************************************************************************
 }
-
-?>

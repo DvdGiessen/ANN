@@ -83,7 +83,6 @@ private $floatNetworkErrorPrevious = 10;
 private $arrInputsToTrain = array();
 private $intInputsToTrainIndex = -1;
 public $intOutputType = self::OUTPUT_LINEAR;
-public $floatMomentum = 0.95;
 public $floatLearningRate = 0.7;
 public $boolFirstLoopOfTraining = TRUE;
 public $boolFirstEpochOfTraining = TRUE;
@@ -530,25 +529,6 @@ public function setLearningRate($floatLearningRate = 0.5)
 // ****************************************************************************
 
 /**
- * @param float $floatMomentum (Default: 0.95) (0 .. 1)
- * @uses ANN_Exception::__construct()
- * @throws ANN_Exception
- */
-
-public function setMomentum($floatMomentum = 0.95)
-{
-  if(!is_float($floatMomentum) && !is_integer($floatMomentum))
-    throw new ANN_Exception('$floatLearningRate should be between 0 and 1');
-
-  if($floatMomentum <= 0 || $floatMomentum > 1)
-    throw new ANN_Exception('$floatLearningRate should be between 0 and 1');
-
-  $this->floatMomentum = $floatMomentum;
-}
-
-// ****************************************************************************
-
-/**
  * @return boolean
  * @uses getOutputs()
  */
@@ -752,7 +732,7 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
 
   foreach($objHiddenLayer->getNeurons() as $objNeuron)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
-          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), ANN_Maths::PRECISION) ."</p>"
+          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 6) ."</p>"
           ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
           .implode('<br />', $objNeuron->getWeights())
           ."</p></td>\n";
@@ -769,7 +749,7 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
 
   foreach($this->objOutputLayer->getNeurons() as $objNeuron)
     print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
-          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), ANN_Maths::PRECISION) ."</p>"
+          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 6) ."</p>"
           ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
           .implode('<br />', $objNeuron->getWeights())
           ."</p></td>\n";
@@ -820,13 +800,6 @@ protected function printNetworkDetails1()
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD\">Activation function</td>\n";
   print "<td style=\"background-color: #CCCCCC\">Sigmoid</td>\n";
-  print "</tr>\n";
-
-  print "<tr>\n";
-  print "<td style=\"color: #DDDDDD\">Momentum</td>\n";
-  print "<td style=\"background-color: #CCCCCC\">"
-        .$this->floatMomentum
-        ."</td>\n";
   print "</tr>\n";
 
   print "<tr>\n";
