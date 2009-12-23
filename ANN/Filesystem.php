@@ -110,6 +110,7 @@ public static function loadFromFile($strFilename = null)
 		if(!($objInstance instanceof ANN_Network)
     && !($objInstance instanceof ANN_Values)
     && !($objInstance instanceof ANN_InputValue)
+    && !($objInstance instanceof ANN_StringValue)
     && !($objInstance instanceof ANN_OutputValue))
       throw new ANN_Exception('File '. basename($strFilename) .' could not be opened (no ANN format)');
 		

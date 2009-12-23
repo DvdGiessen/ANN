@@ -97,6 +97,11 @@ public function input()
 
   $arrParameters = func_get_args();
   
+  // If ANN_InputStringValue is used
+  
+  if(isset($arrParameters[0]) && is_array($arrParameters[0]))
+		$arrParameters = $arrParameters[0];
+  
   $intCountParameters = func_num_args();
   
   foreach($arrParameters as $floatParameter)

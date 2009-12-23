@@ -715,8 +715,8 @@ public function printNetwork($intLevel = 2)
 
   foreach($this->arrInputs[0] as $intKey => $input)
   {
-    print "<td style=\"background-color: #CCCCCC\">"
-            ."<b>Input ". ($intKey + 1) ."</b></td>\n";
+    print "<td style=\"background-color: #CCCCCC; text-align: center\">"
+            ."<b>Input<br />". ($intKey + 1) ."</b></td>\n";
   }
   
   for($i = $this->getNumberInputs() + 1; $i <= $countColumns; $i++)
