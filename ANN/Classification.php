@@ -83,8 +83,29 @@ public function addClassifier($strValue)
 {
 	if(count($this->arrClassifiers) == $this->intMaxClassifiers)
 		throw new ANN_Exception('Maximal count of classifiers reached');
+		
+	if($this->existsClassifier($strValue))
+		throw new ANN_Exception('Classifier "'. $strValue .'" does already exist');
 	
 	$this->arrClassifiers[] = $strValue;
+}
+
+// ****************************************************************************
+
+/**
+ * @param string $strValue
+ * @return boolean
+ */
+
+protected function existsClassifier($strValue)
+{
+	foreach($this->arrClassifiers as $strClassifier)
+	{
+		if(strtolower($strClassifier) == strtolower($strValue))
+			return TRUE;
+	}
+
+	return FALSE;
 }
 
 // ****************************************************************************
