@@ -61,7 +61,7 @@ protected $arrMapping = array();
 // ****************************************************************************
 
 /**
- * @param float $intMaxStringLength
+ * @param integer $intMaxStringLength
  * @param boolean $boolOverride (Default: FALSE)
  * @throws ANN_Exception
  *
@@ -75,8 +75,8 @@ public function __construct($intMaxStringLength, $boolOverride = FALSE)
 {
 	mb_internal_encoding('UTF-8');
 	
-  if(!is_integer($intMaxStringLength) && $intMaxStringLength > 0)
-    throw new ANN_Exception('Constraints: $$intMaxStringLength should be a positive integer number');
+  if(!is_integer($intMaxStringLength) || $intMaxStringLength <= 0)
+    throw new ANN_Exception('Constraints: $intMaxStringLength should be a positive integer number');
 
   if(!is_bool($boolOverride))
     throw new ANN_Exception('Constraints: $boolOverride should be boolean');
@@ -163,7 +163,6 @@ protected function calculateInputValues($strValue)
 // ****************************************************************************
 
 /**
- * 
  * @param string $strCharacter
  * @return float
  * @throws ANN_Exception
