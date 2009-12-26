@@ -91,7 +91,7 @@ public function saveToFile($strFilename = null)
 
 /**
  * @param string $strFilename (Default: null)
- * @return ANN_Network|ANN_InputValue|ANN_OutputValue|ANN_Values
+ * @return ANN_Network|ANN_InputValue|ANN_OutputValue|ANN_Values|ANN_StringValue|ANN_Classification
  * @uses ANN_Exception::__construct()
  * @throws ANN_Exception
  */
@@ -111,6 +111,7 @@ public static function loadFromFile($strFilename = null)
     && !($objInstance instanceof ANN_Values)
     && !($objInstance instanceof ANN_InputValue)
     && !($objInstance instanceof ANN_StringValue)
+    && !($objInstance instanceof ANN_Classification)
     && !($objInstance instanceof ANN_OutputValue))
       throw new ANN_Exception('File '. basename($strFilename) .' could not be opened (no ANN format)');
 		

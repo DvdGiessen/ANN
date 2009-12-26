@@ -8,13 +8,21 @@ require_once '../ANN/Loader.php';
 
 try
 {
-  $network = ANN_Network::loadFromFile('strings.dat');
+  $objNetwork = ANN_Network::loadFromFile('strings.dat');
 }
 catch(Exception $e)
 {
 	print "\nCreating a new one...";
 
-	$network = new ANN_Network(1, 8, 2);
+	$objClassification = new ANN_Classification(2);
+	
+	$objClassification->addClassifier('german');
+	
+	$objClassification->addClassifier('english');
+	
+	$objClassification->saveToFile('classifiers_strings.dat');
+
+	$objNetwork = new ANN_Network(1, 8, 2);
 
 	$objStringValues = new ANN_StringValue(15);
 	
@@ -24,9 +32,9 @@ catch(Exception $e)
   
   $objValues->train()
   					->input($objStringValues->getInputValue('Hallo Welt'))
-  					->output(1, 0)
+  					->output($objClassification->getOutputValue('german'))
   					->input($objStringValues->getInputValue('Hello World'))
-  					->output(0, 1);
+  					->output($objClassification->getOutputValue('english'));
   
   $objValues->saveToFile('values_strings.dat');
   
@@ -42,10 +50,15 @@ catch(Exception $e)
   die('Loading of values failed');
 }
 
-$network->setValues($objValues);
+$objNetwork->setValues($objValues);
 
-$network->train();
+$objNetwork->train();
 
-$network->saveToFile('strings.dat');
+$objNetwork->saveToFile('strings.dat');
 
-$network->printNetwork();
+$objNetwork->printNetwork();
+
+$arrOutputs = $objNetwork->getOutputs();
+
+foreach($arrOutputs as $arrOutput)
+	print_r($objClassification->getRealOutputValue($arrOutput));

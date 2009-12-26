@@ -97,7 +97,7 @@ public function input()
 
   $arrParameters = func_get_args();
   
-  // If ANN_InputStringValue is used
+  // If ANN_StringValue is used
   
   if(isset($arrParameters[0]) && is_array($arrParameters[0]))
 		$arrParameters = $arrParameters[0];
@@ -153,7 +153,12 @@ public function output()
 
   $arrParameters = func_get_args();
 
-  $intCountParameters = func_num_args();
+  // If ANN_Classification is used
+  
+  if(isset($arrParameters[0]) && is_array($arrParameters[0]))
+		$arrParameters = $arrParameters[0];
+  
+	$intCountParameters = func_num_args();
 
   foreach($arrParameters as $floatParameter)
     if(!is_float($floatParameter) && !is_integer($floatParameter))

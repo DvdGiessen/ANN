@@ -8,7 +8,7 @@ require_once '../ANN/Loader.php';
 
 try
 {
-  $network = ANN_Network::loadFromFile('strings.dat');
+  $objNetwork = ANN_Network::loadFromFile('strings.dat');
 }
 catch(Exception $e)
 {
@@ -46,6 +46,6 @@ $objValues->input($objStringValues->getInputValue('Hßlló Wórld'));
 $objValues->input($objStringValues->getInputValue('Hallo Welt!'));
 $objValues->input($objStringValues->getInputValue('Helló Wórld!'));
 
-$network->setValues($objValues);
+$objNetwork->setValues($objValues);
 
-$network->printNetwork();
+$objNetwork->printNetwork();
