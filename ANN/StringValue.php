@@ -63,12 +63,12 @@ protected $arrMapping = array();
 /**
  * @param integer $intMaxStringLength
  * @param boolean $boolOverride (Default: FALSE)
- * @throws ANN_Exception
- *
  * If $boolOverride is FALSE, an exception will be thrown if getInputValue() will
  * be called with outranged values. If $boolOverride is TRUE, no exception will be
  * thrown in this case, but lower values are replaced by $floatMin and upper values
  * are replaced by $floatMax.
+ * @uses createMapping()
+ * @throws ANN_Exception
  */
 
 public function __construct($intMaxStringLength, $boolOverride = FALSE)
@@ -93,7 +93,7 @@ public function __construct($intMaxStringLength, $boolOverride = FALSE)
 /**
  * @param string $strValue
  * @return array
- * @uses calculateInputValue()
+ * @uses calculateInputValues()
  * @uses removeSpecialCharacters()
  * @throws ANN_Exception
  */
@@ -295,6 +295,7 @@ public function __wakeup()
 /**
  * @param string $strValue
  * @return array
+ * @uses getInputValue()
  */
 
 public function __invoke($strValue)

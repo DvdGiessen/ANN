@@ -188,8 +188,11 @@ public function activate()
 // ****************************************************************************
 
 /**
- * @uses calculateDeltaByBackpropagation()
  * @uses ANN_Neuron::setDelta()
+ * @uses ANN_Neuron::getWeight()
+ * @uses ANN_Neuron::getDelta()
+ * @uses ANN_Neuron::getOutput()
+ * @uses getNeurons()
  */
 
 public function calculateHiddenDeltas()
@@ -217,8 +220,8 @@ public function calculateHiddenDeltas()
 
 /**
  * @param array $arrDesiredOutputs
- * @uses calculateOutputDeltaByBackpropagation()
  * @uses ANN_Neuron::setDelta()
+ * @uses ANN_Neuron::getOutput()
  */
 
 public function calculateOutputDeltas($arrDesiredOutputs)

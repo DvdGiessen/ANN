@@ -75,7 +75,7 @@ protected $intNeuronDistance = 50;
  * @uses createImage()
  * @uses drawNetwork()
  * @uses ANN_Network::getNumberHiddenLayers()
- * @uses ANN_Network::getintNumberInputs()
+ * @uses ANN_Network::getNumberInputs()
  * @uses ANN_Network::getNumberHiddens()
  * @uses ANN_Network::getNumberOutputs()
  */

@@ -77,6 +77,7 @@ public function __construct($intMaxClassifiers)
 /**
  * @param string $strValue
  * @throws ANN_Exception
+ * @uses existsClassifier()
  */
 
 public function addClassifier($strValue)

@@ -1,6 +1,6 @@
 <?php
 
-ini_set('max_execution_time', 300);
+ini_set('max_execution_time', 20);
 ini_set('error_reporting', E_ALL | E_STRICT);
 ini_set('date.timezone', 'Europe/Berlin');
 
@@ -44,6 +44,8 @@ catch(Exception $e)
 try
 {
   $objValues = ANN_Values::loadFromFile('values_strings.dat');
+
+	$objClassification = ANN_Classification::loadFromFile('classifiers_strings.dat');
 }
 catch(Exception $e)
 {
