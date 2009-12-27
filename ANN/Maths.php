@@ -67,12 +67,26 @@ public static function sigmoid($floatValue)
 
 /**
  * @param float $floatValue
- * @return float (between near -1 and near 1)
+ * @return float (between near 0 and near 1)
+ * @todo experimental
  */
 
 public static function tangensHyperbolicus($floatValue)
 {
-  return tanh($floatValue);
+  return (tanh($floatValue) + 1) / 2;
+}
+
+// ****************************************************************************
+
+/**
+ * @param float $floatValue
+ * @return float (between near 0 and near 1)
+ * @todo experimental
+ */
+
+public static function inverseAbsolute($floatValue)
+{
+	return ($floatValue / (1 + abs($floatValue)) + 1) / 2;
 }
 
 // ****************************************************************************
