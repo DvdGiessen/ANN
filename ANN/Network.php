@@ -78,15 +78,12 @@ protected $boolNetworkActivated = FALSE;
 protected $arrTrainingComplete = array();
 protected $intNumberOfNeuronsPerLayer = 0;
 protected $floatOutputErrorTolerance = 0.02;
-private $floatNetworkErrorCurrent = 10;
-private $floatNetworkErrorPrevious = 10;
 private $arrInputsToTrain = array();
 private $intInputsToTrainIndex = -1;
 public $intOutputType = self::OUTPUT_LINEAR;
 public $floatLearningRate = 0.7;
 public $boolFirstLoopOfTraining = TRUE;
 public $boolFirstEpochOfTraining = TRUE;
-public $floatQuickPropMaxWeightChangeFactor = 0;
 
 /**#@-*/
 
