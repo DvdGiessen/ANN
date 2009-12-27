@@ -82,16 +82,16 @@ public function __construct(ANN_Network $objNetwork)
 // ****************************************************************************
 
 /**
- * @param array $arrInputs
+ * @param array &$arrInputs
  * @uses initializeWeights()
  */
 
-public function setInputs($arrInputs)
+public function setInputs(&$arrInputs)
 {
-	$arrInputs[] = 1; // bias
-		
 	$this->arrInputs = $arrInputs;
 
+	$this->arrInputs[] = 1; // bias
+	
 	if($this->arrWeights === null)
 		$this->initializeWeights();
 }
@@ -177,7 +177,7 @@ public function activate()
 	foreach($this->arrInputs as $intKey => $floatInput)
 		$floatSum += $floatInput * $this->arrWeights[$intKey];
 
-  $this->floatOutput = ANN_Maths::sigmoid($floatSum);
+	$this->floatOutput = ANN_Maths::sigmoid($floatSum);
 }
 	
 // ****************************************************************************

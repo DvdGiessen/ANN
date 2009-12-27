@@ -86,11 +86,11 @@ public function __construct(ANN_Network $objNetwork, $intNumberOfNeurons, ANN_La
 // ****************************************************************************
 
 /**
- * @param array $arrInputs
+ * @param array &$arrInputs
  * @uses ANN_Neuron::setInputs()
  */
 
-public function setInputs($arrInputs)
+public function setInputs(&$arrInputs)
 {
 	foreach($this->arrNeurons as $objNeuron)
 		$objNeuron->setInputs($arrInputs);
@@ -174,15 +174,17 @@ public function activate()
   {
 		$objNeuron->activate();
 
-  	$this->arrOutputs[$intKey] = $objNeuron->getOutput();
+  	$arrOutputs[$intKey] = $objNeuron->getOutput();
 	}
 
 	if($this->objNextLayer !== null)
 	{
-  	$this->objNextLayer->setInputs($this->arrOutputs);
+  	$this->objNextLayer->setInputs($arrOutputs);
 
   	$this->objNextLayer->activate();
 	}
+	
+	$this->arrOutputs = $arrOutputs;
 }
 	
 // ****************************************************************************
