@@ -703,43 +703,37 @@ public function printNetwork($intLevel = 2)
   if($intLevel >= 1)
     $this->printNetworkDetails1();
 
-  $countColumns = max($this->intNumberOfNeuronsPerLayer, $this->getNumberInputs(), $this->getNumberOutputs());
+  $countColumns = max($this->intNumberOfNeuronsPerLayer, $this->getNumberOutputs());
 
   print "<table border=\"1\" style=\"background-color: #AAAAAA; border-width: 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD; text-align: center\">Input<br />Layer</td>\n";
 
-  foreach($this->arrInputs[0] as $intKey => $input)
-  {
-    print "<td style=\"background-color: #CCCCCC; text-align: center\">"
-            ."<b>Input<br />". ($intKey + 1) ."</b></td>\n";
-  }
+  print "<td style=\"background-color: #CCCCCC; text-align: center\" colspan=\"$countColumns\">"
+           ."<b>". $this->getNumberInputs() ." Inputs</b></td>\n";
   
-  for($i = $this->getNumberInputs() + 1; $i <= $countColumns; $i++)
-    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
-
   print "</tr>\n";
 
 
-foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
-{
-  print "<tr>\n";
-  print "<td style=\"color: #DDDDDD; text-align: center\">Hidden<br />Layer<br />". ($intIndex + 1) ."</td>\n";
-
-  foreach($objHiddenLayer->getNeurons() as $objNeuron)
-    print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
-          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 6) ."</p>"
-          ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
-          .implode('<br />', $objNeuron->getWeights())
-          ."</p></td>\n";
-
-  for($i = $this->intNumberOfNeuronsPerLayer + 1; $i <= $countColumns; $i++)
-    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
-
-
-  print "</tr>\n";
-}
+	foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
+	{
+	  print "<tr>\n";
+	  print "<td style=\"color: #DDDDDD; text-align: center\">Hidden<br />Layer<br />". ($intIndex + 1) ."</td>\n";
+	
+	  foreach($objHiddenLayer->getNeurons() as $objNeuron)
+	    print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
+	          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 6) ."</p>"
+	          ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
+	          .implode('<br />', $objNeuron->getWeights())
+	          ."</p></td>\n";
+	
+	  for($i = $this->intNumberOfNeuronsPerLayer + 1; $i <= $countColumns; $i++)
+	    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
+	
+	
+	  print "</tr>\n";
+	}
 
   print "<tr>\n";
   print "<td style=\"color: #DDDDDD; text-align: center\" rowspan=\"2\">Output<br />Layer</td>\n";
@@ -757,11 +751,7 @@ foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
   print "</tr>\n";
   print "<tr>\n";
 
-  foreach($this->objOutputLayer->getNeurons() as $intKey => $objNeuron)
-    print "<td style=\"background-color: #CCCCCC\"><b>Output ". ($intKey + 1) ."</b></td>\n";
-
-  for($i = $this->getNumberOutputs() + 1; $i <= $countColumns; $i++)
-    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
+  print "<td style=\"background-color: #CCCCCC; text-align: center; height: 40px\" colspan=\"$countColumns\"><b>". $this->getNumberOutputs() ." Outputs</b></td>\n";
 
   print "<tr>\n";
   print "</table>\n";
