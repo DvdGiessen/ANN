@@ -96,15 +96,22 @@ public function input()
     throw new ANN_Exception('After calling input() method output() should be called');
 
   $arrParameters = func_get_args();
+
+  $arrInputParameters = array();
   
-  // If ANN_StringValue is used
-  
-  if(isset($arrParameters[0]) && is_array($arrParameters[0]))
-		$arrParameters = $arrParameters[0];
+  foreach($arrParameters as $mixedParameter)
+	  if(is_array($mixedParameter))
+	  {
+			$arrInputParameters = array_merge($arrInputParameters, $mixedParameter);
+	  }
+	  elseif(is_numeric($mixedParameter))
+	  {
+	  	$arrInputParameters[] = $mixedParameter;
+	  }
   
   $intCountParameters = func_num_args();
   
-  foreach($arrParameters as $floatParameter)
+  foreach($arrInputParameters as $floatParameter)
     if(!is_float($floatParameter) && !is_integer($floatParameter))
       throw new ANN_Exception('Each parameter should be float');
       
@@ -114,7 +121,7 @@ public function input()
   if($this->intCountInputs != $intCountParameters)
     throw new ANN_Exception('There should be '. $this->intCountInputs .' parameter values for input()');
 
-  $this->arrInputs[] = $arrParameters;
+  $this->arrInputs[] = $arrInputParameters;
   
   $this->boolLastActionInput = TRUE;
   
