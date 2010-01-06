@@ -284,7 +284,7 @@ public function getDaylight($strDate = null)
 
 public function setHolidaysFilename($strFilename)
 {
-	$this->strHolidaysFilename = $strHolidaysFilename;
+	$this->strHolidaysFilename = $strFilename;
 }
 
 // ****************************************************************************
@@ -499,7 +499,8 @@ protected function getFirstDayOfWeek($strDate)
 // ****************************************************************************
 
 /**
- * @param string $strDate (Default: null)
+ * @param string $strDate
+ * @param integer $intDayIncrement
  * @return string
  * @uses getDefaultDate()
  */
