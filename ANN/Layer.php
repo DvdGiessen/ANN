@@ -51,204 +51,180 @@
 
 final class ANN_Layer
 {
-/**#@+
- * @ignore
- */
-
-protected $arrNeurons   = array();
-protected $arrOutputs   = array();
-protected $objNetwork   = null;
-protected $objNextLayer = null;
-protected $intNumberOfNeurons = null;
-
-/**#@-*/
-
-// ****************************************************************************
-
-/**
- * @param ANN_Network $objNetwork
- * @param integer $intNumberOfNeurons
- * @param ANN_Layer $objNextLayer (Default: null)
- * @uses createNeurons()
- */
-
-public function __construct(ANN_Network $objNetwork, $intNumberOfNeurons, ANN_Layer $objNextLayer = null)
-{
-  $this->objNetwork = $objNetwork;
-
-  $this->objNextLayer = $objNextLayer;
-
-  $this->createNeurons($intNumberOfNeurons);
-  
-  $this->intNumberOfNeurons = $intNumberOfNeurons;
-}
+	/**#@+
+	 * @ignore
+	 */
 	
-// ****************************************************************************
-
-/**
- * @param array &$arrInputs
- * @uses ANN_Neuron::setInputs()
- */
-
-public function setInputs(&$arrInputs)
-{
-	foreach($this->arrNeurons as $objNeuron)
-		$objNeuron->setInputs($arrInputs);
-}
+	protected $arrNeurons   = array();
+	protected $arrOutputs   = array();
+	protected $objNetwork   = null;
+	protected $objNextLayer = null;
+	protected $intNumberOfNeurons = null;
 	
-// ****************************************************************************
-
-/**
- * @return array
- */
-
-public function getNeurons()
-{
-	return $this->arrNeurons;
-}
-
-// ****************************************************************************
-
-/**
- * @return integer
- */
-
-public function getNeuronsCount()
-{
-	return $this->intNumberOfNeurons;
-}
-
-// ****************************************************************************
-
-/**
- * @return array
- */
-
-public function getOutputs()
-{
-	return $this->arrOutputs;
-}
-
-// ****************************************************************************
-
-/**
- * @return array
- * @uses ANN_Maths::threshold()
- */
-
-public function getThresholdOutputs()
-{
-  $arrReturnOutputs = array();
-
-  foreach($this->arrOutputs as $intKey => $floatOutput)
-    $arrReturnOutputs[$intKey] = ANN_Maths::threshold($floatOutput);
-  
-  return $arrReturnOutputs;
-}
-
-// ****************************************************************************
-
-/**
- * @param integer $intNumberOfNeurons
- * @uses ANN_Neuron::__construct()
- */
-
-protected function createNeurons($intNumberOfNeurons)
-{
-	for($intIndex = 0; $intIndex < $intNumberOfNeurons; $intIndex++)
-		$this->arrNeurons[] = new ANN_Neuron($this->objNetwork);
-}
+	/**#@-*/
 	
-// ****************************************************************************
-
-/**
- * @uses ANN_Neuron::activate()
- * @uses ANN_Neuron::getOutput()
- * @uses ANN_Layer::setInputs()
- * @uses ANN_Layer::activate()
- */
-
-public function activate()
-{
-	foreach($this->arrNeurons as $intKey => $objNeuron)
-  {
-		$objNeuron->activate();
-
-  	$arrOutputs[$intKey] = $objNeuron->getOutput();
-	}
-
-	if($this->objNextLayer !== null)
+	/**
+	 * @param ANN_Network $objNetwork
+	 * @param integer $intNumberOfNeurons
+	 * @param ANN_Layer $objNextLayer (Default: null)
+	 * @uses createNeurons()
+	 */
+	
+	public function __construct(ANN_Network $objNetwork, $intNumberOfNeurons, ANN_Layer $objNextLayer = null)
 	{
-  	$this->objNextLayer->setInputs($arrOutputs);
-
-  	$this->objNextLayer->activate();
-	}
+	  $this->objNetwork = $objNetwork;
 	
-	$this->arrOutputs = $arrOutputs;
-}
+	  $this->objNextLayer = $objNextLayer;
 	
-// ****************************************************************************
-
-/**
- * @uses ANN_Neuron::setDelta()
- * @uses ANN_Neuron::getWeight()
- * @uses ANN_Neuron::getDelta()
- * @uses ANN_Neuron::getOutput()
- * @uses getNeurons()
- */
-
-public function calculateHiddenDeltas()
-{
-	$floatDelta = 0;
-
-  $floatSum = 0;
-	
-	$arrNeuronsNextLayer = $this->objNextLayer->getNeurons();
-	
-	foreach($this->arrNeurons as $intKeyNeuron => $objNeuron)
-  {
-		foreach($arrNeuronsNextLayer as $objNeuronNextLayer)
-    	$floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDelta();
-
-  	$floatOutput = $this->arrNeurons[$intKeyNeuron]->getOutput();
-
-  	$floatDelta = $floatOutput * (1 - $floatOutput) * $floatSum;
-		
-		$objNeuron->setDelta($floatDelta);
-  }
-}
-	
-// ****************************************************************************
-
-/**
- * @param array $arrDesiredOutputs
- * @uses ANN_Neuron::setDelta()
- * @uses ANN_Neuron::getOutput()
- */
-
-public function calculateOutputDeltas($arrDesiredOutputs)
-{
-	foreach($this->arrNeurons as $intKeyNeuron => $objNeuron)
-  {
-	  $floatOutput = $objNeuron->getOutput();
-
-		$floatDelta = $floatOutput * ($arrDesiredOutputs[$intKeyNeuron] - $floatOutput) * (1 - $floatOutput);
+	  $this->createNeurons($intNumberOfNeurons);
 	  
-	  $objNeuron->setDelta($floatDelta);
+	  $this->intNumberOfNeurons = $intNumberOfNeurons;
 	}
-}
+		
+	/**
+	 * @param array &$arrInputs
+	 * @uses ANN_Neuron::setInputs()
+	 */
 	
-// ****************************************************************************
-
-/**
- * @uses ANN_Neuron::adjustWeights()
- */
-
-public function adjustWeights()
-{
-	foreach($this->arrNeurons as $objNeuron)
-		$objNeuron->adjustWeights();
-}
-
-// ****************************************************************************
+	public function setInputs(&$arrInputs)
+	{
+		foreach($this->arrNeurons as $objNeuron)
+			$objNeuron->setInputs($arrInputs);
+	}
+		
+	/**
+	 * @return array
+	 */
+	
+	public function getNeurons()
+	{
+		return $this->arrNeurons;
+	}
+	
+	/**
+	 * @return integer
+	 */
+	
+	public function getNeuronsCount()
+	{
+		return $this->intNumberOfNeurons;
+	}
+	
+	/**
+	 * @return array
+	 */
+	
+	public function getOutputs()
+	{
+		return $this->arrOutputs;
+	}
+	
+	/**
+	 * @return array
+	 * @uses ANN_Maths::threshold()
+	 */
+	
+	public function getThresholdOutputs()
+	{
+	  $arrReturnOutputs = array();
+	
+	  foreach($this->arrOutputs as $intKey => $floatOutput)
+	    $arrReturnOutputs[$intKey] = ANN_Maths::threshold($floatOutput);
+	  
+	  return $arrReturnOutputs;
+	}
+	
+	/**
+	 * @param integer $intNumberOfNeurons
+	 * @uses ANN_Neuron::__construct()
+	 */
+	
+	protected function createNeurons($intNumberOfNeurons)
+	{
+		for($intIndex = 0; $intIndex < $intNumberOfNeurons; $intIndex++)
+			$this->arrNeurons[] = new ANN_Neuron($this->objNetwork);
+	}
+		
+	/**
+	 * @uses ANN_Neuron::activate()
+	 * @uses ANN_Neuron::getOutput()
+	 * @uses ANN_Layer::setInputs()
+	 * @uses ANN_Layer::activate()
+	 */
+	
+	public function activate()
+	{
+		foreach($this->arrNeurons as $intKey => $objNeuron)
+	  {
+			$objNeuron->activate();
+	
+	  	$arrOutputs[$intKey] = $objNeuron->getOutput();
+		}
+	
+		if($this->objNextLayer !== null)
+		{
+	  	$this->objNextLayer->setInputs($arrOutputs);
+	
+	  	$this->objNextLayer->activate();
+		}
+		
+		$this->arrOutputs = $arrOutputs;
+	}
+		
+	/**
+	 * @uses ANN_Neuron::setDelta()
+	 * @uses ANN_Neuron::getWeight()
+	 * @uses ANN_Neuron::getDelta()
+	 * @uses ANN_Neuron::getOutput()
+	 * @uses getNeurons()
+	 */
+	
+	public function calculateHiddenDeltas()
+	{
+		$floatDelta = 0;
+	
+	  $floatSum = 0;
+		
+		$arrNeuronsNextLayer = $this->objNextLayer->getNeurons();
+		
+		foreach($this->arrNeurons as $intKeyNeuron => $objNeuron)
+	  {
+			foreach($arrNeuronsNextLayer as $objNeuronNextLayer)
+	    	$floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDelta();
+	
+	  	$floatOutput = $this->arrNeurons[$intKeyNeuron]->getOutput();
+	
+	  	$floatDelta = $floatOutput * (1 - $floatOutput) * $floatSum;
+			
+			$objNeuron->setDelta($floatDelta);
+	  }
+	}
+		
+	/**
+	 * @param array $arrDesiredOutputs
+	 * @uses ANN_Neuron::setDelta()
+	 * @uses ANN_Neuron::getOutput()
+	 */
+	
+	public function calculateOutputDeltas($arrDesiredOutputs)
+	{
+		foreach($this->arrNeurons as $intKeyNeuron => $objNeuron)
+	  {
+		  $floatOutput = $objNeuron->getOutput();
+	
+			$floatDelta = $floatOutput * ($arrDesiredOutputs[$intKeyNeuron] - $floatOutput) * (1 - $floatOutput);
+		  
+		  $objNeuron->setDelta($floatDelta);
+		}
+	}
+		
+	/**
+	 * @uses ANN_Neuron::adjustWeights()
+	 */
+	
+	public function adjustWeights()
+	{
+		foreach($this->arrNeurons as $objNeuron)
+			$objNeuron->adjustWeights();
+	}
 }

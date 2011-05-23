@@ -42,59 +42,51 @@
 
 class ANN_Loader
 {
-/**#@+
- * @ignore
- */
-
-protected $strDir = '';
-
-/**#@-*/
-
-// ****************************************************************************
-
-public function __construct()
-{
-  $this->strDir = dirname(__FILE__);
-
-  spl_autoload_register(array($this, 'autoload'));
-}
-
-// ****************************************************************************
-
-public function __destruct()
-{
-  spl_autoload_unregister(array($this, 'autoload'));
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strClassname
- * @return boolean
- */
-
-public function autoload($strClassname)
-{
-  settype($strClassname, 'string');
-
-  if(!preg_match('/^ANN/', $strClassname))
-    return FALSE;
-
-  $strClassname = preg_replace('/^ANN_/', '', $strClassname);
-
-  $strFilename = $this->strDir . "/$strClassname.php";
-
-  if(is_file($strFilename))
-  {
-    require_once($strFilename);
-    
-    return TRUE;
-  }
-
-  return FALSE;
-}
-
-// ****************************************************************************
+	/**#@+
+	 * @ignore
+	 */
+	
+	protected $strDir = '';
+	
+	/**#@-*/
+	
+	public function __construct()
+	{
+	  $this->strDir = dirname(__FILE__);
+	
+	  spl_autoload_register(array($this, 'autoload'));
+	}
+	
+	public function __destruct()
+	{
+	  spl_autoload_unregister(array($this, 'autoload'));
+	}
+	
+	/**
+	 * @param string $strClassname
+	 * @return boolean
+	 */
+	
+	public function autoload($strClassname)
+	{
+	  settype($strClassname, 'string');
+	
+	  if(!preg_match('/^ANN/', $strClassname))
+	    return FALSE;
+	
+	  $strClassname = preg_replace('/^ANN_/', '', $strClassname);
+	
+	  $strFilename = $this->strDir . "/$strClassname.php";
+	
+	  if(is_file($strFilename))
+	  {
+	    require_once($strFilename);
+	    
+	    return TRUE;
+	  }
+	
+	  return FALSE;
+	}
 }
 
 $objANNLoader = new ANN_Loader;

@@ -48,162 +48,146 @@
 
 final class ANN_Classification extends ANN_Filesystem
 {
-/**#@+
- * @ignore
- */
-
-protected $intMaxClassifiers;
-protected $arrClassifiers = array();
-
-/**#@-*/
-
-// ****************************************************************************
-
-/**
- * @param integer $intMaxClassifiers
- * @throws ANN_Exception
- */
-
-public function __construct($intMaxClassifiers)
-{
-  if(!is_integer($intMaxClassifiers) || $intMaxClassifiers <= 0)
-    throw new ANN_Exception('Constraints: $intMaxClassifiers should be a positive integer number');
-
-  $this->intMaxClassifiers = $intMaxClassifiers;
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strValue
- * @throws ANN_Exception
- * @uses existsClassifier()
- */
-
-public function addClassifier($strValue)
-{
-	if(count($this->arrClassifiers) == $this->intMaxClassifiers)
-		throw new ANN_Exception('Maximal count of classifiers reached');
+	/**#@+
+	 * @ignore
+	 */
+	
+	protected $intMaxClassifiers;
+	protected $arrClassifiers = array();
+	
+	/**#@-*/
+	
+	/**
+	 * @param integer $intMaxClassifiers
+	 * @throws ANN_Exception
+	 */
+	
+	public function __construct($intMaxClassifiers)
+	{
+	  if(!is_integer($intMaxClassifiers) || $intMaxClassifiers <= 0)
+	    throw new ANN_Exception('Constraints: $intMaxClassifiers should be a positive integer number');
+	
+	  $this->intMaxClassifiers = $intMaxClassifiers;
+	}
+	
+	/**
+	 * @param string $strValue
+	 * @throws ANN_Exception
+	 * @uses existsClassifier()
+	 */
+	
+	public function addClassifier($strValue)
+	{
+		if(count($this->arrClassifiers) == $this->intMaxClassifiers)
+			throw new ANN_Exception('Maximal count of classifiers reached');
+			
+		if($this->existsClassifier($strValue))
+			throw new ANN_Exception('Classifier "'. $strValue .'" does already exist');
 		
-	if($this->existsClassifier($strValue))
-		throw new ANN_Exception('Classifier "'. $strValue .'" does already exist');
-	
-	$this->arrClassifiers[] = $strValue;
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strValue
- * @return boolean
- */
-
-protected function existsClassifier($strValue)
-{
-	foreach($this->arrClassifiers as $strClassifier)
-	{
-		if(strtolower($strClassifier) == strtolower($strValue))
-			return TRUE;
+		$this->arrClassifiers[] = $strValue;
 	}
-
-	return FALSE;
-}
-
-// ****************************************************************************
-
-/**
- * @param string|array $mixedValues
- * @return array
- * @uses calculateOutputValues()
- * @throws ANN_Exception
- */
-
-public function getOutputValue($mixedValues)
-{
-	if(!is_string($mixedValues) && !is_array($mixedValues))
-		throw new ANN_Exception('$mixedValues should be either string or array');
+	
+	/**
+	 * @param string $strValue
+	 * @return boolean
+	 */
+	
+	protected function existsClassifier($strValue)
+	{
+		foreach($this->arrClassifiers as $strClassifier)
+		{
+			if(strtolower($strClassifier) == strtolower($strValue))
+				return TRUE;
+		}
+	
+		return FALSE;
+	}
+	
+	/**
+	 * @param string|array $mixedValues
+	 * @return array
+	 * @uses calculateOutputValues()
+	 * @throws ANN_Exception
+	 */
+	
+	public function getOutputValue($mixedValues)
+	{
+		if(!is_string($mixedValues) && !is_array($mixedValues))
+			throw new ANN_Exception('$mixedValues should be either string or array');
+			
+		$arrValues = array();
+			
+		if(is_string($mixedValues))
+		{
+			$arrValues = array($mixedValues);
+		}
+		else
+		{
+			$arrValues = $mixedValues;
+		}
 		
-	$arrValues = array();
+	  return $this->calculateOutputValues($arrValues);
+	}
+	
+	/**
+	 * @param array $arrValues
+	 * @return array
+	 * @throws ANN_Exception
+	 */
+	
+	protected function calculateOutputValues($arrValues)
+	{
+		$arrReturn = array();
 		
-	if(is_string($mixedValues))
-	{
-		$arrValues = array($mixedValues);
-	}
-	else
-	{
-		$arrValues = $mixedValues;
-	}
-	
-  return $this->calculateOutputValues($arrValues);
-}
-
-// ****************************************************************************
-
-/**
- * @param array $arrValues
- * @return array
- * @throws ANN_Exception
- */
-
-protected function calculateOutputValues($arrValues)
-{
-	$arrReturn = array();
-	
-	$boolFound = FALSE;
-	
-	foreach($this->arrClassifiers as $intKey => $strClassifier)
-	{
-		$arrReturn[$intKey] = (in_array($strClassifier, $arrValues)) ? 1 : 0;
+		$boolFound = FALSE;
 		
-		if($arrReturn[$intKey] == 1)
-			$boolFound = TRUE;
+		foreach($this->arrClassifiers as $intKey => $strClassifier)
+		{
+			$arrReturn[$intKey] = (in_array($strClassifier, $arrValues)) ? 1 : 0;
+			
+			if($arrReturn[$intKey] == 1)
+				$boolFound = TRUE;
+		}
+		
+		if(!$boolFound)
+			throw new ANN_Exception('Classifier(s) "'. implode(', ', $arrValues) .'" not found');
+		
+		$intCountRemainingOutputs = $this->intMaxClassifiers - count($arrReturn);
+	
+		for($intIndex = 0; $intIndex < $intCountRemainingOutputs; $intIndex++)
+		{
+			$arrReturn[] = 0;
+		}
+		
+		return $arrReturn;
 	}
 	
-	if(!$boolFound)
-		throw new ANN_Exception('Classifier(s) "'. implode(', ', $arrValues) .'" not found');
+	/**
+	 * @param string|array $mixedValues
+	 * @return array
+	 * @uses getOutputValue()
+	 */
 	
-	$intCountRemainingOutputs = $this->intMaxClassifiers - count($arrReturn);
-
-	for($intIndex = 0; $intIndex < $intCountRemainingOutputs; $intIndex++)
+	public function __invoke($mixedValues)
 	{
-		$arrReturn[] = 0;
+		return $this->getOutputValue($mixedValues);
 	}
 	
-	return $arrReturn;
-}
-
-// ****************************************************************************
-
-/**
- * @param string|array $mixedValues
- * @return array
- * @uses getOutputValue()
- */
-
-public function __invoke($mixedValues)
-{
-	return $this->getOutputValue($mixedValues);
-}
-
-// ****************************************************************************
-
-/**
- * @param array $arrValues
- * @return array
- */
-
-public function getRealOutputValue($arrValues)
-{
-	$arrReturn = array();
-
-	foreach($this->arrClassifiers as $intKey => $strClassifier)
+	/**
+	 * @param array $arrValues
+	 * @return array
+	 */
+	
+	public function getRealOutputValue($arrValues)
 	{
-		if($arrValues[$intKey] == 1)
-			$arrReturn[] = $strClassifier;
-	}
+		$arrReturn = array();
 	
-	return $arrReturn;
-}
-
-// ****************************************************************************
+		foreach($this->arrClassifiers as $intKey => $strClassifier)
+		{
+			if($arrValues[$intKey] == 1)
+				$arrReturn[] = $strClassifier;
+		}
+		
+		return $arrReturn;
+	}
 }

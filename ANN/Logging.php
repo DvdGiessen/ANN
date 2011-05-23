@@ -48,93 +48,81 @@
 
 class ANN_Logging
 {
-/**#@+
- * @ignore
- */
-
-protected $strFilename;
-protected $handleFile;
-protected $boolHeader = FALSE;
-
-/**#@-*/
-
-const SEPARATOR = ';';
-
-// ****************************************************************************
-
-/**
- * @param string $strFilename
- * @uses ANN_Exception::__construct()
- * @throws ANN_Exception
- */
-
-public function setFilename($strFilename)
-{
-  $this->strFilename = $strFilename;
-
-  $this->handleFile = @fopen($strFilename, 'w+');
-
-  if(!is_resource($this->handleFile))
-    throw new ANN_Exception('File '. basename($strFilename). ' cannot be created');
-}
-
-// ****************************************************************************
-
-/**
- * @param array $arrData
- * @uses isHeader()
- * @uses logHeader()
- */
-
-public function logData($arrData)
-{
-  if(!$this->isHeader())
-    $this->logHeader($arrData);
-
-  $strData = implode(self::SEPARATOR, $arrData);
-
-  if(is_resource($this->handleFile))
-    @fwrite($this->handleFile, $strData, strlen($strData));
-
-  @fwrite($this->handleFile, "\r\n", strlen("\r\n"));
-}
-
-// ****************************************************************************
-
-public function __destruct()
-{
-  if(is_resource($this->handleFile))
-    @fclose($this->handleFile);
-}
-
-// ****************************************************************************
-
-/**
- * @return boolean
- */
-
-protected function isHeader()
-{
-  return $this->boolHeader;
-}
-
-// ****************************************************************************
-
-/**
- * @param array $arrData
- */
-
-protected function logHeader($arrData)
-{
-  $strData = implode(self::SEPARATOR, array_keys($arrData));
-
-  if(is_resource($this->handleFile))
-    @fwrite($this->handleFile, $strData, strlen($strData));
-
-  @fwrite($this->handleFile, "\r\n", strlen("\r\n"));
-
-  $this->boolHeader = TRUE;
-}
-
-// ****************************************************************************
+	/**#@+
+	 * @ignore
+	 */
+	
+	protected $strFilename;
+	protected $handleFile;
+	protected $boolHeader = FALSE;
+	
+	/**#@-*/
+	
+	const SEPARATOR = ';';
+	
+	/**
+	 * @param string $strFilename
+	 * @uses ANN_Exception::__construct()
+	 * @throws ANN_Exception
+	 */
+	
+	public function setFilename($strFilename)
+	{
+	  $this->strFilename = $strFilename;
+	
+	  $this->handleFile = @fopen($strFilename, 'w+');
+	
+	  if(!is_resource($this->handleFile))
+	    throw new ANN_Exception('File '. basename($strFilename). ' cannot be created');
+	}
+	
+	/**
+	 * @param array $arrData
+	 * @uses isHeader()
+	 * @uses logHeader()
+	 */
+	
+	public function logData($arrData)
+	{
+	  if(!$this->isHeader())
+	    $this->logHeader($arrData);
+	
+	  $strData = implode(self::SEPARATOR, $arrData);
+	
+	  if(is_resource($this->handleFile))
+	    @fwrite($this->handleFile, $strData, strlen($strData));
+	
+	  @fwrite($this->handleFile, "\r\n", strlen("\r\n"));
+	}
+	
+	public function __destruct()
+	{
+	  if(is_resource($this->handleFile))
+	    @fclose($this->handleFile);
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	
+	protected function isHeader()
+	{
+	  return $this->boolHeader;
+	}
+	
+	/**
+	 * @param array $arrData
+	 */
+	
+	protected function logHeader($arrData)
+	{
+	  $strData = implode(self::SEPARATOR, array_keys($arrData));
+	
+	  if(is_resource($this->handleFile))
+	    @fwrite($this->handleFile, $strData, strlen($strData));
+	
+	  @fwrite($this->handleFile, "\r\n", strlen("\r\n"));
+	
+	  $this->boolHeader = TRUE;
+	}
 }

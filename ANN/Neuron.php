@@ -51,165 +51,143 @@
 
 final class ANN_Neuron
 {
-/**#@+
- * @ignore
- */
- 
-protected $arrInputs = null;
-protected $arrWeights = null;
-protected $floatOutput = null;
-protected $floatDelta = 0;
-protected $objNetwork = null;
-protected $floatLearningRate = 0;
-
-/**#@-*/
-
-// ****************************************************************************
-
-/**
- * @param ANN_Network $objNetwork
- */
-
-public function __construct(ANN_Network $objNetwork)
-{
-  $this->objNetwork = $objNetwork;
-
-  $this->floatDelta = ANN_Maths::random(40000, 90000) / 100000;
-  
-  $this->floatLearningRate = $this->objNetwork->floatLearningRate;
-}
-
-// ****************************************************************************
-
-/**
- * @param array &$arrInputs
- * @uses initializeWeights()
- */
-
-public function setInputs(&$arrInputs)
-{
-	$this->arrInputs = $arrInputs;
-
-	$this->arrInputs[] = 1; // bias
+	/**#@+
+	 * @ignore
+	 */
+	 
+	protected $arrInputs = null;
+	protected $arrWeights = null;
+	protected $floatOutput = null;
+	protected $floatDelta = 0;
+	protected $objNetwork = null;
+	protected $floatLearningRate = 0;
 	
-	if($this->arrWeights === null)
-		$this->initializeWeights();
-}
+	/**#@-*/
 	
-// ****************************************************************************
-
-/**
- * @param float $floatDelta
- */
-
-public function setDelta($floatDelta)
-{
-	$this->floatDelta = $floatDelta;
-}
+	/**
+	 * @param ANN_Network $objNetwork
+	 */
 	
-// ****************************************************************************
-
-/**
- * @return array
- */
-
-public function getWeights()
-{
-	return $this->arrWeights;
-}
-
-// ****************************************************************************
-
-/**
- * @param integer $intKeyNeuron
- * @return float
- */
-
-public function getWeight($intKeyNeuron)
-{
-	return $this->arrWeights[$intKeyNeuron];
-}
-
-// ****************************************************************************
-
-/**
- * @return float
- */
-
-public function getOutput()
-{
-	return $this->floatOutput;
-}
-
-// ****************************************************************************
-
-/**
- * @return float
- */
-
-public function getDelta()
-{
-	return $this->floatDelta;
-}
-
-// ****************************************************************************
-
-/**
- * @uses ANN_Maths::random()
- */
-
-protected function initializeWeights()
-{
-	foreach($this->arrInputs as $intKey => $floatInput)
-		$this->arrWeights[$intKey] = ANN_Maths::random(-50000, 50000) / 100000;
-}
+	public function __construct(ANN_Network $objNetwork)
+	{
+	  $this->objNetwork = $objNetwork;
 	
-// ****************************************************************************
-
-/**
- * @uses ANN_Maths::sigmoid()
- */
-
-public function activate()
-{
-	$floatSum = 0;
+	  $this->floatDelta = ANN_Maths::random(40000, 90000) / 100000;
+	  
+	  $this->floatLearningRate = $this->objNetwork->floatLearningRate;
+	}
+	
+	/**
+	 * @param array &$arrInputs
+	 * @uses initializeWeights()
+	 */
+	
+	public function setInputs(&$arrInputs)
+	{
+		$this->arrInputs = $arrInputs;
+	
+		$this->arrInputs[] = 1; // bias
 		
-	foreach($this->arrInputs as $intKey => $floatInput)
-		$floatSum += $floatInput * $this->arrWeights[$intKey];
-
-	$this->floatOutput = ANN_Maths::sigmoid($floatSum);
-}
+		if($this->arrWeights === null)
+			$this->initializeWeights();
+	}
+		
+	/**
+	 * @param float $floatDelta
+	 */
 	
-// ****************************************************************************
-
-public function adjustWeights()
-{
-  switch($this->objNetwork->intOutputType)
-  {
-    case ANN_Network::OUTPUT_LINEAR:
-
-      $floatDelta = 0;
-
-      $floatLearningRateDeltaFactor = $this->floatLearningRate * $this->floatDelta;
-      
-      foreach($this->arrInputs as $floatInput)
-        $floatDelta += $floatLearningRateDeltaFactor * $floatInput;
-
-    	foreach ($this->arrWeights as $intKey => $floatWeight)
-    		$this->arrWeights[$intKey] += $floatDelta;
-
-      break;
-
-    case ANN_Network::OUTPUT_BINARY:
-
-      $floatLearningRateDeltaFactor = $this->floatLearningRate * $this->floatDelta;
-    	
-      foreach ($this->arrWeights as $intKey => $floatWeight)
-    		$this->arrWeights[$intKey] += $this->arrInputs[$intKey] * $floatLearningRateDeltaFactor;
-
-      break;
-  }
-}
-
-// ****************************************************************************
+	public function setDelta($floatDelta)
+	{
+		$this->floatDelta = $floatDelta;
+	}
+		
+	/**
+	 * @return array
+	 */
+	
+	public function getWeights()
+	{
+		return $this->arrWeights;
+	}
+	
+	/**
+	 * @param integer $intKeyNeuron
+	 * @return float
+	 */
+	
+	public function getWeight($intKeyNeuron)
+	{
+		return $this->arrWeights[$intKeyNeuron];
+	}
+	
+	/**
+	 * @return float
+	 */
+	
+	public function getOutput()
+	{
+		return $this->floatOutput;
+	}
+	
+	/**
+	 * @return float
+	 */
+	
+	public function getDelta()
+	{
+		return $this->floatDelta;
+	}
+	
+	/**
+	 * @uses ANN_Maths::random()
+	 */
+	
+	protected function initializeWeights()
+	{
+		foreach($this->arrInputs as $intKey => $floatInput)
+			$this->arrWeights[$intKey] = ANN_Maths::random(-50000, 50000) / 100000;
+	}
+		
+	/**
+	 * @uses ANN_Maths::sigmoid()
+	 */
+	
+	public function activate()
+	{
+		$floatSum = 0;
+			
+		foreach($this->arrInputs as $intKey => $floatInput)
+			$floatSum += $floatInput * $this->arrWeights[$intKey];
+	
+		$this->floatOutput = ANN_Maths::sigmoid($floatSum);
+	}
+		
+	public function adjustWeights()
+	{
+	  switch($this->objNetwork->intOutputType)
+	  {
+	    case ANN_Network::OUTPUT_LINEAR:
+	
+	      $floatDelta = 0;
+	
+	      $floatLearningRateDeltaFactor = $this->floatLearningRate * $this->floatDelta;
+	      
+	      foreach($this->arrInputs as $floatInput)
+	        $floatDelta += $floatLearningRateDeltaFactor * $floatInput;
+	
+	    	foreach ($this->arrWeights as $intKey => $floatWeight)
+	    		$this->arrWeights[$intKey] += $floatDelta;
+	
+	      break;
+	
+	    case ANN_Network::OUTPUT_BINARY:
+	
+	      $floatLearningRateDeltaFactor = $this->floatLearningRate * $this->floatDelta;
+	    	
+	      foreach ($this->arrWeights as $intKey => $floatWeight)
+	    		$this->arrWeights[$intKey] += $this->arrInputs[$intKey] * $floatLearningRateDeltaFactor;
+	
+	      break;
+	  }
+	}
 }

@@ -48,472 +48,438 @@
 
 final class ANN_DateInputs
 {
-/**#@+
- * @ignore
- */
-	
-protected $strDate = null;
-protected $strHolidaysFilename = 'Holidays.xml';
-protected $objHolidaysXML = null;
-
-/**#@-*/
-
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- */
-	
-public function __construct($strDate = null)
-{
-	$this->strDate = $strDate;	
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strDate
- */
-
-public function setDefaultDate($strDate)
-{
-	$this->strDate = $strDate;	
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return array
- * @uses getDefaultDate()
- */
-	
-public function getWeek($strDate = null)
-{
-	$arrReturn = array();
-	
-	if(!$strDate)
-		$strDate = $this->getDefaultDate();
-	
-	if($strDate)
-	{
-		$intWeek = date('W', strtotime($strDate));
-	}
-	else
-	{
-		$intWeek = date('W');
-	}
-	
-	for($intIndex = 1; $intIndex <= 53; $intIndex++)
-		$arrReturn[$intIndex] = ($intWeek == $intIndex) ? 1 : 0;
-
-	return $arrReturn;
-}
-	
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return array
- * @uses getDefaultDate()
- */
-	
-public function getWeekDay($strDate = null)
-{
-	$arrReturn = array();
-	
-	if(!$strDate)
-		$strDate = $this->getDefaultDate();
-	
-	if($strDate)
-	{
-		$intWeekDay = date('w', strtotime($strDate));
-	}
-	else
-	{
-		$intWeekDay = date('w');
-	}
-	
-	if($intWeekDay == 0)
-		$intWeekDay = 7;
-	
-	for($intIndex = 1; $intIndex <= 7; $intIndex++)
-		$arrReturn[$intIndex] = ($intWeekDay == $intIndex) ? 1 : 0;
-
-	return $arrReturn;
-}
-	
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return array
- * @uses getDefaultDate()
- */
-	
-public function getYearDay($strDate = null)
-{
-	$arrReturn = array();
-	
-	if(!$strDate)
-		$strDate = $this->getDefaultDate();
-	
-	if($strDate)
-	{
-		$intYearDay = date('z', strtotime($strDate));
-	}
-	else
-	{
-		$intYearDay = date('z');
-	}
-	
-	$intYearDay++;
-	
-	for($intIndex = 1; $intIndex <= 366; $intIndex++)
-		$arrReturn[$intIndex] = ($intYearDay == $intIndex) ? 1 : 0;
-
-	return $arrReturn;
-}
-	
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return array
- * @uses getDefaultDate()
- */
-	
-public function getMonthWeek($strDate = null)
-{
-	$arrReturn = array();
-	
-	if(!$strDate)
-		$strDate = $this->getDefaultDate();
-	
-	if($strDate)
-	{
-		$intDay = date('d', strtotime($strDate));
-	}
-	else
-	{
-		$intDay = date('d');
-	}
-	
-	$intWeek = (int)($intDay / 7);
-	
-	$intWeek++;
-	
-	for($intIndex = 1; $intIndex <= 5; $intIndex++)
-		$arrReturn[$intIndex] = ($intWeek == $intIndex) ? 1 : 0;
-
-	return $arrReturn;
-}
-	
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return array
- * @uses getDefaultDate()
- */
-	
-public function getQuarter($strDate = null)
-{
-	$arrReturn = array();
-	
-	if(!$strDate)
-		$strDate = $this->getDefaultDate();
-	
-	if($strDate)
-	{
-		$intMonth = date('m', strtotime($strDate));
-	}
-	else
-	{
-		$intMonth = date('m');
-	}
-	
-	$intQuarter = (int)($intMonth / 4);
-	
-	$intQuarter++;
-	
-	for($intIndex = 1; $intIndex <= 4; $intIndex++)
-		$arrReturn[$intIndex] = ($intQuarter == $intIndex) ? 1 : 0;
-
-	return $arrReturn;
-}
-	
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return array
- * @uses getDefaultDate()
- */
-	
-public function getDaylight($strDate = null)
-{
-	$arrReturn = array();
-	
-	if(!$strDate)
-		$strDate = $this->getDefaultDate();
-	
-	if($strDate)
-	{
-		$floatSunrise = date_sunrise(strtotime($strDate), SUNFUNCS_RET_DOUBLE);
+	/**#@+
+	 * @ignore
+	 */
 		
-		$floatSunset = date_sunset(strtotime($strDate), SUNFUNCS_RET_DOUBLE);
-	}
-	else
-	{
-		$floatSunrise = date_sunrise(time(), SUNFUNCS_RET_DOUBLE);
+	protected $strDate = null;
+	protected $strHolidaysFilename = 'Holidays.xml';
+	protected $objHolidaysXML = null;
+	
+	/**#@-*/
+	
+	/**
+	 * @param string $strDate (Default: null)
+	 */
 		
-		$floatSunset = date_sunset(time(), SUNFUNCS_RET_DOUBLE);
-	}
-	
-	$floatDaylight = ($floatSunset - $floatSunrise) / 24;
-	
-	return array($floatDaylight);
-}
-	
-// ****************************************************************************
-
-/**
- * @param string $strFilename
- */
-
-public function setHolidaysFilename($strFilename)
-{
-	$this->strHolidaysFilename = $strFilename;
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return array
- * @uses getDefaultDate()
- * @uses getDatesOfWeek()
- * @uses isHoliday()
- */
-
-public function getHolidaysInWeek($strDate = null)
-{
-	if(!$strDate)
-		$strDate = $this->getDefaultDate(TRUE);
-	
-	$arrDatesOfWeek = $this->getDatesOfWeek($strDate);
-	
-	foreach($arrDatesOfWeek as $intKey => $strDateOfWeek)
+	public function __construct($strDate = null)
 	{
-		$arrReturn[$intKey] = ($this->isHoliday($strDateOfWeek)) ? 1 : 0;
+		$this->strDate = $strDate;	
 	}
 	
-	return $arrReturn;
-}
-
-// ****************************************************************************
-
-/**
- * @param boolean $boolCurrentDate
- * @return string
- */
-
-protected function getDefaultDate($boolCurrentDate = FALSE)
-{
-	if($boolCurrentDate && $this->strDate === null)
-		return date('Y-m-d');
+	/**
+	 * @param string $strDate
+	 */
 	
-	return $this->strDate;
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return boolean
- * @uses getDefaultDate()
- * @uses getHolidays()
- */
-
-protected function isHoliday($strDate = null)
-{
-	if(!$strDate)
-		$strDate = $this->getDefaultDate(TRUE);
-
-	$this->getHolidays();
+	public function setDefaultDate($strDate)
+	{
+		$this->strDate = $strDate;	
+	}
+	
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return array
+	 * @uses getDefaultDate()
+	 */
 		
-	$arrDate = explode('-', $strDate);
-	
-	$strDay   = (int)$arrDate[2];
-	
-	$strMonth = (int)$arrDate[1];
-	
-	$strYear  = (int)$arrDate[0];
-	
-	if($this->objHolidaysXML instanceof SimpleXMLElement)
-		foreach($this->objHolidaysXML->holiday as $objHoliday)
+	public function getWeek($strDate = null)
+	{
+		$arrReturn = array();
+		
+		if(!$strDate)
+			$strDate = $this->getDefaultDate();
+		
+		if($strDate)
 		{
-			if($objHoliday->day == $strDay
-			  && $objHoliday->month == $strMonth
-			  && $objHoliday->year == $strYear)
-					return TRUE;
+			$intWeek = date('W', strtotime($strDate));
+		}
+		else
+		{
+			$intWeek = date('W');
 		}
 		
-	if($this->objHolidaysXML instanceof SimpleXMLElement)
-		foreach($this->objHolidaysXML->holiday as $objHoliday)
+		for($intIndex = 1; $intIndex <= 53; $intIndex++)
+			$arrReturn[$intIndex] = ($intWeek == $intIndex) ? 1 : 0;
+	
+		return $arrReturn;
+	}
+		
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return array
+	 * @uses getDefaultDate()
+	 */
+		
+	public function getWeekDay($strDate = null)
+	{
+		$arrReturn = array();
+		
+		if(!$strDate)
+			$strDate = $this->getDefaultDate();
+		
+		if($strDate)
 		{
-			if($objHoliday->day == $strDay
-			  && $objHoliday->month == $strMonth
-			  && $objHoliday->year == 'any')
-					return TRUE;
+			$intWeekDay = date('w', strtotime($strDate));
 		}
-}
-
-// ****************************************************************************
-
-/**
- * @uses SimpleXMLElement::__construct()
- * @throws ANN_Exception
- */
-
-protected function getHolidays()
-{
-	if($this->objHolidaysXML instanceof SimpleXMLElement)
-		return;
-
-	if(!is_file($this->strHolidaysFilename))
-		throw new ANN_Exception('File '. $this->strHolidaysFilename .' does not exist');
+		else
+		{
+			$intWeekDay = date('w');
+		}
 		
-	if(!is_readable($this->strHolidaysFilename))
-		throw new ANN_Exception('File '. $this->strHolidaysFilename .' does not have read permission');
+		if($intWeekDay == 0)
+			$intWeekDay = 7;
 		
-	$strXML = @file_get_contents($this->strHolidaysFilename);
+		for($intIndex = 1; $intIndex <= 7; $intIndex++)
+			$arrReturn[$intIndex] = ($intWeekDay == $intIndex) ? 1 : 0;
 	
-	try
+		return $arrReturn;
+	}
+		
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return array
+	 * @uses getDefaultDate()
+	 */
+		
+	public function getYearDay($strDate = null)
 	{
-		$this->objHolidaysXML = new SimpleXMLElement($strXML);
+		$arrReturn = array();
+		
+		if(!$strDate)
+			$strDate = $this->getDefaultDate();
+		
+		if($strDate)
+		{
+			$intYearDay = date('z', strtotime($strDate));
+		}
+		else
+		{
+			$intYearDay = date('z');
+		}
+		
+		$intYearDay++;
+		
+		for($intIndex = 1; $intIndex <= 366; $intIndex++)
+			$arrReturn[$intIndex] = ($intYearDay == $intIndex) ? 1 : 0;
+	
+		return $arrReturn;
 	}
-	catch(Exception $e)
+		
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return array
+	 * @uses getDefaultDate()
+	 */
+		
+	public function getMonthWeek($strDate = null)
 	{
-		throw new ANN_Exception($e->getMessage());
+		$arrReturn = array();
+		
+		if(!$strDate)
+			$strDate = $this->getDefaultDate();
+		
+		if($strDate)
+		{
+			$intDay = date('d', strtotime($strDate));
+		}
+		else
+		{
+			$intDay = date('d');
+		}
+		
+		$intWeek = (int)($intDay / 7);
+		
+		$intWeek++;
+		
+		for($intIndex = 1; $intIndex <= 5; $intIndex++)
+			$arrReturn[$intIndex] = ($intWeek == $intIndex) ? 1 : 0;
+	
+		return $arrReturn;
 	}
-
-	if(!($this->objHolidaysXML instanceof SimpleXMLElement))
-		throw new ANN_Exception('XML Object cannot be created');
+		
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return array
+	 * @uses getDefaultDate()
+	 */
+		
+	public function getQuarter($strDate = null)
+	{
+		$arrReturn = array();
+		
+		if(!$strDate)
+			$strDate = $this->getDefaultDate();
+		
+		if($strDate)
+		{
+			$intMonth = date('m', strtotime($strDate));
+		}
+		else
+		{
+			$intMonth = date('m');
+		}
+		
+		$intQuarter = (int)($intMonth / 4);
+		
+		$intQuarter++;
+		
+		for($intIndex = 1; $intIndex <= 4; $intIndex++)
+			$arrReturn[$intIndex] = ($intQuarter == $intIndex) ? 1 : 0;
 	
-	if(!isset($this->objHolidaysXML->holiday))
-		throw new ANN_Exception('Missing at least on holiday element');
-
-	$intElementIndex = 0;
-		
-	foreach($this->objHolidaysXML->holiday as $objHoliday)
-	{		
-		$intElementIndex++;
-		
-		if(!isset($objHoliday->day))
-			throw new ANN_Exception('Missing day element in holiday element '. $intElementIndex);
-		
-		if(!isset($objHoliday->month))
-			throw new ANN_Exception('Missing month element in holiday element '. $intElementIndex);
-		
-		if(!isset($objHoliday->year))
-			throw new ANN_Exception('Missing year element in holiday element '. $intElementIndex);
-		
-		if(!isset($objHoliday->country))
-			throw new ANN_Exception('Missing country element in holiday element '. $intElementIndex);
-		
-		if(!isset($objHoliday->state))
-			throw new ANN_Exception('Missing state element in holiday element '. $intElementIndex);
-		
-		if(!isset($objHoliday->description))
-			throw new ANN_Exception('Missing descrition element in holiday element '. $intElementIndex);
+		return $arrReturn;
 	}
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return array
- * @uses getDefaultDate()
- * @uses getFirstDayOfWeek()
- * @uses getNextDayOfWeek()
- */
-
-protected function getDatesOfWeek($strDate = null)
-{
-	if(!$strDate)
-		$strDate = $this->getDefaultDate(TRUE);
+		
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return array
+	 * @uses getDefaultDate()
+	 */
+		
+	public function getDaylight($strDate = null)
+	{
+		$arrReturn = array();
+		
+		if(!$strDate)
+			$strDate = $this->getDefaultDate();
+		
+		if($strDate)
+		{
+			$floatSunrise = date_sunrise(strtotime($strDate), SUNFUNCS_RET_DOUBLE);
+			
+			$floatSunset = date_sunset(strtotime($strDate), SUNFUNCS_RET_DOUBLE);
+		}
+		else
+		{
+			$floatSunrise = date_sunrise(time(), SUNFUNCS_RET_DOUBLE);
+			
+			$floatSunset = date_sunset(time(), SUNFUNCS_RET_DOUBLE);
+		}
+		
+		$floatDaylight = ($floatSunset - $floatSunrise) / 24;
+		
+		return array($floatDaylight);
+	}
+		
+	/**
+	 * @param string $strFilename
+	 */
 	
-	$strDateMonday    = $this->getFirstDayOfWeek($strDate);
+	public function setHolidaysFilename($strFilename)
+	{
+		$this->strHolidaysFilename = $strFilename;
+	}
 	
-	$strDateTuesday   = $this->getNextDayOfWeek($strDateMonday, 1);
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return array
+	 * @uses getDefaultDate()
+	 * @uses getDatesOfWeek()
+	 * @uses isHoliday()
+	 */
 	
-	$strDateWednesday = $this->getNextDayOfWeek($strDateMonday, 2);
+	public function getHolidaysInWeek($strDate = null)
+	{
+		if(!$strDate)
+			$strDate = $this->getDefaultDate(TRUE);
+		
+		$arrDatesOfWeek = $this->getDatesOfWeek($strDate);
+		
+		foreach($arrDatesOfWeek as $intKey => $strDateOfWeek)
+		{
+			$arrReturn[$intKey] = ($this->isHoliday($strDateOfWeek)) ? 1 : 0;
+		}
+		
+		return $arrReturn;
+	}
 	
-	$strDateThursday  = $this->getNextDayOfWeek($strDateMonday, 3);
-
-	$strDateFriday    = $this->getNextDayOfWeek($strDateMonday, 4);
+	/**
+	 * @param boolean $boolCurrentDate
+	 * @return string
+	 */
 	
-	$strDateSaturday  = $this->getNextDayOfWeek($strDateMonday, 5);
+	protected function getDefaultDate($boolCurrentDate = FALSE)
+	{
+		if($boolCurrentDate && $this->strDate === null)
+			return date('Y-m-d');
+		
+		return $this->strDate;
+	}
 	
-	$strDateSunday    = $this->getNextDayOfWeek($strDateMonday, 6);
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return boolean
+	 * @uses getDefaultDate()
+	 * @uses getHolidays()
+	 */
 	
-	$arrReturn = array(
-		1 => $strDateMonday,
-		2 => $strDateTuesday,
-		3 => $strDateWednesday,
-		4 => $strDateThursday,
-		5 => $strDateFriday,
-		6 => $strDateSaturday,
-		7 => $strDateSunday
-	);
+	protected function isHoliday($strDate = null)
+	{
+		if(!$strDate)
+			$strDate = $this->getDefaultDate(TRUE);
 	
-	return $arrReturn;
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strDate (Default: null)
- * @return string
- * @uses getDefaultDate()
- */
-
-protected function getFirstDayOfWeek($strDate)
-{
-	if(!$strDate)
-		$strDate = $this->getDefaultDate(TRUE);
-
-	$intDayOfWeek = date('w', strtotime($strDate));
+		$this->getHolidays();
+			
+		$arrDate = explode('-', $strDate);
+		
+		$strDay   = (int)$arrDate[2];
+		
+		$strMonth = (int)$arrDate[1];
+		
+		$strYear  = (int)$arrDate[0];
+		
+		if($this->objHolidaysXML instanceof SimpleXMLElement)
+			foreach($this->objHolidaysXML->holiday as $objHoliday)
+			{
+				if($objHoliday->day == $strDay
+				  && $objHoliday->month == $strMonth
+				  && $objHoliday->year == $strYear)
+						return TRUE;
+			}
+			
+		if($this->objHolidaysXML instanceof SimpleXMLElement)
+			foreach($this->objHolidaysXML->holiday as $objHoliday)
+			{
+				if($objHoliday->day == $strDay
+				  && $objHoliday->month == $strMonth
+				  && $objHoliday->year == 'any')
+						return TRUE;
+			}
+	}
 	
-	if($intDayOfWeek == 0)
-		$intDayOfWeek = 7;
+	/**
+	 * @uses SimpleXMLElement::__construct()
+	 * @throws ANN_Exception
+	 */
 	
-	$intUnixTime = strtotime($strDate) - ($intDayOfWeek - 1) * 86400;
+	protected function getHolidays()
+	{
+		if($this->objHolidaysXML instanceof SimpleXMLElement)
+			return;
 	
-	return date('Y-m-d', $intUnixTime);
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strDate
- * @param integer $intDayIncrement
- * @return string
- * @uses getDefaultDate()
- */
-
-protected function getNextDayOfWeek($strDate, $intDayIncrement)
-{
-	if(!$strDate)
-		$strDate = $this->getDefaultDate(TRUE);
-
-	$intUnixTime = strtotime($strDate) + $intDayIncrement * 86400;
+		if(!is_file($this->strHolidaysFilename))
+			throw new ANN_Exception('File '. $this->strHolidaysFilename .' does not exist');
+			
+		if(!is_readable($this->strHolidaysFilename))
+			throw new ANN_Exception('File '. $this->strHolidaysFilename .' does not have read permission');
+			
+		$strXML = @file_get_contents($this->strHolidaysFilename);
+		
+		try
+		{
+			$this->objHolidaysXML = new SimpleXMLElement($strXML);
+		}
+		catch(Exception $e)
+		{
+			throw new ANN_Exception($e->getMessage());
+		}
 	
-	return date('Y-m-d', $intUnixTime);
-}
-
-// ****************************************************************************
+		if(!($this->objHolidaysXML instanceof SimpleXMLElement))
+			throw new ANN_Exception('XML Object cannot be created');
+		
+		if(!isset($this->objHolidaysXML->holiday))
+			throw new ANN_Exception('Missing at least on holiday element');
+	
+		$intElementIndex = 0;
+			
+		foreach($this->objHolidaysXML->holiday as $objHoliday)
+		{		
+			$intElementIndex++;
+			
+			if(!isset($objHoliday->day))
+				throw new ANN_Exception('Missing day element in holiday element '. $intElementIndex);
+			
+			if(!isset($objHoliday->month))
+				throw new ANN_Exception('Missing month element in holiday element '. $intElementIndex);
+			
+			if(!isset($objHoliday->year))
+				throw new ANN_Exception('Missing year element in holiday element '. $intElementIndex);
+			
+			if(!isset($objHoliday->country))
+				throw new ANN_Exception('Missing country element in holiday element '. $intElementIndex);
+			
+			if(!isset($objHoliday->state))
+				throw new ANN_Exception('Missing state element in holiday element '. $intElementIndex);
+			
+			if(!isset($objHoliday->description))
+				throw new ANN_Exception('Missing descrition element in holiday element '. $intElementIndex);
+		}
+	}
+	
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return array
+	 * @uses getDefaultDate()
+	 * @uses getFirstDayOfWeek()
+	 * @uses getNextDayOfWeek()
+	 */
+	
+	protected function getDatesOfWeek($strDate = null)
+	{
+		if(!$strDate)
+			$strDate = $this->getDefaultDate(TRUE);
+		
+		$strDateMonday    = $this->getFirstDayOfWeek($strDate);
+		
+		$strDateTuesday   = $this->getNextDayOfWeek($strDateMonday, 1);
+		
+		$strDateWednesday = $this->getNextDayOfWeek($strDateMonday, 2);
+		
+		$strDateThursday  = $this->getNextDayOfWeek($strDateMonday, 3);
+	
+		$strDateFriday    = $this->getNextDayOfWeek($strDateMonday, 4);
+		
+		$strDateSaturday  = $this->getNextDayOfWeek($strDateMonday, 5);
+		
+		$strDateSunday    = $this->getNextDayOfWeek($strDateMonday, 6);
+		
+		$arrReturn = array(
+			1 => $strDateMonday,
+			2 => $strDateTuesday,
+			3 => $strDateWednesday,
+			4 => $strDateThursday,
+			5 => $strDateFriday,
+			6 => $strDateSaturday,
+			7 => $strDateSunday
+		);
+		
+		return $arrReturn;
+	}
+	
+	/**
+	 * @param string $strDate (Default: null)
+	 * @return string
+	 * @uses getDefaultDate()
+	 */
+	
+	protected function getFirstDayOfWeek($strDate)
+	{
+		if(!$strDate)
+			$strDate = $this->getDefaultDate(TRUE);
+	
+		$intDayOfWeek = date('w', strtotime($strDate));
+		
+		if($intDayOfWeek == 0)
+			$intDayOfWeek = 7;
+		
+		$intUnixTime = strtotime($strDate) - ($intDayOfWeek - 1) * 86400;
+		
+		return date('Y-m-d', $intUnixTime);
+	}
+	
+	/**
+	 * @param string $strDate
+	 * @param integer $intDayIncrement
+	 * @return string
+	 * @uses getDefaultDate()
+	 */
+	
+	protected function getNextDayOfWeek($strDate, $intDayIncrement)
+	{
+		if(!$strDate)
+			$strDate = $this->getDefaultDate(TRUE);
+	
+		$intUnixTime = strtotime($strDate) + $intDayIncrement * 86400;
+		
+		return date('Y-m-d', $intUnixTime);
+	}
 }

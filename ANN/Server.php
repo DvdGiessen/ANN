@@ -48,173 +48,155 @@
 
 class ANN_Server
 {
-/**#@+
- * @ignore
- */
-
-protected $boolLogin = FALSE;
-protected $objNetwork = null;
-protected $objNetworkUnserialized = null;
-protected $strDir = '';
-
-/**#@-*/
-
-// ****************************************************************************
-
-/**
- * @param string $strDir (Default: 'networks')
- * @uses ANN_Exception::__construct()
- * @uses onPost()
- * @throws ANN_Exception
- */
-
-public function __construct($strDir = 'networks')
-{
-  if(!is_dir($strDir) && is_writable($strDir))
-    throw new ANN_Exception('Directory '. $strDir .' does not exists or has no writing permissions');
-
-  $this->strDir = $strDir;
-
-  if(isset($_POST) && count($_POST))
-    $this->OnPost();
-}
-
-// ****************************************************************************
-
-/**
- * @uses loadFromHost()
- * @uses checkLogin()
- * @uses saveToHost()
- * @uses trainByHost()
- */
-
-protected function onPost()
-{
-  if(!isset($_POST['username']))
-    $_POST['username'] = '';
-
-  if(!isset($_POST['password']))
-    $_POST['password'] = '';
-    
-  settype($_POST['username'], 'string');
-
-  settype($_POST['password'], 'string');
-
-  $this->boolLogin = $this->checkLogin($_POST['username'], $_POST['password']);
-
-  if(!$this->boolLogin)
-    return;
-
-  if(isset($_POST['mode']))
-    switch($_POST['mode'])
-    {
-      case 'savetohost':
-
-        $this->objNetworkUnserialized = $_POST['network'];
-
-        $this->saveToHost();
-
-        break;
-
-      case 'loadfromhost':
-
-        $this->loadFromHost();
-
-        break;
-
-      case 'trainbyhost':
-
-        $this->objNetworkUnserialized = $_POST['network'];
-
-        $this->trainByHost();
-
-        break;
-    }
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strUsername
- * @param string $strPassword
- * @return boolean
- */
-
-protected function checkLogin($strUsername, $strPassword)
-{
-  return TRUE;
-}
-
-// ****************************************************************************
-
-/**
- * @uses ANN_Network::saveToFile()
- */
-
-protected function saveToHost()
-{
-  $this->objNetwork = unserialize($this->objNetworkUnserialized);
-  
-  if($this->objNetwork instanceof ANN_Network)
-    $this->objNetwork->saveToFile($this->strDir .'/'. $_POST['username'] .'.dat');
-}
-
-// ****************************************************************************
-
-/**
- * @uses ANN_Network::loadFromFile()
- */
-
-protected function loadFromHost()
-{
-  $this->objNetwork = ANN_Network::loadFromFile($this->strDir .'/'. $_POST['username'] .'.dat');
-}
-
-// ****************************************************************************
-
-/**
- * @uses ANN_Network::saveToFile()
- * @uses ANN_Network::train()
- * @uses saveToHost()
- */
-
-protected function trainByHost()
-{
-  $this->saveToHost();
-
-  if($this->objNetwork instanceof ANN_Network)
-  {
-    $this->objNetwork->saveToFile($this->strDir .'/'. $_POST['username'] .'.dat');
-
-    $this->objNetwork->train();
-  }
-}
-
-// ****************************************************************************
-
-protected function printNetwork()
-{
-  header('Content-Type: text/plain');
-
-  print serialize($this->objNetwork);
-}
-
-// ****************************************************************************
-
-/**
- * @uses printNetwork()
- */
-
-public function __destruct()
-{
-  if(isset($_POST['mode']))
-    switch($_POST['mode'])
-    {
-      case 'loadfromhost':
-      case 'trainbyhost':
-        $this->printNetwork();
-    }
-}
-
-// ****************************************************************************
+	/**#@+
+	 * @ignore
+	 */
+	
+	protected $boolLogin = FALSE;
+	protected $objNetwork = null;
+	protected $objNetworkUnserialized = null;
+	protected $strDir = '';
+	
+	/**#@-*/
+	
+	/**
+	 * @param string $strDir (Default: 'networks')
+	 * @uses ANN_Exception::__construct()
+	 * @uses onPost()
+	 * @throws ANN_Exception
+	 */
+	
+	public function __construct($strDir = 'networks')
+	{
+	  if(!is_dir($strDir) && is_writable($strDir))
+	    throw new ANN_Exception('Directory '. $strDir .' does not exists or has no writing permissions');
+	
+	  $this->strDir = $strDir;
+	
+	  if(isset($_POST) && count($_POST))
+	    $this->OnPost();
+	}
+	
+	/**
+	 * @uses loadFromHost()
+	 * @uses checkLogin()
+	 * @uses saveToHost()
+	 * @uses trainByHost()
+	 */
+	
+	protected function onPost()
+	{
+	  if(!isset($_POST['username']))
+	    $_POST['username'] = '';
+	
+	  if(!isset($_POST['password']))
+	    $_POST['password'] = '';
+	    
+	  settype($_POST['username'], 'string');
+	
+	  settype($_POST['password'], 'string');
+	
+	  $this->boolLogin = $this->checkLogin($_POST['username'], $_POST['password']);
+	
+	  if(!$this->boolLogin)
+	    return;
+	
+	  if(isset($_POST['mode']))
+	    switch($_POST['mode'])
+	    {
+	      case 'savetohost':
+	
+	        $this->objNetworkUnserialized = $_POST['network'];
+	
+	        $this->saveToHost();
+	
+	        break;
+	
+	      case 'loadfromhost':
+	
+	        $this->loadFromHost();
+	
+	        break;
+	
+	      case 'trainbyhost':
+	
+	        $this->objNetworkUnserialized = $_POST['network'];
+	
+	        $this->trainByHost();
+	
+	        break;
+	    }
+	}
+	
+	/**
+	 * @param string $strUsername
+	 * @param string $strPassword
+	 * @return boolean
+	 */
+	
+	protected function checkLogin($strUsername, $strPassword)
+	{
+	  return TRUE;
+	}
+	
+	/**
+	 * @uses ANN_Network::saveToFile()
+	 */
+	
+	protected function saveToHost()
+	{
+	  $this->objNetwork = unserialize($this->objNetworkUnserialized);
+	  
+	  if($this->objNetwork instanceof ANN_Network)
+	    $this->objNetwork->saveToFile($this->strDir .'/'. $_POST['username'] .'.dat');
+	}
+	
+	/**
+	 * @uses ANN_Network::loadFromFile()
+	 */
+	
+	protected function loadFromHost()
+	{
+	  $this->objNetwork = ANN_Network::loadFromFile($this->strDir .'/'. $_POST['username'] .'.dat');
+	}
+	
+	/**
+	 * @uses ANN_Network::saveToFile()
+	 * @uses ANN_Network::train()
+	 * @uses saveToHost()
+	 */
+	
+	protected function trainByHost()
+	{
+	  $this->saveToHost();
+	
+	  if($this->objNetwork instanceof ANN_Network)
+	  {
+	    $this->objNetwork->saveToFile($this->strDir .'/'. $_POST['username'] .'.dat');
+	
+	    $this->objNetwork->train();
+	  }
+	}
+	
+	protected function printNetwork()
+	{
+	  header('Content-Type: text/plain');
+	
+	  print serialize($this->objNetwork);
+	}
+	
+	/**
+	 * @uses printNetwork()
+	 */
+	
+	public function __destruct()
+	{
+	  if(isset($_POST['mode']))
+	    switch($_POST['mode'])
+	    {
+	      case 'loadfromhost':
+	      case 'trainbyhost':
+	        $this->printNetwork();
+	    }
+	}
 }

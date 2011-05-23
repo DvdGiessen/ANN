@@ -51,42 +51,34 @@
 
 class ANN_Maths
 {
-// ****************************************************************************
-
-/**
- * @param float $floatValue
- * @return float (between near 0 and near 1)
- */
-
-public static function sigmoid($floatValue)
-{
-  return 1 / (1 + exp(-1 * $floatValue));
-}
-
-// ****************************************************************************
-
-/**
- * @param float $floatValue
- * @return integer (0 or 1)
- */
-
-public static function threshold($floatValue)
-{
-  return ($floatValue > 0.5) ? 1 : 0;
-}
-
-// ****************************************************************************
-
-/**
- * @param integer $floatValueMin (Default:  0)
- * @param integer $floatValueMax (Default:  10)
- * @return integer
- */
-
-public static function random($floatValueMin = 0, $floatValueMax = 10)
-{
-  return mt_rand($floatValueMin, $floatValueMax);
-}
-
-// ****************************************************************************
+	/**
+	 * @param float $floatValue
+	 * @return float (between near 0 and near 1)
+	 */
+	
+	public static function sigmoid($floatValue)
+	{
+	  return 1 / (1 + exp(-1 * $floatValue));
+	}
+	
+	/**
+	 * @param float $floatValue
+	 * @return integer (0 or 1)
+	 */
+	
+	public static function threshold($floatValue)
+	{
+	  return ($floatValue > 0.5) ? 1 : 0;
+	}
+	
+	/**
+	 * @param integer $floatValueMin (Default:  0)
+	 * @param integer $floatValueMax (Default:  10)
+	 * @return integer
+	 */
+	
+	public static function random($floatValueMin = 0, $floatValueMax = 10)
+	{
+	  return mt_rand($floatValueMin, $floatValueMax);
+	}
 }

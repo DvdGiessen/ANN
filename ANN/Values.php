@@ -49,234 +49,218 @@
 
 class ANN_Values extends ANN_Filesystem
 {
-/**#@+
- * @ignore
- */
-
-protected $arrInputs  = array();
-protected $arrOutputs = array();
-protected $boolLastActionInput = FALSE;
-protected $boolTrain = FALSE;
-protected $intCountInputs = null;
-protected $intCountOutputs = null;
-
-/**#@-*/
-
-// ****************************************************************************
-
-/**
- * Input values
- *
- * List all input values comma separated
- *
- * <code>
- * $objValues = new ANN_Values;
- *
- * $objValues->train()
- *           ->input(0.12, 0.11, 0.15)
- *           ->output(0.56);
- * </code>
- *
- * <code>
- * $objValues = new ANN_Values;
- *
- * $objValues->input(0.12, 0.11, 0.15)
- *           ->input(0.13, 0.12, 0.16)
- *           ->input(0.14, 0.13, 0.17);
- * </code>
- *
- * @return ANN_Values
- * @uses ANN_Exception::__construct()
- * @throws ANN_Exception
- */
-
-public function input()
-{
-  if($this->boolTrain && $this->boolLastActionInput)
-    throw new ANN_Exception('After calling input() method output() should be called');
-
-  $arrParameters = func_get_args();
-
-  $arrInputParameters = array();
-  
-  foreach($arrParameters as $mixedParameter)
-	  if(is_array($mixedParameter))
-	  {
-			$arrInputParameters = array_merge($arrInputParameters, $mixedParameter);
-	  }
-	  elseif(is_numeric($mixedParameter))
-	  {
-	  	$arrInputParameters[] = $mixedParameter;
-	  }
-  
-  $intCountParameters = func_num_args();
-  
-  foreach($arrInputParameters as $floatParameter)
-    if(!is_float($floatParameter) && !is_integer($floatParameter))
-      throw new ANN_Exception('Each parameter should be float');
-      
-  if($this->intCountInputs === null)
-    $this->intCountInputs =  $intCountParameters;
-    
-  if($this->intCountInputs != $intCountParameters)
-    throw new ANN_Exception('There should be '. $this->intCountInputs .' parameter values for input()');
-
-  $this->arrInputs[] = $arrInputParameters;
-  
-  $this->boolLastActionInput = TRUE;
-  
-  return $this;
-}
-
-// ****************************************************************************
-
-/**
- * Output values
- *
- * List all output values comma separated. Before you can call this method you
- * have to call input(). After calling output() you cannot call the same method
- * again. You have to call input() again first.
- *
- * <code>
- * $objValues = new ANN_Values;
- *
- * $objValues->train()
- *           ->input(0.12, 0.11, 0.15)
- *           ->output(0.56);
- * </code>
- *
- * @return ANN_Values
- * @uses ANN_Exception::__construct()
- * @throws ANN_Exception
- */
-
-public function output()
-{
-  if(!$this->boolLastActionInput)
-    throw new ANN_Exception('After calling output() method input() should be called');
-
-  if(!$this->boolTrain)
-    throw new ANN_Exception('Calling output() is just allowed for training. Call train() if values for training.');
-
-  $arrParameters = func_get_args();
-
-  // If ANN_Classification is used
-  
-  if(isset($arrParameters[0]) && is_array($arrParameters[0]))
-		$arrParameters = $arrParameters[0];
-  
-	$intCountParameters = func_num_args();
-
-  foreach($arrParameters as $floatParameter)
-    if(!is_float($floatParameter) && !is_integer($floatParameter))
-      throw new ANN_Exception('Each parameter should be float');
-
-  if($this->intCountOutputs === null)
-    $this->intCountOutputs =  $intCountParameters;
-
-  if($this->intCountOutputs != $intCountParameters)
-    throw new ANN_Exception('There should be '. $this->intCountOutputs .' parameter values for output()');
-
-  $this->arrOutputs[] = $arrParameters;
-
-  $this->boolLastActionInput = FALSE;
-
-  return $this;
-}
-
-// ****************************************************************************
-
-/**
- * @return ANN_Values
- */
-
-public function train()
-{
-  $this->boolTrain = TRUE;
-  
-  return $this;
-}
-
-// ****************************************************************************
-
-/**
- * Get internal saved input array
- *
- * Actually there is no reason to call this method in your application. This
- * method is used by ANN_Network only.
- *
- * @return array
- */
-
-public function getInputsArray()
-{
-  return $this->arrInputs;
-}
-
-// ****************************************************************************
-
-/**
- * Get internal saved output array
- *
- * Actually there is no reason to call this method in your application. This
- * method is used by ANN_Network only.
- *
- * @return array
- */
-
-public function getOutputsArray()
-{
-  return $this->arrOutputs;
-}
-
-// ****************************************************************************
-
-/**
- * Unserializing ANN_Values
- *
- * After calling unserialize the train mode is set to false. Therefore it is
- * possible to use a saved object of ANN_Values to use inputs not for training
- * purposes.
- *
- * You would not use unserialize in your application but you can call loadFromFile()
- * to load the saved object to your application.
- */
-
-public function __wakeup()
-{
-  $this->boolTrain = FALSE;
-}
-
-// ****************************************************************************
-
-/**
- * Reset saved input and output values
- *
- * All internal saved input and output values will be deleted after calling reset().
- * If train() was called before, train state does not change by calling reset().
- *
- * <code>
- * $objValues = new ANN_Values;
- *
- * $objValues->train()
- *           ->input(0.12, 0.11, 0.15)
- *           ->output(0.56)
- *           ->reset()
- *           ->input(0.12, 0.11, 0.15)
- *           ->output(0.56);
- * </code>
- *
- * @return ANN_Values
- */
-
-public function reset()
-{
-  $this->arrInputs = array();
-
-  $this->arrOutputs = array();
-  
-  return $this;
-}
-
-// ****************************************************************************
+	/**#@+
+	 * @ignore
+	 */
+	
+	protected $arrInputs  = array();
+	protected $arrOutputs = array();
+	protected $boolLastActionInput = FALSE;
+	protected $boolTrain = FALSE;
+	protected $intCountInputs = null;
+	protected $intCountOutputs = null;
+	
+	/**#@-*/
+	
+	/**
+	 * Input values
+	 *
+	 * List all input values comma separated
+	 *
+	 * <code>
+	 * $objValues = new ANN_Values;
+	 *
+	 * $objValues->train()
+	 *           ->input(0.12, 0.11, 0.15)
+	 *           ->output(0.56);
+	 * </code>
+	 *
+	 * <code>
+	 * $objValues = new ANN_Values;
+	 *
+	 * $objValues->input(0.12, 0.11, 0.15)
+	 *           ->input(0.13, 0.12, 0.16)
+	 *           ->input(0.14, 0.13, 0.17);
+	 * </code>
+	 *
+	 * @return ANN_Values
+	 * @uses ANN_Exception::__construct()
+	 * @throws ANN_Exception
+	 */
+	
+	public function input()
+	{
+	  if($this->boolTrain && $this->boolLastActionInput)
+	    throw new ANN_Exception('After calling input() method output() should be called');
+	
+	  $arrParameters = func_get_args();
+	
+	  $arrInputParameters = array();
+	  
+	  foreach($arrParameters as $mixedParameter)
+		  if(is_array($mixedParameter))
+		  {
+				$arrInputParameters = array_merge($arrInputParameters, $mixedParameter);
+		  }
+		  elseif(is_numeric($mixedParameter))
+		  {
+		  	$arrInputParameters[] = $mixedParameter;
+		  }
+	  
+	  $intCountParameters = func_num_args();
+	  
+	  foreach($arrInputParameters as $floatParameter)
+	    if(!is_float($floatParameter) && !is_integer($floatParameter))
+	      throw new ANN_Exception('Each parameter should be float');
+	      
+	  if($this->intCountInputs === null)
+	    $this->intCountInputs =  $intCountParameters;
+	    
+	  if($this->intCountInputs != $intCountParameters)
+	    throw new ANN_Exception('There should be '. $this->intCountInputs .' parameter values for input()');
+	
+	  $this->arrInputs[] = $arrInputParameters;
+	  
+	  $this->boolLastActionInput = TRUE;
+	  
+	  return $this;
+	}
+	
+	/**
+	 * Output values
+	 *
+	 * List all output values comma separated. Before you can call this method you
+	 * have to call input(). After calling output() you cannot call the same method
+	 * again. You have to call input() again first.
+	 *
+	 * <code>
+	 * $objValues = new ANN_Values;
+	 *
+	 * $objValues->train()
+	 *           ->input(0.12, 0.11, 0.15)
+	 *           ->output(0.56);
+	 * </code>
+	 *
+	 * @return ANN_Values
+	 * @uses ANN_Exception::__construct()
+	 * @throws ANN_Exception
+	 */
+	
+	public function output()
+	{
+	  if(!$this->boolLastActionInput)
+	    throw new ANN_Exception('After calling output() method input() should be called');
+	
+	  if(!$this->boolTrain)
+	    throw new ANN_Exception('Calling output() is just allowed for training. Call train() if values for training.');
+	
+	  $arrParameters = func_get_args();
+	
+	  // If ANN_Classification is used
+	  
+	  if(isset($arrParameters[0]) && is_array($arrParameters[0]))
+			$arrParameters = $arrParameters[0];
+	  
+		$intCountParameters = func_num_args();
+	
+	  foreach($arrParameters as $floatParameter)
+	    if(!is_float($floatParameter) && !is_integer($floatParameter))
+	      throw new ANN_Exception('Each parameter should be float');
+	
+	  if($this->intCountOutputs === null)
+	    $this->intCountOutputs =  $intCountParameters;
+	
+	  if($this->intCountOutputs != $intCountParameters)
+	    throw new ANN_Exception('There should be '. $this->intCountOutputs .' parameter values for output()');
+	
+	  $this->arrOutputs[] = $arrParameters;
+	
+	  $this->boolLastActionInput = FALSE;
+	
+	  return $this;
+	}
+	
+	/**
+	 * @return ANN_Values
+	 */
+	
+	public function train()
+	{
+	  $this->boolTrain = TRUE;
+	  
+	  return $this;
+	}
+	
+	/**
+	 * Get internal saved input array
+	 *
+	 * Actually there is no reason to call this method in your application. This
+	 * method is used by ANN_Network only.
+	 *
+	 * @return array
+	 */
+	
+	public function getInputsArray()
+	{
+	  return $this->arrInputs;
+	}
+	
+	/**
+	 * Get internal saved output array
+	 *
+	 * Actually there is no reason to call this method in your application. This
+	 * method is used by ANN_Network only.
+	 *
+	 * @return array
+	 */
+	
+	public function getOutputsArray()
+	{
+	  return $this->arrOutputs;
+	}
+	
+	/**
+	 * Unserializing ANN_Values
+	 *
+	 * After calling unserialize the train mode is set to false. Therefore it is
+	 * possible to use a saved object of ANN_Values to use inputs not for training
+	 * purposes.
+	 *
+	 * You would not use unserialize in your application but you can call loadFromFile()
+	 * to load the saved object to your application.
+	 */
+	
+	public function __wakeup()
+	{
+	  $this->boolTrain = FALSE;
+	}
+	
+	/**
+	 * Reset saved input and output values
+	 *
+	 * All internal saved input and output values will be deleted after calling reset().
+	 * If train() was called before, train state does not change by calling reset().
+	 *
+	 * <code>
+	 * $objValues = new ANN_Values;
+	 *
+	 * $objValues->train()
+	 *           ->input(0.12, 0.11, 0.15)
+	 *           ->output(0.56)
+	 *           ->reset()
+	 *           ->input(0.12, 0.11, 0.15)
+	 *           ->output(0.56);
+	 * </code>
+	 *
+	 * @return ANN_Values
+	 */
+	
+	public function reset()
+	{
+	  $this->arrInputs = array();
+	
+	  $this->arrOutputs = array();
+	  
+	  return $this;
+	}
 }
