@@ -72,13 +72,11 @@ class ANN_Maths
 	}
 	
 	/**
-	 * @param integer $floatValueMin (Default:  0)
-	 * @param integer $floatValueMax (Default:  10)
-	 * @return integer
+	 * @return float
 	 */
 	
-	public static function random($floatValueMin = -1000, $floatValueMax = 1000)
+	public static function random()
 	{
-	  return mt_rand($floatValueMin, $floatValueMax) / 10000;
+	  return mt_rand(-2000, 2000) / 1000;
 	}
 }

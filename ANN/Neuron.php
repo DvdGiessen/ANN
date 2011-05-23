@@ -71,6 +71,7 @@ final class ANN_Neuron
 	
 	/**
 	 * @param ANN_Network $objNetwork
+	 * @uses ANN_Maths::random()
 	 */
 	
 	public function __construct(ANN_Network $objNetwork)
@@ -150,7 +151,7 @@ final class ANN_Neuron
 	protected function initializeWeights()
 	{
 		foreach($this->arrInputs as $intKey => $floatInput)
-			$this->arrWeights[$intKey] = ANN_Maths::random(-50000, 50000) / 100000;
+			$this->arrWeights[$intKey] = ANN_Maths::random();
 	}
 		
 	/**
