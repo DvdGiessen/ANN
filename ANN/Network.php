@@ -64,8 +64,7 @@ class ANN_Network extends ANN_Filesystem
 	protected $intTotalActivationsRequests = 0;
 	protected $intNumberOfHiddenLayers = null;
 	protected $intNumberOfHiddenLayersDec = null; // decremented value
-	protected $intMaxTrainingLoops;
-	protected $intMaxTrainingLoopsFactor = 230;
+	protected $intMaxExecutionTime = 0;
 	protected $intNumberEpoch = 0;
 	protected $boolLoggingWeights = FALSE;
 	protected $boolLoggingNetworkErrors = FALSE;
@@ -130,7 +129,7 @@ class ANN_Network extends ANN_Filesystem
 	  
 	  $this->intNumberOfNeuronsPerLayer = $intNumberOfNeuronsPerLayer;
 	  
-	  $this->calculateMaxTrainingLoops();
+	  $this->setMaxExecutionTime();
 	}
 		
 	/**
@@ -344,6 +343,7 @@ class ANN_Network extends ANN_Filesystem
 	 * @uses ANN_Exception::__construct()
 	 * @uses setInputs()
 	 * @uses setOutputs()
+	 * @uses hasTimeLeftForTraining()
 	 * @uses isTrainingComplete()
 	 * @uses isTrainingCompleteByEpoch()
 	 * @uses setInputsToTrain()
@@ -379,8 +379,12 @@ class ANN_Network extends ANN_Filesystem
 	  
 	  $this->boolFirstEpochOfTraining = TRUE;
 	
-	  for ($i = 0; $i < $this->intMaxTrainingLoops; $i++)
+	  $intLoop = 0;
+	  
+	  while($this->hasTimeLeftForTraining())
 	  {
+	  	$intLoop++;
+	  	
 	    $j = $this->getNextIndexInputsToTrain();
 	
 	    $this->setInputsToTrain($this->arrInputs[$j]);
@@ -407,13 +411,21 @@ class ANN_Network extends ANN_Filesystem
 	
 	  $intStopTime = date('U');
 	
-	  $this->intTotalLoops += $i;
+	  $this->intTotalLoops += $intLoop;
 	
 	  $this->intTrainingTime += $intStopTime - $intStartTime;
 	  
 	  $this->boolTrained = $this->isTrainingComplete();
 	  
 	  return $this->boolTrained;
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	protected function hasTimeLeftForTraining()
+	{
+		return ($_SERVER['REQUEST_TIME'] + $this->intMaxExecutionTime > date('U'));
 	}
 		
 	/**
@@ -913,33 +925,25 @@ class ANN_Network extends ANN_Filesystem
 	  print "</table>\n";
 	}
 	
-	protected function calculateMaxTrainingLoops()
-	{
-	  $seconds = (int)ini_get('max_execution_time');
-	
-	  $this->intMaxTrainingLoops = $seconds * $this->intMaxTrainingLoopsFactor;
-	}
-	
 	/**
-	 * @param integer $intMaxTrainingLoopsFactor (Default: 230)
 	 * @throws ANN_Exception
 	 */
-	
-	public function setMaxTrainingLoopsFactor($intMaxTrainingLoopsFactor = 230)
+
+	protected function setMaxExecutionTime()
 	{
-	  if(!is_int($intMaxTrainingLoopsFactor) && $intMaxTrainingLoopsFactor > 0)
-	    throw new ANN_Exception('Constraints: $intMaxTrainingLoopsFactor should be an positive integer');
-	
-	  $this->intMaxTrainingLoopsFactor = $intMaxTrainingLoopsFactor;
+		$this->intMaxExecutionTime = (int)ini_get('max_execution_time');
+		
+		if($this->intMaxExecutionTime == 0)
+			throw new ANN_Exception('max_execution_time is 0');
 	}
 	
 	/**
-	 * @uses calculateMaxTrainingLoops()
+	 * @uses setMaxExecutionTime()
 	 */
 	
 	public function __wakeup()
 	{
-	  $this->calculateMaxTrainingLoops();
+	  $this->setMaxExecutionTime();
 	
 	  $this->boolNetworkActivated = FALSE;
 	}
