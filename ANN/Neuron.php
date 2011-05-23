@@ -59,6 +59,11 @@ final class ANN_Neuron
 	protected $arrWeights = null;
 	protected $floatOutput = null;
 	protected $floatDelta = 0;
+	
+	/**
+	 * @var ANN_Network
+	 */
+	
 	protected $objNetwork = null;
 	protected $floatLearningRate = 0;
 	
@@ -72,7 +77,7 @@ final class ANN_Neuron
 	{
 	  $this->objNetwork = $objNetwork;
 	
-	  $this->floatDelta = ANN_Maths::random(40000, 90000) / 100000;
+	  $this->floatDelta = ANN_Maths::random();
 	  
 	  $this->floatLearningRate = $this->objNetwork->floatLearningRate;
 	}

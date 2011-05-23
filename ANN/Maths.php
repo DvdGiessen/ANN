@@ -77,8 +77,8 @@ class ANN_Maths
 	 * @return integer
 	 */
 	
-	public static function random($floatValueMin = 0, $floatValueMax = 10)
+	public static function random($floatValueMin = -1000, $floatValueMax = 1000)
 	{
-	  return mt_rand($floatValueMin, $floatValueMax);
+	  return mt_rand($floatValueMin, $floatValueMax) / 10000;
 	}
 }
