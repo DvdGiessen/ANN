@@ -247,8 +247,8 @@ class ANN_NetworkGraph
 	
 	protected function drawOutputNeurons()
 	{
-	  for($layer = 0; $layer < $this->intNumberHiddenLayers; $layer++)
-	    $xpos = 100 + $this->intLayerDistance + $this->intLayerDistance * $layer;
+	  for($intIndexLayer = 0; $intIndexLayer < $this->intNumberHiddenLayers; $intIndexLayer++)
+	    $xpos = 100 + $this->intLayerDistance + $this->intLayerDistance * $intIndexLayer;
 	
 	  $yposStart = $this->calculateYPosStart($this->intNumberOfOutputs);
 	
