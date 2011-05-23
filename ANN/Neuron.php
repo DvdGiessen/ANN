@@ -170,30 +170,9 @@ final class ANN_Neuron
 		
 	public function adjustWeights()
 	{
-	  switch($this->objNetwork->intOutputType)
-	  {
-	    case ANN_Network::OUTPUT_LINEAR:
-	
-	      $floatDelta = 0;
-	
-	      $floatLearningRateDeltaFactor = $this->floatLearningRate * $this->floatDelta;
-	      
-	      foreach($this->arrInputs as $floatInput)
-	        $floatDelta += $floatLearningRateDeltaFactor * $floatInput;
-	
-	    	foreach ($this->arrWeights as $intKey => $floatWeight)
-	    		$this->arrWeights[$intKey] += $floatDelta;
-	
-	      break;
-	
-	    case ANN_Network::OUTPUT_BINARY:
-	
-	      $floatLearningRateDeltaFactor = $this->floatLearningRate * $this->floatDelta;
-	    	
-	      foreach ($this->arrWeights as $intKey => $floatWeight)
-	    		$this->arrWeights[$intKey] += $this->arrInputs[$intKey] * $floatLearningRateDeltaFactor;
-	
-	      break;
-	  }
+		$floatLearningRateDeltaFactor = $this->floatLearningRate * $this->floatDelta;
+		    	
+		foreach ($this->arrWeights as $intKey => $floatWeight)
+			$this->arrWeights[$intKey] += $this->arrInputs[$intKey] * $floatLearningRateDeltaFactor;
 	}
 }
