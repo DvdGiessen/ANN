@@ -2,7 +2,6 @@
 
 ini_set('error_reporting', E_ALL | E_STRICT);
 ini_set('max_execution_time', 400);
-ini_set('precision', '6');
 ini_set('date.timezone', 'Europe/Berlin');
 
 

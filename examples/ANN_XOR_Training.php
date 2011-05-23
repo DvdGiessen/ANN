@@ -1,6 +1,6 @@
 <?php
 
-ini_set('max_execution_time', 2);
+ini_set('max_execution_time', 60);
 ini_set('error_reporting', E_ALL | E_STRICT);
 ini_set('date.timezone', 'Europe/Berlin');
 
@@ -14,7 +14,7 @@ catch(Exception $e)
 {
 	print "\nCreating a new one...";
 
-	$network = new ANN_Network(2, 4, 1);
+	$network = new ANN_Network(1, 4, 1);
 
   $objValues = new ANN_Values;
 
@@ -44,6 +44,6 @@ $network->setValues($objValues);
 
 $network->train();
 
-$network->saveToFile('xor.dat');
+// $network->saveToFile('xor.dat');
 
 $network->printNetwork();
