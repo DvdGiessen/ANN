@@ -76,6 +76,7 @@ class ANN_Network extends ANN_Filesystem
 	protected $arrTrainingComplete = array();
 	protected $intNumberOfNeuronsPerLayer = 0;
 	protected $floatOutputErrorTolerance = 0.02;
+	public $floatMomentum = 0.95;
 	private $arrInputsToTrain = array();
 	private $intInputsToTrainIndex = -1;
 	public $intOutputType = self::OUTPUT_LINEAR;
@@ -753,6 +754,13 @@ class ANN_Network extends ANN_Filesystem
 	  print "</tr>\n";
 	
 	  print "<tr>\n";
+	  print "<td style=\"color: #DDDDDD\">Momentum</td>\n";
+	  print "<td style=\"background-color: #CCCCCC\">"
+	        .$this->floatMomentum
+	        ."</td>\n";
+	  print "</tr>\n";
+
+		print "<tr>\n";
 	  print "<td style=\"color: #DDDDDD\">Learning rate</td>\n";
 	  print "<td style=\"background-color: #CCCCCC\">"
 	        .$this->floatLearningRate
@@ -1256,5 +1264,22 @@ class ANN_Network extends ANN_Filesystem
 	    throw new ANN_Exception('$floatOutputErrorTolerance must be between 0 and 0.1');
 	
 	  $this->floatOutputErrorTolerance = $floatOutputErrorTolerance;
+	}
+	
+	/**
+	 * @param float $floatMomentum (Default: 0.95) (0 .. 1)
+	 * @uses ANN_Exception::__construct()
+	 * @throws ANN_Exception
+	 */
+	
+	public function setMomentum($floatMomentum = 0.95)
+	{
+	  if(!is_float($floatMomentum) && !is_integer($floatMomentum))
+	    throw new ANN_Exception('$floatLearningRate should be between 0 and 1');
+	
+	  if($floatMomentum <= 0 || $floatMomentum > 1)
+	    throw new ANN_Exception('$floatLearningRate should be between 0 and 1');
+	
+	  $this->floatMomentum = $floatMomentum;
 	}
 }
