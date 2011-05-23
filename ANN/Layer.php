@@ -194,8 +194,6 @@ final class ANN_Layer
 	
 	  $floatSum = 0;
 	  
-	  $floatMomentum = $this->objNetwork->floatMomentum;
-	  
 		$arrNeuronsNextLayer = $this->objNextLayer->getNeurons();
 		
 		/* @var $objNeuron ANN_Neuron */
@@ -205,9 +203,9 @@ final class ANN_Layer
 	  	/* @var $objNeuronNextLayer ANN_Neuron */
 	  	
 	  	foreach($arrNeuronsNextLayer as $objNeuronNextLayer)
-	    	$floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDelta() * $floatMomentum;
+	    	$floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDelta() * $this->objNetwork->floatMomentum;
 	
-	  	$floatOutput = $this->arrNeurons[$intKeyNeuron]->getOutput();
+	  	$floatOutput = $objNeuron->getOutput();
 	
 	  	$floatDelta = $floatOutput * (1 - $floatOutput) * $floatSum;
 			
