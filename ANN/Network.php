@@ -775,218 +775,227 @@ class ANN_Network extends ANN_Filesystem
 	 * @uses ANN_Layer::getNeurons()
 	 * @uses getNumberInputs()
 	 * @uses getNumberOutputs()
-	 * @uses printNetworkDetails1()
-	 * @uses printNetworkDetails2()
+	 * @uses getPrintNetworkDetails1()
+	 * @uses getPrintNetworkDetails2()
+	 * @return string
 	 */
 	
-	public function printNetwork($intLevel = 2)
+	protected function getPrintNetwork($intLevel = 2)
 	{
+		$strPrint = ''; 
+		
 	  if($intLevel >= 1)
-	    $this->printNetworkDetails1();
+	    $strPrint .= $this->getPrintNetworkDetails1();
 	
 	  $countColumns = max($this->intNumberOfNeuronsPerLayer, $this->getNumberOutputs());
 	
-	  print "<table border=\"1\" style=\"background-color: #AAAAAA; border-width: 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
+	  $strPrint .= "<table border=\"1\" style=\"background-color: #AAAAAA; border-width: 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD; text-align: center\">Input<br />Layer</td>\n";
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD; text-align: center\">Input<br />Layer</td>\n";
 	
-	  print "<td style=\"background-color: #CCCCCC; text-align: center\" colspan=\"$countColumns\">"
+	  $strPrint .= "<td style=\"background-color: #CCCCCC; text-align: center\" colspan=\"$countColumns\">"
 	           ."<b>". $this->getNumberInputs() ." Inputs</b></td>\n";
 	  
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
 	
 		foreach($this->arrHiddenLayers as $intIndex => $objHiddenLayer)
 		{
-		  print "<tr>\n";
-		  print "<td style=\"color: #DDDDDD; text-align: center\">Hidden<br />Layer<br />". ($intIndex + 1) ."</td>\n";
+		  $strPrint .= "<tr>\n";
+		  $strPrint .= "<td style=\"color: #DDDDDD; text-align: center\">Hidden<br />Layer<br />". ($intIndex + 1) ."</td>\n";
 		
 		  foreach($objHiddenLayer->getNeurons() as $objNeuron)
-		    print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
+		    $strPrint .= "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
 		          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 6) ."</p>"
 		          ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
 		          .implode('<br />', $objNeuron->getWeights())
 		          ."</p></td>\n";
 		
 		  for($i = $this->intNumberOfNeuronsPerLayer + 1; $i <= $countColumns; $i++)
-		    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
+		    $strPrint .= "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
 		
 		
-		  print "</tr>\n";
+		  $strPrint .= "</tr>\n";
 		}
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD; text-align: center\" rowspan=\"2\">Output<br />Layer</td>\n";
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD; text-align: center\" rowspan=\"2\">Output<br />Layer</td>\n";
 	
 	  foreach($this->objOutputLayer->getNeurons() as $objNeuron)
-	    print "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
+	    $strPrint .= "<td style=\"background-color: #CCCCCC; text-align: right\"><p style=\"border: solid #00FF00 1px;\"><b>Inputs</b><br /> ". (count($objNeuron->getWeights()) - 1) ." + BIAS</p>"
 	          ."<p style=\"border: solid #0000FF 1px;\"><b>Delta</b><br /> ". round($objNeuron->getDelta(), 6) ."</p>"
 	          ."<p style=\"border: solid #FF0000 1px;\"><b>Weights</b><br />"
 	          .implode('<br />', $objNeuron->getWeights())
 	          ."</p></td>\n";
 	
 	  for($i = $this->getNumberOutputs() + 1; $i <= $countColumns; $i++)
-	    print "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
+	    $strPrint .= "<td style=\"background-color: #CCCCCC\">&nbsp;</td>\n";
 	
-	  print "</tr>\n";
-	  print "<tr>\n";
+	  $strPrint .= "</tr>\n";
+	  $strPrint .= "<tr>\n";
 	
-	  print "<td style=\"background-color: #CCCCCC; text-align: center; height: 40px\" colspan=\"$countColumns\"><b>". $this->getNumberOutputs() ." Outputs</b></td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC; text-align: center; height: 40px\" colspan=\"$countColumns\"><b>". $this->getNumberOutputs() ." Outputs</b></td>\n";
 	
-	  print "<tr>\n";
-	  print "</table>\n";
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "</table>\n";
 	  
 	  if($intLevel >= 2)
-	    $this->printNetworkDetails2();
+	    $strPrint .= $this->getPrintNetworkDetails2();
+	  
+	  return $strPrint;
 	}
 	
 	/**
 	 * @uses getNetworkError()
+	 * @return string
 	 */
 	
-	protected function printNetworkDetails1()
+	protected function getPrintNetworkDetails1()
 	{
-	  print "<table border=\"1\" style=\"background-color: #AAAAAA; border: solid #000000 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
+	  $strPrint = "<table border=\"1\" style=\"background-color: #AAAAAA; border: solid #000000 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Detected output type</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Detected output type</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .(($this->intOutputType == self::OUTPUT_BINARY) ? 'Binary' : 'Linear')
 	        ."</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Backpropagation algorithm</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">Back propagation";
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Backpropagation algorithm</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">Back propagation";
 	
-	  print "</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</td>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Activation function</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">Sigmoid</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Activation function</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">Sigmoid</td>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Momentum</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Momentum</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .$this->floatMomentum
 	        ."</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 
-		print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Learning rate</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+		$strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Learning rate</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .$this->floatLearningRate
 	        ."</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Network error</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Network error</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .$this->getNetworkError()
 	        ."</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Output error tolerance</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">+/- "
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Output error tolerance</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">+/- "
 	        .$this->floatOutputErrorTolerance
 	        ."</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Total loops</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Total loops</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .number_format($this->intTotalLoops, 0, '.', ',')
 	        ." loops</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Total trainings</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Total trainings</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .number_format($this->intTotalTrainings, 0, '.', ',')
 	        ." trainings</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Total activations</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Total activations</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .number_format($this->intTotalActivations, 0, '.', ',')
 	        ." activations</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Total activation requests</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Total activation requests</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .number_format($this->intTotalActivationsRequests, 0, '.', ',')
 	        ." activation requests</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Epoch</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Epoch</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .$this->intNumberEpoch
 	        ." loops</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
 	  $intTrainingTime = ($this->intTrainingTime > 0) ? $this->intTrainingTime : 1;
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Training time</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Training time</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .$this->intTrainingTime ." seconds = ". round($intTrainingTime / 60, 1) ." minutes</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Loops / second</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Loops / second</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .round($this->intTotalLoops / $intTrainingTime) ." loops / second</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Training finished</td>\n";
-	  print "<td style=\"background-color: #CCCCCC\">"
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Training finished</td>\n";
+	  $strPrint .= "<td style=\"background-color: #CCCCCC\">"
 	        .(($this->boolTrained) ? 'Yes' : 'No') ."</td>\n";
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
-	  print "</table>\n<br />\n";
+	  $strPrint .= "</table>\n<br />\n";
+	  
+	  return $strPrint;
 	}
 	
 	/**
 	 * @uses getOutputsByInputKey()
 	 * @uses isTrainingCompleteByInputKey()
+	 * @return string
 	 */
 	
-	protected function printNetworkDetails2()
+	protected function getPrintNetworkDetails2()
 	{
 	  $boolTrained = 0;
 	
-	  print "<br />\n";
+	  $strPrint = "<br />\n";
 	
-	  print "<table border=\"1\" style=\"background-color: #AAAAAA; border: solid #000000 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
+	  $strPrint .= "<table border=\"1\" style=\"background-color: #AAAAAA; border: solid #000000 1px; border-collapse:collapse; empty-cells:show\" cellpadding=\"2\" cellspacing=\"0\">\n";
 	
-	  print "<tr>\n";
-	  print "<td style=\"color: #DDDDDD\">Input</td>\n";
-	  print "<td style=\"color: #DDDDDD\">Output</td>\n";
+	  $strPrint .= "<tr>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Input</td>\n";
+	  $strPrint .= "<td style=\"color: #DDDDDD\">Output</td>\n";
 	
 	  if(!$this->boolTrained)
 	  {
-	    print "<td style=\"color: #DDDDDD\">Desired output</td>\n";
-	    print "<td style=\"color: #DDDDDD\">Differences</td>\n";
+	    $strPrint .= "<td style=\"color: #DDDDDD\">Desired output</td>\n";
+	    $strPrint .= "<td style=\"color: #DDDDDD\">Differences</td>\n";
 	  }
 	  
-	  print "</tr>\n";
+	  $strPrint .= "</tr>\n";
 	
 	  foreach($this->arrInputs as $intKeyInputs => $arrInputs)
 	  {
-	    print "<tr>\n";
+	    $strPrint .= "<tr>\n";
 	
 	    foreach($arrInputs as $intKeyInput => $input)
 	      $arrInputs[$intKeyInput] = round($input, 3);
 	
-	    print "<td style=\"color: #DDDDDD\" align=\"right\">&nbsp;<b>f</b>(". implode(', ', $arrInputs) .") =&nbsp;</td>\n";
+	    $strPrint .= "<td style=\"color: #DDDDDD\" align=\"right\">&nbsp;<b>f</b>(". implode(', ', $arrInputs) .") =&nbsp;</td>\n";
 	
 	    $arrOutputs = $this->getOutputsByInputKey($intKeyInputs);
 	
@@ -1022,30 +1031,32 @@ class ANN_Network extends ANN_Filesystem
 	    if($this->isTrainingCompleteByInputKey($intKeyInputs))
 	      $boolTrained++;
 	
-	    print "<td style=\"background-color: $color\">$strArrayOutputs</td>\n";
+	    $strPrint .= "<td style=\"background-color: $color\">$strArrayOutputs</td>\n";
 	
 	    if(!$this->boolTrained)
 	    {
-	      print "<td style=\"background-color: $color\">$strDesiredArrayOutputs</td>\n";
+	      $strPrint .= "<td style=\"background-color: $color\">$strDesiredArrayOutputs</td>\n";
 	
-	      print "<td style=\"background-color: $color\">$strDesiredArrayOutputsDifferences</td>\n";
+	      $strPrint .= "<td style=\"background-color: $color\">$strDesiredArrayOutputsDifferences</td>\n";
 	    }
 	    
-	    print "</tr>\n";
+	    $strPrint .= "</tr>\n";
 	  }
 	
 	  $boolTrainedPerCent = round(($boolTrained / @count($this->arrOutputs)) * 100, 1);
 	
 	  if(!$this->boolTrained)
 	  {
-	    print "<tr>\n";
+	    $strPrint .= "<tr>\n";
 	
-	    print "<td colspan=\"3\">$boolTrainedPerCent per cent trained patterns</td>\n";
+	    $strPrint .= "<td colspan=\"3\">$boolTrainedPerCent per cent trained patterns</td>\n";
 	
-	    print "</tr>\n";
+	    $strPrint .= "</tr>\n";
 	  }
 	  
-	  print "</table>\n";
+	  $strPrint .= "</table>\n";
+	  
+	  return $strPrint;
 	}
 	
 	/**
@@ -1396,5 +1407,35 @@ class ANN_Network extends ANN_Filesystem
 	    throw new ANN_Exception('$floatLearningRate should be between 0 and 1');
 	
 	  $this->floatMomentum = $floatMomentum;
+	}
+
+	/**
+	 * @param integer $intLevel (Default: 2)
+	 * @uses getPrintNetwork()
+	 */
+
+	public function printNetwork($intLevel = 2)
+	{
+		print $this->getPrintNetwork($intLevel);
+	}	
+	
+	/**
+	 * @param integer $intLevel (Default: 2)
+	 * @uses printNetwork()
+	 */
+
+	public function __invoke($intLevel = 2)
+	{
+		$this->printNetwork($intLevel);
+	}
+	
+	/**
+	 * @uses getPrintNetwork()
+	 * @return string
+	 */
+
+	public function __toString()
+	{
+		return $this->getPrintNetwork();
 	}
 }
