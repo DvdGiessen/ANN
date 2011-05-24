@@ -40,10 +40,8 @@ catch(Exception $e)
 
 $network->setValues($objValues);
 
-// $network->logWeightsToFile('test.csv');
-
 $network->train();
 
-// $network->saveToFile('xor.dat');
+$network->saveToFile('xor.dat');
 
 $network->printNetwork();
