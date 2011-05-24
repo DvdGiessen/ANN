@@ -48,133 +48,119 @@
 
 final class ANN_TimeInputs
 {
-/**#@+
- * @ignore
- */
-
+	/**#@+
+	 * @ignore
+	 */
+	
 	/**
 	 * @var string
 	 */
 	protected $strTime = null;
-
-/**#@-*/
-
-// ****************************************************************************
-
-/**
- * @param string $strTime (Default: null)
- * @uses checkTimeFormat()
- * @throws ANN_Exception
- */
 	
-public function __construct($strTime = null)
-{
-	if($strTime && !$this->checkTimeFormat($strTime))
-		throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
+	/**#@-*/
 	
-	$this->strTime = $strTime;
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strTime
- * @uses checkTimeFormat()
- * @throws ANN_Exception
- */
-
-public function setDefaultTime($strTime)
-{
-	if(!$this->checkTimeFormat($strTime))
-		throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
-	
-	$this->strTime = $strTime;
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strTime (Default: null)
- * @return array
- * @uses checkTimeFormat()
- * @throws ANN_Exception
- */
-
-public function getTimeOfDay($strTime = null)
-{
-	if(!$strTime)
-		$strTime = $this->getDefaultTime();
-	
-	if(!$this->checkTimeFormat($strTime))
-		throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
-	
-	$arrReturn = array();
-
-	$intHour = date('G', strtotime($strTime));
-	
-	$arrReturn[0] = ($intHour < 6) ? 1 : 0;
-	
-	$arrReturn[1] = ($intHour >= 6 && $intHour < 12) ? 1 : 0;
-	
-	$arrReturn[2] = ($intHour >= 12 && $intHour < 18) ? 1 : 0;
-	
-	$arrReturn[3] = ($intHour >= 18) ? 1 : 0;
-	
-	return $arrReturn;
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strTime (Default: null)
- * @return array
- * @uses checkTimeFormat()
- * @throws ANN_Exception
- */
-
-public function getHour($strTime = null)
-{
-	if(!$strTime)
-		$strTime = $this->getDefaultTime();
-	
-	if(!$this->checkTimeFormat($strTime))
-		throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
-	
-	for($intHour = 0; $intHour <= 23; $intHour++)
-		$arrReturn[$intHour] = 0;
+	/**
+	 * @param string $strTime (Default: null)
+	 * @uses checkTimeFormat()
+	 * @throws ANN_Exception
+	 */
 		
-	$intHour = date('G', strtotime($strTime));
-	
-	$arrReturn[$intHour] = 1;
-	
-	return $arrReturn;
-}
-
-// ****************************************************************************
-
-/**
- * @return string
- */
-
-protected function getDefaultTime()
-{
-	if(!$this->strTime)
-		return date('H:i');
+	public function __construct($strTime = null)
+	{
+		if($strTime && !$this->checkTimeFormat($strTime))
+			throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
 		
-	return $this->strTime;
-}
-
-// ****************************************************************************
-
-/**
- * @param string $strTime
- * @return boolean
- */
-
-protected function checkTimeFormat($strTime)
-{
-	return preg_match('/^[0-2][0-9]:[0-5][0-9]$/', $strTime);	
-}
-
-// ****************************************************************************
+		$this->strTime = $strTime;
+	}
+	
+	/**
+	 * @param string $strTime
+	 * @uses checkTimeFormat()
+	 * @throws ANN_Exception
+	 */
+	
+	public function setDefaultTime($strTime)
+	{
+		if(!$this->checkTimeFormat($strTime))
+			throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
+		
+		$this->strTime = $strTime;
+	}
+	
+	/**
+	 * @param string $strTime (Default: null)
+	 * @return array
+	 * @uses checkTimeFormat()
+	 * @throws ANN_Exception
+	 */
+	
+	public function getTimeOfDay($strTime = null)
+	{
+		if(!$strTime)
+			$strTime = $this->getDefaultTime();
+		
+		if(!$this->checkTimeFormat($strTime))
+			throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
+		
+		$arrReturn = array();
+	
+		$intHour = date('G', strtotime($strTime));
+		
+		$arrReturn[0] = ($intHour < 6) ? 1 : 0;
+		
+		$arrReturn[1] = ($intHour >= 6 && $intHour < 12) ? 1 : 0;
+		
+		$arrReturn[2] = ($intHour >= 12 && $intHour < 18) ? 1 : 0;
+		
+		$arrReturn[3] = ($intHour >= 18) ? 1 : 0;
+		
+		return $arrReturn;
+	}
+	
+	/**
+	 * @param string $strTime (Default: null)
+	 * @return array
+	 * @uses checkTimeFormat()
+	 * @throws ANN_Exception
+	 */
+	
+	public function getHour($strTime = null)
+	{
+		if(!$strTime)
+			$strTime = $this->getDefaultTime();
+		
+		if(!$this->checkTimeFormat($strTime))
+			throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
+		
+		for($intHour = 0; $intHour <= 23; $intHour++)
+			$arrReturn[$intHour] = 0;
+			
+		$intHour = date('G', strtotime($strTime));
+		
+		$arrReturn[$intHour] = 1;
+		
+		return $arrReturn;
+	}
+	
+	/**
+	 * @return string
+	 */
+	
+	protected function getDefaultTime()
+	{
+		if(!$this->strTime)
+			return date('H:i');
+			
+		return $this->strTime;
+	}
+	
+	/**
+	 * @param string $strTime
+	 * @return boolean
+	 */
+	
+	protected function checkTimeFormat($strTime)
+	{
+		return preg_match('/^[0-2][0-9]:[0-5][0-9]$/', $strTime);	
+	}
 }
