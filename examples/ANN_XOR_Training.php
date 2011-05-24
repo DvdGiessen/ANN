@@ -14,7 +14,7 @@ catch(Exception $e)
 {
 	print "\nCreating a new one...";
 
-	$network = new ANN_Network(1, 4, 1);
+	$network = new ANN_Network(2, 4, 1);
 
   $objValues = new ANN_Values;
 
