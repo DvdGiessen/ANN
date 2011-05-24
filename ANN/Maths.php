@@ -75,7 +75,16 @@ class ANN_Maths
 	 * @return float
 	 */
 	
-	public static function random()
+	public static function randomDelta()
+	{
+	  return mt_rand(-999, 999) / 1000;
+	}
+
+	/**
+	 * @return float
+	 */
+	
+	public static function randomWeight()
 	{
 	  return mt_rand(-2000, 2000) / 1000;
 	}

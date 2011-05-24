@@ -71,14 +71,14 @@ final class ANN_Neuron
 	
 	/**
 	 * @param ANN_Network $objNetwork
-	 * @uses ANN_Maths::random()
+	 * @uses ANN_Maths::randomDelta()
 	 */
 	
 	public function __construct(ANN_Network $objNetwork)
 	{
 	  $this->objNetwork = $objNetwork;
 	
-	  $this->floatDelta = ANN_Maths::random();
+	  $this->floatDelta = ANN_Maths::randomDelta();
 	  
 	  $this->floatLearningRate = $this->objNetwork->floatLearningRate;
 	}
@@ -145,13 +145,13 @@ final class ANN_Neuron
 	}
 	
 	/**
-	 * @uses ANN_Maths::random()
+	 * @uses ANN_Maths::randomWeight()
 	 */
 	
 	protected function initializeWeights()
 	{
 		foreach($this->arrInputs as $intKey => $floatInput)
-			$this->arrWeights[$intKey] = ANN_Maths::random();
+			$this->arrWeights[$intKey] = ANN_Maths::randomWeight();
 	}
 		
 	/**
