@@ -63,9 +63,9 @@ class ANN_Server
 	protected $objNetwork = null;
 
 	/**
-	 * @var ANN_Network
+	 * @var string
 	 */
-	protected $objNetworkUnserialized = null;
+	protected $strNetworkSerialized = null;
 
 	/**
 	 * @var string
@@ -121,7 +121,7 @@ class ANN_Server
 	    {
 	      case 'savetohost':
 	
-	        $this->objNetworkUnserialized = $_POST['network'];
+	        $this->strNetworkSerialized = $_POST['network'];
 	
 	        $this->saveToHost();
 	
@@ -135,7 +135,7 @@ class ANN_Server
 	
 	      case 'trainbyhost':
 	
-	        $this->objNetworkUnserialized = $_POST['network'];
+	        $this->strNetworkSerialized = $_POST['network'];
 	
 	        $this->trainByHost();
 	
@@ -160,7 +160,7 @@ class ANN_Server
 	
 	protected function saveToHost()
 	{
-	  $this->objNetwork = unserialize($this->objNetworkUnserialized);
+	  $this->objNetwork = unserialize($this->strNetworkSerialized);
 	  
 	  if($this->objNetwork instanceof ANN_Network)
 	    $this->objNetwork->saveToFile($this->strDir .'/'. $_POST['username'] .'.dat');
