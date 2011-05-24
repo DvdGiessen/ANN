@@ -51,10 +51,25 @@ class ANN_Server
 	/**#@+
 	 * @ignore
 	 */
-	
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolLogin = FALSE;
+
+	/**
+	 * @var ANN_Network
+	 */
 	protected $objNetwork = null;
+
+	/**
+	 * @var ANN_Network
+	 */
 	protected $objNetworkUnserialized = null;
+
+	/**
+	 * @var string
+	 */
 	protected $strDir = '';
 	
 	/**#@-*/

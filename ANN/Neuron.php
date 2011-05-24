@@ -54,10 +54,25 @@ final class ANN_Neuron
 	/**#@+
 	 * @ignore
 	 */
-	 
+
+	/**
+	 * @var array
+	 */
 	protected $arrInputs = null;
+
+	/**
+	 * @var array
+	 */
 	protected $arrWeights = null;
+
+	/**
+	 * @var float
+	 */
 	protected $floatOutput = null;
+
+	/**
+	 * @var float
+	 */
 	protected $floatDelta = 0;
 	
 	/**

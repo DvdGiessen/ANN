@@ -45,7 +45,10 @@ class ANN_Loader
 	/**#@+
 	 * @ignore
 	 */
-	
+
+	/**
+	 * @var string
+	 */
 	protected $strDir = '';
 	
 	/**#@-*/

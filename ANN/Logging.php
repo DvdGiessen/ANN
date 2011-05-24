@@ -51,9 +51,20 @@ class ANN_Logging
 	/**#@+
 	 * @ignore
 	 */
-	
+
+	/**
+	 * @var string
+	 */
 	protected $strFilename;
+
+	/**
+	 * @var resource
+	 */
 	protected $handleFile;
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolHeader = FALSE;
 	
 	/**#@-*/

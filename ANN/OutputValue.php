@@ -51,9 +51,20 @@ final class ANN_OutputValue extends ANN_Filesystem
 	/**#@+
 	 * @ignore
 	 */
-	
+
+	/**
+	 * @var float
+	 */
 	protected $floatMin;
+
+	/**
+	 * @var float
+	 */
 	protected $floatMax;
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolOverride = FALSE;
 	
 	/**#@-*/

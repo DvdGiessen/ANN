@@ -55,7 +55,15 @@ final class ANN_Layer
 	 * @ignore
 	 */
 	
+
+	/**
+	 * @var array
+	 */
 	protected $arrNeurons   = array();
+
+	/**
+	 * @var array
+	 */
 	protected $arrOutputs   = array();
 	
 	/**
@@ -68,6 +76,10 @@ final class ANN_Layer
 	 */
 	
 	protected $objNextLayer = null;
+
+	/**
+	 * @var integer
+	 */
 	protected $intNumberOfNeurons = null;
 	
 	/**#@-*/

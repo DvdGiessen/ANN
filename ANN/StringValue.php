@@ -51,9 +51,20 @@ final class ANN_StringValue extends ANN_Filesystem
 	/**#@+
 	 * @ignore
 	 */
-	
+
+	/**
+	 * @var integer
+	 */
 	protected $intMaxStringLength;
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolOverride = FALSE;
+
+	/**
+	 * @var array
+	 */
 	protected $arrMapping = array();
 	
 	/**#@-*/

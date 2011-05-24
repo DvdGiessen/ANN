@@ -51,8 +51,15 @@ final class ANN_Classification extends ANN_Filesystem
 	/**#@+
 	 * @ignore
 	 */
-	
+
+	/**
+	 * @var integer
+	 */
 	protected $intMaxClassifiers;
+	
+	/**
+	 * @var array
+	 */
 	protected $arrClassifiers = array();
 	
 	/**#@-*/

@@ -50,20 +50,75 @@ class ANN_NetworkGraph
 	/**#@+
 	 * @ignore
 	 */
-	
+
+	/**
+	 * @var integer
+	 */
 	protected $intNumberInputs;
+
+	/**
+	 * @var integer
+	 */
 	protected $intNumberHiddenLayers;
+
+	/**
+	 * @var integer
+	 */
 	protected $intNumberNeuronsOfHiddenLayer;
+
+	/**
+	 * @var integer
+	 */
 	protected $intNumberOfOutputs;
+
+	/**
+	 * @var resource
+	 */
 	protected $handleImage;
+
+	/**
+	 * @var resource
+	 */
 	protected $handleColorNeuronInput;
+
+	/**
+	 * @var resource
+	 */
 	protected $handleColorNeuronHidden;
+
+	/**
+	 * @var resource
+	 */
 	protected $handleColorNeuronOutput;
+
+	/**
+	 * @var resource
+	 */
 	protected $handleColorNeuronBorder;
+
+	/**
+	 * @var resource
+	 */
 	protected $handleColorBackground;
+
+	/**
+	 * @var resource
+	 */
 	protected $handleColorConnection;
+
+	/**
+	 * @var integer
+	 */
 	protected $intMaxNeuronsPerLayer;
+
+	/**
+	 * @var integer
+	 */
 	protected $intLayerDistance = 250;
+
+	/**
+	 * @var integer
+	 */
 	protected $intNeuronDistance = 50;
 	
 	/**#@-*/

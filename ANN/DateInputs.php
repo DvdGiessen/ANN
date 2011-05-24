@@ -52,8 +52,19 @@ final class ANN_DateInputs
 	 * @ignore
 	 */
 		
+	/**
+	 * @var string
+	 */
 	protected $strDate = null;
+	
+	/**
+	 * @var string
+	 */
 	protected $strHolidaysFilename = 'Holidays.xml';
+	
+	/**
+	 * @var SimpleXMLElement
+	 */
 	protected $objHolidaysXML = null;
 	
 	/**#@-*/

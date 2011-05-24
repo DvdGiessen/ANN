@@ -51,8 +51,11 @@ final class ANN_TimeInputs
 /**#@+
  * @ignore
  */
-	
-protected $strTime = null;
+
+	/**
+	 * @var string
+	 */
+	protected $strTime = null;
 
 /**#@-*/
 

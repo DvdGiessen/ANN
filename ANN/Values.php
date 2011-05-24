@@ -52,12 +52,35 @@ class ANN_Values extends ANN_Filesystem
 	/**#@+
 	 * @ignore
 	 */
-	
+
+	/**
+	 * @var array
+	 */
 	protected $arrInputs  = array();
+
+	/**
+	 * @var array
+	 */
 	protected $arrOutputs = array();
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolLastActionInput = FALSE;
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolTrain = FALSE;
+
+	/**
+	 * @var integer
+	 */
 	protected $intCountInputs = null;
+
+	/**
+	 * @var integer
+	 */
 	protected $intCountOutputs = null;
 	
 	/**#@-*/

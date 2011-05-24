@@ -53,35 +53,150 @@ class ANN_Network extends ANN_Filesystem
 	/**#@+
 	 * @ignore
 	 */
-	 
+
+	/**
+	 * @var ANN_Layer
+	 */
 	protected $objOutputLayer = null;
+
+	/**
+	 * @var array
+	 */
 	protected $arrHiddenLayers = array();
+
+	/**
+	 * @var array
+	 */
 	protected $arrInputs = null;
+
+	/**
+	 * @var array
+	 */
 	protected $arrOutputs = null;
+
+	/**
+	 * @var integer
+	 */
 	protected $intTotalLoops = 0;
+
+	/**
+	 * @var integer
+	 */
 	protected $intTotalTrainings = 0;
+
+	/**
+	 * @var integer
+	 */
 	protected $intTotalActivations = 0;
+
+	/**
+	 * @var integer
+	 */
 	protected $intTotalActivationsRequests = 0;
+
+	/**
+	 * @var integer
+	 */
 	protected $intNumberOfHiddenLayers = null;
+
+	/**
+	 * @var integer
+	 */
 	protected $intNumberOfHiddenLayersDec = null; // decremented value
+
+	/**
+	 * @var integer
+	 */
 	protected $intMaxExecutionTime = 0;
+
+	/**
+	 * @var integer
+	 */
 	protected $intNumberEpoch = 0;
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolLoggingWeights = FALSE;
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolLoggingNetworkErrors = FALSE;
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolTrained = FALSE;
+
+	/**
+	 * @var integer
+	 */
 	protected $intTrainingTime = 0; // Seconds
+
+	/**
+	 * @var ANN_Logging
+	 */
 	protected $objLoggingWeights = null;
+
+	/**
+	 * @var ANN_Logging
+	 */
 	protected $objLoggingNetworkErrors = null;
+
+	/**
+	 * @var boolean
+	 */
 	protected $boolNetworkActivated = FALSE;
+
+	/**
+	 * @var array
+	 */
 	protected $arrTrainingComplete = array();
+
+	/**
+	 * @var integer
+	 */
 	protected $intNumberOfNeuronsPerLayer = 0;
+
+	/**
+	 * @var float
+	 */
 	protected $floatOutputErrorTolerance = 0.02;
+
+	/**
+	 * @var float
+	 */
 	public $floatMomentum = 0.95;
+
+	/**
+	 * @var array
+	 */
 	private $arrInputsToTrain = array();
+
+	/**
+	 * @var integer
+	 */
 	private $intInputsToTrainIndex = -1;
+
+	/**
+	 * @var integer
+	 */
 	public $intOutputType = self::OUTPUT_LINEAR;
+
+	/**
+	 * @var float
+	 */
 	public $floatLearningRate = 0.7;
+
+	/**
+	 * @var boolean
+	 */
 	public $boolFirstLoopOfTraining = TRUE;
+
+	/**
+	 * @var boolean
+	 */
 	public $boolFirstEpochOfTraining = TRUE;
 	
 	/**#@-*/
