@@ -1085,7 +1085,7 @@ class ANN_Network extends ANN_Filesystem
 	/**
 	 * @param string $strFilename (Default: null)
 	 * @uses parent::loadFromFile()
-	 * @uses self::getDefaultFilename()
+	 * @uses getDefaultFilename()
 	 */
 	
 	public static function loadFromFile($strFilename = null)
@@ -1099,7 +1099,7 @@ class ANN_Network extends ANN_Filesystem
 	/**
 	 * @param string $strFilename (Default: null)
 	 * @uses parent::saveToFile()
-	 * @uses self::getDefaultFilename()
+	 * @uses getDefaultFilename()
 	 */
 	
 	public function saveToFile($strFilename = null)
