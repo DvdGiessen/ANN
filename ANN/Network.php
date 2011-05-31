@@ -469,6 +469,7 @@ class ANN_Network extends ANN_Filesystem
 	 * @uses logNetworkErrors()
 	 * @uses getNextIndexInputsToTrain()
 	 * @uses isTrainingCompleteByInputKey()
+	 * @uses setDynamicLearningRate()
 	 * @throws ANN_Exception
 	 */
 	
@@ -500,7 +501,9 @@ class ANN_Network extends ANN_Filesystem
 	  while($this->hasTimeLeftForTraining())
 	  {
 	  	$intLoop++;
-	  	
+
+    	$this->setDynamicLearningRate($intLoop);
+
 	    $j = $this->getNextIndexInputsToTrain();
 	
 	    $this->setInputsToTrain($this->arrInputs[$j]);
@@ -609,7 +612,7 @@ class ANN_Network extends ANN_Filesystem
 	 * @throws ANN_Exception
 	 */
 	
-	public function setLearningRate($floatLearningRate = 0.7)
+	protected function setLearningRate($floatLearningRate = 0.7)
 	{
 	  if(!is_float($floatLearningRate))
 	    throw new ANN_Exception('$floatLearningRate should be between 0.1 and 0.9');
@@ -1437,5 +1440,25 @@ class ANN_Network extends ANN_Filesystem
 	public function __toString()
 	{
 		return $this->getPrintNetwork();
+	}
+	
+	/**
+	 * Dynamic Learning Rate
+	 *
+	 * Setting learning rate all 1000 loops dynamically
+	 *
+	 * @param integer $intLoop
+	 * @return float
+	 * @uses setLearningRate()
+	 */
+
+	protected function setDynamicLearningRate($intLoop)
+	{
+	  if($intLoop % 1000)
+	    return;
+	
+	  $floatLearningRate = (mt_rand(1, 7) / 10);
+	  
+    $this->setLearningRate($floatLearningRate);
 	}
 }

@@ -94,8 +94,6 @@ catch(Exception $e)
  
 $objNetwork->setValues($objValues); // to be called as of version 2.0.6
  
-$objNetwork->setLearningRate($floatLearningRate = 0.5);
- 
 $boolTrained = $objNetwork->train();
  
 print ($boolTrained)
