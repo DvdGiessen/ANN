@@ -43,13 +43,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access private
  */
 
-class ANN_Maths
+class Maths
 {
 	/**
 	 * @param float $floatValue

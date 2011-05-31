@@ -40,18 +40,19 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access private
  */
 
-abstract class ANN_Filesystem
+abstract class Filesystem
 {
 	/**
 	 * @param string $strFilename (Default: null)
-	 * @uses ANN_Exception::__construct()
-	 * @throws ANN_Exception
+	 * @uses Exception::__construct()
+	 * @throws Exception
 	 */
 	
 	public function saveToFile($strFilename = null)
@@ -59,7 +60,7 @@ abstract class ANN_Filesystem
 	  settype($strFilename, 'string');
 	
 	  if(empty($strFilename))
-			throw new ANN_Exception('Paramter $strFilename should be a filename');
+			throw new Exception('Paramter $strFilename should be a filename');
 	
 	  $strDir = dirname($strFilename);
 	  
@@ -67,13 +68,13 @@ abstract class ANN_Filesystem
 	    $strDir = '.';
 	    
 	  if(!is_dir($strDir))
-			throw new ANN_Exception("Directory $strDir does not exist");
+			throw new Exception("Directory $strDir does not exist");
 	
 	  if(!is_writable($strDir))
-			throw new ANN_Exception("Directory $strDir has no writing permission");
+			throw new Exception("Directory $strDir has no writing permission");
 			
 	  if(is_file($strFilename) && !is_writable($strFilename))
-			throw new ANN_Exception("File $strFilename does exist but has no writing permission");
+			throw new Exception("File $strFilename does exist but has no writing permission");
 	
 		try
 		{
@@ -83,15 +84,15 @@ abstract class ANN_Filesystem
 	  }
 	  catch(Exception $e)
 		{
-			throw new ANN_Exception("Could not open or create $strFilename!");
+			throw new Exception("Could not open or create $strFilename!");
 	  }
 	}
 	
 	/**
 	 * @param string $strFilename (Default: null)
-	 * @return ANN_Network|ANN_InputValue|ANN_OutputValue|ANN_Values|ANN_StringValue|ANN_Classification
-	 * @uses ANN_Exception::__construct()
-	 * @throws ANN_Exception
+	 * @return Network|InputValue|OutputValue|Values|StringValue|Classification
+	 * @uses Exception::__construct()
+	 * @throws Exception
 	 */
 	
 	public static function loadFromFile($strFilename = null)
@@ -101,21 +102,21 @@ abstract class ANN_Filesystem
 	    $strSerialized = file_get_contents($strFilename);
 	
 	  	if (empty($strSerialized))
-	      throw new ANN_Exception('File '. basename($strFilename) .' could not be loaded (file has no object information stored)');
+	      throw new Exception('File '. basename($strFilename) .' could not be loaded (file has no object information stored)');
 	
 			$objInstance = unserialize($strSerialized);
 			
-			if(!($objInstance instanceof ANN_Network)
-	    && !($objInstance instanceof ANN_Values)
-	    && !($objInstance instanceof ANN_InputValue)
-	    && !($objInstance instanceof ANN_StringValue)
-	    && !($objInstance instanceof ANN_Classification)
-	    && !($objInstance instanceof ANN_OutputValue))
-	      throw new ANN_Exception('File '. basename($strFilename) .' could not be opened (no ANN format)');
+			if(!($objInstance instanceof Network)
+	    && !($objInstance instanceof Values)
+	    && !($objInstance instanceof InputValue)
+	    && !($objInstance instanceof StringValue)
+	    && !($objInstance instanceof Classification)
+	    && !($objInstance instanceof OutputValue))
+	      throw new Exception('File '. basename($strFilename) .' could not be opened (no ANN format)');
 			
 			return $objInstance;
 		}
 	
-	  throw new ANN_Exception('File '. basename($strFilename) .' could not be opened');
+	  throw new Exception('File '. basename($strFilename) .' could not be opened');
 	}
 }

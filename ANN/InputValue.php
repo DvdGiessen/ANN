@@ -40,13 +40,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access public
  */
 
-final class ANN_InputValue extends ANN_Filesystem
+final class InputValue extends Filesystem
 {
 	/**#@+
 	 * @ignore
@@ -73,7 +74,7 @@ final class ANN_InputValue extends ANN_Filesystem
 	 * @param float $floatMin
 	 * @param float $floatMax
 	 * @param boolean $boolOverride (Default: FALSE)
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 *
 	 * If $boolOverride is FALSE, an exception will be thrown if getInputValue() will
 	 * be called with outranged values. If $boolOverride is TRUE, no exception will be
@@ -84,16 +85,16 @@ final class ANN_InputValue extends ANN_Filesystem
 	public function __construct($floatMin, $floatMax, $boolOverride = FALSE)
 	{
 	  if(!is_float($floatMin) && !is_integer($floatMin))
-	    throw new ANN_Exception('Constraints: $floatMin should be a float or integer number');
+	    throw new Exception('Constraints: $floatMin should be a float or integer number');
 	
 	  if(!is_float($floatMax) && !is_integer($floatMax))
-	    throw new ANN_Exception('Constraints: $floatMin should be a float or integer number');
+	    throw new Exception('Constraints: $floatMin should be a float or integer number');
 	
 	  if($floatMin > $floatMax)
-	    throw new ANN_Exception('Constraints: $floatMin should be lower than $floatMax');
+	    throw new Exception('Constraints: $floatMin should be lower than $floatMax');
 	    
 	  if(!is_bool($boolOverride))
-	    throw new ANN_Exception('Constraints: $boolOverride should be boolean');
+	    throw new Exception('Constraints: $boolOverride should be boolean');
 	
 	  $this->floatMin = $floatMin;
 	  
@@ -106,16 +107,16 @@ final class ANN_InputValue extends ANN_Filesystem
 	 * @param float $floatValue
 	 * @return float
 	 * @uses calculateInputValue()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function getInputValue($floatValue)
 	{
 	  if(!$this->override && $floatValue < $this->floatMin)
-	    throw new ANN_Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
+	    throw new Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
 	
 	  if(!$this->override && $floatValue > $this->floatMax)
-	    throw new ANN_Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
+	    throw new Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
 	
 	  if($this->override && $floatValue < $this->floatMin)
 	    $floatValue = $this->floatMin;

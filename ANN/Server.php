@@ -40,13 +40,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access public
  */
 
-class ANN_Server
+class Server
 {
 	/**#@+
 	 * @ignore
@@ -58,7 +59,7 @@ class ANN_Server
 	protected $boolLogin = FALSE;
 
 	/**
-	 * @var ANN_Network
+	 * @var Network
 	 */
 	protected $objNetwork = null;
 
@@ -76,15 +77,15 @@ class ANN_Server
 	
 	/**
 	 * @param string $strDir (Default: 'networks')
-	 * @uses ANN_Exception::__construct()
+	 * @uses Exception::__construct()
 	 * @uses onPost()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function __construct($strDir = 'networks')
 	{
 	  if(!is_dir($strDir) && is_writable($strDir))
-	    throw new ANN_Exception('Directory '. $strDir .' does not exists or has no writing permissions');
+	    throw new Exception('Directory '. $strDir .' does not exists or has no writing permissions');
 	
 	  $this->strDir = $strDir;
 	
@@ -155,29 +156,29 @@ class ANN_Server
 	}
 	
 	/**
-	 * @uses ANN_Network::saveToFile()
+	 * @uses Network::saveToFile()
 	 */
 	
 	protected function saveToHost()
 	{
 	  $this->objNetwork = unserialize($this->strNetworkSerialized);
 	  
-	  if($this->objNetwork instanceof ANN_Network)
+	  if($this->objNetwork instanceof Network)
 	    $this->objNetwork->saveToFile($this->strDir .'/'. $_POST['username'] .'.dat');
 	}
 	
 	/**
-	 * @uses ANN_Network::loadFromFile()
+	 * @uses Network::loadFromFile()
 	 */
 	
 	protected function loadFromHost()
 	{
-	  $this->objNetwork = ANN_Network::loadFromFile($this->strDir .'/'. $_POST['username'] .'.dat');
+	  $this->objNetwork = Network::loadFromFile($this->strDir .'/'. $_POST['username'] .'.dat');
 	}
 	
 	/**
-	 * @uses ANN_Network::saveToFile()
-	 * @uses ANN_Network::train()
+	 * @uses Network::saveToFile()
+	 * @uses Network::train()
 	 * @uses saveToHost()
 	 */
 	
@@ -185,7 +186,7 @@ class ANN_Server
 	{
 	  $this->saveToHost();
 	
-	  if($this->objNetwork instanceof ANN_Network)
+	  if($this->objNetwork instanceof Network)
 	  {
 	    $this->objNetwork->saveToFile($this->strDir .'/'. $_POST['username'] .'.dat');
 	

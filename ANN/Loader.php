@@ -40,7 +40,9 @@
  * @package ANN
  */
 
-class ANN_Loader
+namespace ANN;
+
+class Loader
 {
 	/**#@+
 	 * @ignore
@@ -74,10 +76,10 @@ class ANN_Loader
 	{
 	  settype($strClassname, 'string');
 	
-	  if(!preg_match('/^ANN/', $strClassname))
+	  if(!preg_match('/^ANN\\\/', $strClassname))
 	    return FALSE;
-	
-	  $strClassname = preg_replace('/^ANN_/', '', $strClassname);
+	    
+	  $strClassname = preg_replace('/^ANN\\\/', '', $strClassname);
 	
 	  $strFilename = $this->strDir . "/$strClassname.php";
 	
@@ -92,4 +94,4 @@ class ANN_Loader
 	}
 }
 
-$objANNLoader = new ANN_Loader;
+$objANNLoader = new Loader;

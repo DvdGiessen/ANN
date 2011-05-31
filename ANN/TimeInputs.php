@@ -40,13 +40,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access public
  */
 
-final class ANN_TimeInputs
+final class TimeInputs
 {
 	/**#@+
 	 * @ignore
@@ -62,13 +63,13 @@ final class ANN_TimeInputs
 	/**
 	 * @param string $strTime (Default: null)
 	 * @uses checkTimeFormat()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 		
 	public function __construct($strTime = null)
 	{
 		if($strTime && !$this->checkTimeFormat($strTime))
-			throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
+			throw new Exception('Constraints: $strTime should be HH:MM format');
 		
 		$this->strTime = $strTime;
 	}
@@ -76,13 +77,13 @@ final class ANN_TimeInputs
 	/**
 	 * @param string $strTime
 	 * @uses checkTimeFormat()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function setDefaultTime($strTime)
 	{
 		if(!$this->checkTimeFormat($strTime))
-			throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
+			throw new Exception('Constraints: $strTime should be HH:MM format');
 		
 		$this->strTime = $strTime;
 	}
@@ -91,7 +92,7 @@ final class ANN_TimeInputs
 	 * @param string $strTime (Default: null)
 	 * @return array
 	 * @uses checkTimeFormat()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function getTimeOfDay($strTime = null)
@@ -100,7 +101,7 @@ final class ANN_TimeInputs
 			$strTime = $this->getDefaultTime();
 		
 		if(!$this->checkTimeFormat($strTime))
-			throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
+			throw new Exception('Constraints: $strTime should be HH:MM format');
 		
 		$arrReturn = array();
 	
@@ -121,7 +122,7 @@ final class ANN_TimeInputs
 	 * @param string $strTime (Default: null)
 	 * @return array
 	 * @uses checkTimeFormat()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function getHour($strTime = null)
@@ -130,7 +131,7 @@ final class ANN_TimeInputs
 			$strTime = $this->getDefaultTime();
 		
 		if(!$this->checkTimeFormat($strTime))
-			throw new ANN_Exception('Constraints: $strTime should be HH:MM format');
+			throw new Exception('Constraints: $strTime should be HH:MM format');
 		
 		for($intHour = 0; $intHour <= 23; $intHour++)
 			$arrReturn[$intHour] = 0;

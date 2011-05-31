@@ -40,13 +40,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access public
  */
 
-final class ANN_OutputValue extends ANN_Filesystem
+final class OutputValue extends Filesystem
 {
 	/**#@+
 	 * @ignore
@@ -73,7 +74,7 @@ final class ANN_OutputValue extends ANN_Filesystem
 	 * @param float $floatMin
 	 * @param float $floatMax
 	 * @param boolean $boolOverride (Default: FALSE)
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 *
 	 * If $boolOverride is FALSE, an exception will be thrown if getOutputValue() will
 	 * be called with outranged values. If $boolOverride is TRUE, no exception will be
@@ -84,16 +85,16 @@ final class ANN_OutputValue extends ANN_Filesystem
 	public function __construct($floatMin, $floatMax, $boolOverride = FALSE)
 	{
 	  if(!is_float($floatMin) && !is_integer($floatMin))
-	    throw new ANN_Exception('Constraints: $floatMin must be a float number');
+	    throw new Exception('Constraints: $floatMin must be a float number');
 	
 	  if(!is_float($floatMax) && !is_integer($floatMax))
-	    throw new ANN_Exception('Constraints: $floatMin must be a float number');
+	    throw new Exception('Constraints: $floatMin must be a float number');
 	
 	  if($floatMin > $floatMax)
-	    throw new ANN_Exception('Constraints: $floatMin should be lower than $floatMax');
+	    throw new Exception('Constraints: $floatMin should be lower than $floatMax');
 	
 	  if(!is_bool($boolOverride))
-	    throw new ANN_Exception('Constraints: $boolOverride must be boolean');
+	    throw new Exception('Constraints: $boolOverride must be boolean');
 	
 	  $this->floatMin = $floatMin;
 	  
@@ -106,16 +107,16 @@ final class ANN_OutputValue extends ANN_Filesystem
 	 * @param float $floatValue
 	 * @return float (0..1)
 	 * @uses calculateOutputValue()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function getOutputValue($floatValue)
 	{
 	  if(!$this->boolOverride && $floatValue < $this->floatMin)
-	    throw new ANN_Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
+	    throw new Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
 	
 	  if(!$this->boolOverride && $floatValue > $this->floatMax)
-	    throw new ANN_Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
+	    throw new Exception('Constraints: $floatValue should be between '. $this->floatMin .' and '. $this->floatMax);
 	
 	  if($this->boolOverride && $floatValue < $this->floatMin)
 	    $floatValue = $this->floatMin;
@@ -130,13 +131,13 @@ final class ANN_OutputValue extends ANN_Filesystem
 	/**
 	 * @param float $floatValue (0..1)
 	 * @return float
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function getRealOutputValue($floatValue)
 	{
 	  if($floatValue < 0 || $floatValue > 1)
-	    throw new ANN_Exception('Constraints: $floatValue should be between 0 and 1');
+	    throw new Exception('Constraints: $floatValue should be between 0 and 1');
 	
 	  return $floatValue * ($this->floatMax - $this->floatMin) + $this->floatMin;
 	}

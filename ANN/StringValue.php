@@ -40,13 +40,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access public
  */
 
-final class ANN_StringValue extends ANN_Filesystem
+final class StringValue extends Filesystem
 {
 	/**#@+
 	 * @ignore
@@ -77,7 +78,7 @@ final class ANN_StringValue extends ANN_Filesystem
 	 * thrown in this case, but lower values are replaced by $floatMin and upper values
 	 * are replaced by $floatMax.
 	 * @uses createMapping()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function __construct($intMaxStringLength, $boolOverride = FALSE)
@@ -85,10 +86,10 @@ final class ANN_StringValue extends ANN_Filesystem
 		mb_internal_encoding('UTF-8');
 		
 	  if(!is_integer($intMaxStringLength) || $intMaxStringLength <= 0)
-	    throw new ANN_Exception('Constraints: $intMaxStringLength should be a positive integer number');
+	    throw new Exception('Constraints: $intMaxStringLength should be a positive integer number');
 	
 	  if(!is_bool($boolOverride))
-	    throw new ANN_Exception('Constraints: $boolOverride should be boolean');
+	    throw new Exception('Constraints: $boolOverride should be boolean');
 	
 	  $this->intMaxStringLength = $intMaxStringLength;
 	  
@@ -102,16 +103,16 @@ final class ANN_StringValue extends ANN_Filesystem
 	 * @return array
 	 * @uses calculateInputValues()
 	 * @uses removeSpecialCharacters()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function getInputValue($strValue)
 	{
 		if(!is_string($strValue))
-			throw new ANN_Exception('$strValue should be string');
+			throw new Exception('$strValue should be string');
 			
 		if(!$this->boolOverride && mb_strlen($strValue) > $this->intMaxStringLength)
-			throw new ANN_Exception('$strValue is longer than max string length');
+			throw new Exception('$strValue is longer than max string length');
 			
 		substr($strValue, 0, $this->intMaxStringLength);
 		
@@ -165,13 +166,13 @@ final class ANN_StringValue extends ANN_Filesystem
 	/**
 	 * @param string $strCharacter
 	 * @return float
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	protected function getMapping($strCharacter)
 	{
 		if(!isset($this->arrMapping[$strCharacter]))
-			throw new ANN_Exception('Not convertable character '. $strCharacter);
+			throw new Exception('Not convertable character '. $strCharacter);
 		
 		return $this->arrMapping[$strCharacter];	
 	}
@@ -179,7 +180,7 @@ final class ANN_StringValue extends ANN_Filesystem
 	/**
 	 * @uses ordUTF8() 
 	 * @uses createSimilarityMapping()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	protected function createMapping()
@@ -192,7 +193,7 @@ final class ANN_StringValue extends ANN_Filesystem
 			$this->arrMapping[$strCharacter] = $this->ordUTF8($strCharacter) / 1000;
 			
 			if($this->arrMapping[$strCharacter] > 1)
-				throw new ANN_Exception('Mapping exception');
+				throw new Exception('Mapping exception');
 		}
 		
 		$this->createSimilarityMapping();
@@ -229,7 +230,7 @@ final class ANN_StringValue extends ANN_Filesystem
 	/**
 	 * @param string $strCharacter
 	 * @return integer
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 * @author kerry at shetline dot com
 	 * @author Thomas Wien
 	 */
@@ -237,13 +238,13 @@ final class ANN_StringValue extends ANN_Filesystem
 	protected function ordUTF8($strCharacter)
 	{
 	  if(!is_string($strCharacter))
-	  	throw new ANN_Exception('$strCharacter should be string');
+	  	throw new Exception('$strCharacter should be string');
 	  
 	  if(mb_strlen($strCharacter) == 0)
-	  	throw new ANN_Exception('$strCharacter should be exact one character (1)');
+	  	throw new Exception('$strCharacter should be exact one character (1)');
 	  
 	 	if(mb_strlen($strCharacter) > 1)
-	  	throw new ANN_Exception('$strCharacter should be exact one character (2)');
+	  	throw new Exception('$strCharacter should be exact one character (2)');
 	  
 	  $strOrd = ord($strCharacter{0});
 	
@@ -253,7 +254,7 @@ final class ANN_StringValue extends ANN_Filesystem
 	  }
 	  elseif($strOrd < 0xC2)
 	  {
-	    throw new ANN_Exception('Cannot convert string to number');
+	    throw new Exception('Cannot convert string to number');
 	  }
 	  elseif($strOrd <= 0xDF)
 	  {
@@ -274,7 +275,7 @@ final class ANN_StringValue extends ANN_Filesystem
 	      | (ord($strCharacter{3}) & 0x3F);
 	  }
 	
-	  throw new ANN_Exception('Cannot convert string to number');
+	  throw new Exception('Cannot convert string to number');
 	}
 	
 	public function __wakeup()

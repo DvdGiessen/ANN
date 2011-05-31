@@ -40,6 +40,8 @@
  * @package ANN
  */
 
+namespace ANN;
+
 /**
  * Exception
  *
@@ -48,7 +50,7 @@
  * @access private
  */
 
-class ANN_Exception extends Exception
+class Exception extends \Exception
 {
 
 }

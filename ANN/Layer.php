@@ -43,13 +43,14 @@
  * @package ANN
  */
 
+namespace ANN;
 	
 /**
  * @package ANN
  * @access private
  */
 
-final class ANN_Layer
+final class Layer
 {
 	/**#@+
 	 * @ignore
@@ -67,12 +68,12 @@ final class ANN_Layer
 	protected $arrOutputs   = array();
 	
 	/**
-	 * @var ANN_Network
+	 * @var Network
 	 */
 	protected $objNetwork   = null;
 	
 	/**
-	 * @var ANN_Layer
+	 * @var Layer
 	 */
 	
 	protected $objNextLayer = null;
@@ -85,13 +86,13 @@ final class ANN_Layer
 	/**#@-*/
 	
 	/**
-	 * @param ANN_Network $objNetwork
+	 * @param Network $objNetwork
 	 * @param integer $intNumberOfNeurons
-	 * @param ANN_Layer $objNextLayer (Default: null)
+	 * @param Layer $objNextLayer (Default: null)
 	 * @uses createNeurons()
 	 */
 	
-	public function __construct(ANN_Network $objNetwork, $intNumberOfNeurons, ANN_Layer $objNextLayer = null)
+	public function __construct(Network $objNetwork, $intNumberOfNeurons, Layer $objNextLayer = null)
 	{
 	  $this->objNetwork = $objNetwork;
 	
@@ -104,7 +105,7 @@ final class ANN_Layer
 		
 	/**
 	 * @param array &$arrInputs
-	 * @uses ANN_Neuron::setInputs()
+	 * @uses Neuron::setInputs()
 	 */
 	
 	public function setInputs(&$arrInputs)
@@ -142,7 +143,7 @@ final class ANN_Layer
 	
 	/**
 	 * @return array
-	 * @uses ANN_Maths::threshold()
+	 * @uses Maths::threshold()
 	 */
 	
 	public function getThresholdOutputs()
@@ -150,27 +151,27 @@ final class ANN_Layer
 	  $arrReturnOutputs = array();
 	
 	  foreach($this->arrOutputs as $intKey => $floatOutput)
-	    $arrReturnOutputs[$intKey] = ANN_Maths::threshold($floatOutput);
+	    $arrReturnOutputs[$intKey] = Maths::threshold($floatOutput);
 	  
 	  return $arrReturnOutputs;
 	}
 	
 	/**
 	 * @param integer $intNumberOfNeurons
-	 * @uses ANN_Neuron::__construct()
+	 * @uses Neuron::__construct()
 	 */
 	
 	protected function createNeurons($intNumberOfNeurons)
 	{
 		for($intIndex = 0; $intIndex < $intNumberOfNeurons; $intIndex++)
-			$this->arrNeurons[] = new ANN_Neuron($this->objNetwork);
+			$this->arrNeurons[] = new Neuron($this->objNetwork);
 	}
 		
 	/**
-	 * @uses ANN_Neuron::activate()
-	 * @uses ANN_Neuron::getOutput()
-	 * @uses ANN_Layer::setInputs()
-	 * @uses ANN_Layer::activate()
+	 * @uses Neuron::activate()
+	 * @uses Neuron::getOutput()
+	 * @uses Layer::setInputs()
+	 * @uses Layer::activate()
 	 */
 	
 	public function activate()
@@ -193,10 +194,10 @@ final class ANN_Layer
 	}
 		
 	/**
-	 * @uses ANN_Neuron::setDelta()
-	 * @uses ANN_Neuron::getWeight()
-	 * @uses ANN_Neuron::getDelta()
-	 * @uses ANN_Neuron::getOutput()
+	 * @uses Neuron::setDelta()
+	 * @uses Neuron::getWeight()
+	 * @uses Neuron::getDelta()
+	 * @uses Neuron::getOutput()
 	 * @uses getNeurons()
 	 */
 	
@@ -208,11 +209,11 @@ final class ANN_Layer
 	  
 		$arrNeuronsNextLayer = $this->objNextLayer->getNeurons();
 		
-		/* @var $objNeuron ANN_Neuron */
+		/* @var $objNeuron Neuron */
 		
 		foreach($this->arrNeurons as $intKeyNeuron => $objNeuron)
 	  {
-	  	/* @var $objNeuronNextLayer ANN_Neuron */
+	  	/* @var $objNeuronNextLayer Neuron */
 	  	
 	  	foreach($arrNeuronsNextLayer as $objNeuronNextLayer)
 	    	$floatSum += $objNeuronNextLayer->getWeight($intKeyNeuron) * $objNeuronNextLayer->getDelta() * $this->objNetwork->floatMomentum;
@@ -227,8 +228,8 @@ final class ANN_Layer
 		
 	/**
 	 * @param array $arrDesiredOutputs
-	 * @uses ANN_Neuron::setDelta()
-	 * @uses ANN_Neuron::getOutput()
+	 * @uses Neuron::setDelta()
+	 * @uses Neuron::getOutput()
 	 */
 	
 	public function calculateOutputDeltas($arrDesiredOutputs)
@@ -244,7 +245,7 @@ final class ANN_Layer
 	}
 		
 	/**
-	 * @uses ANN_Neuron::adjustWeights()
+	 * @uses Neuron::adjustWeights()
 	 */
 	
 	public function adjustWeights()

@@ -40,13 +40,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access public
  */
 
-final class ANN_DateInputs
+final class DateInputs
 {
 	/**#@+
 	 * @ignore
@@ -359,7 +360,7 @@ final class ANN_DateInputs
 	
 	/**
 	 * @uses SimpleXMLElement::__construct()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	protected function getHolidays()
@@ -368,10 +369,10 @@ final class ANN_DateInputs
 			return;
 	
 		if(!is_file($this->strHolidaysFilename))
-			throw new ANN_Exception('File '. $this->strHolidaysFilename .' does not exist');
+			throw new Exception('File '. $this->strHolidaysFilename .' does not exist');
 			
 		if(!is_readable($this->strHolidaysFilename))
-			throw new ANN_Exception('File '. $this->strHolidaysFilename .' does not have read permission');
+			throw new Exception('File '. $this->strHolidaysFilename .' does not have read permission');
 			
 		$strXML = @file_get_contents($this->strHolidaysFilename);
 		
@@ -381,14 +382,14 @@ final class ANN_DateInputs
 		}
 		catch(Exception $e)
 		{
-			throw new ANN_Exception($e->getMessage());
+			throw new Exception($e->getMessage());
 		}
 	
 		if(!($this->objHolidaysXML instanceof SimpleXMLElement))
-			throw new ANN_Exception('XML Object cannot be created');
+			throw new Exception('XML Object cannot be created');
 		
 		if(!isset($this->objHolidaysXML->holiday))
-			throw new ANN_Exception('Missing at least on holiday element');
+			throw new Exception('Missing at least on holiday element');
 	
 		$intElementIndex = 0;
 			
@@ -397,22 +398,22 @@ final class ANN_DateInputs
 			$intElementIndex++;
 			
 			if(!isset($objHoliday->day))
-				throw new ANN_Exception('Missing day element in holiday element '. $intElementIndex);
+				throw new Exception('Missing day element in holiday element '. $intElementIndex);
 			
 			if(!isset($objHoliday->month))
-				throw new ANN_Exception('Missing month element in holiday element '. $intElementIndex);
+				throw new Exception('Missing month element in holiday element '. $intElementIndex);
 			
 			if(!isset($objHoliday->year))
-				throw new ANN_Exception('Missing year element in holiday element '. $intElementIndex);
+				throw new Exception('Missing year element in holiday element '. $intElementIndex);
 			
 			if(!isset($objHoliday->country))
-				throw new ANN_Exception('Missing country element in holiday element '. $intElementIndex);
+				throw new Exception('Missing country element in holiday element '. $intElementIndex);
 			
 			if(!isset($objHoliday->state))
-				throw new ANN_Exception('Missing state element in holiday element '. $intElementIndex);
+				throw new Exception('Missing state element in holiday element '. $intElementIndex);
 			
 			if(!isset($objHoliday->description))
-				throw new ANN_Exception('Missing descrition element in holiday element '. $intElementIndex);
+				throw new Exception('Missing descrition element in holiday element '. $intElementIndex);
 		}
 	}
 	

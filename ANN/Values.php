@@ -40,6 +40,7 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
@@ -47,7 +48,7 @@
  * @since 2.0.6
  */
 
-class ANN_Values extends ANN_Filesystem
+class Values extends Filesystem
 {
 	/**#@+
 	 * @ignore
@@ -91,7 +92,7 @@ class ANN_Values extends ANN_Filesystem
 	 * List all input values comma separated
 	 *
 	 * <code>
-	 * $objValues = new ANN_Values;
+	 * $objValues = new \ANN\Values;
 	 *
 	 * $objValues->train()
 	 *           ->input(0.12, 0.11, 0.15)
@@ -99,22 +100,22 @@ class ANN_Values extends ANN_Filesystem
 	 * </code>
 	 *
 	 * <code>
-	 * $objValues = new ANN_Values;
+	 * $objValues = new \ANN\Values;
 	 *
 	 * $objValues->input(0.12, 0.11, 0.15)
 	 *           ->input(0.13, 0.12, 0.16)
 	 *           ->input(0.14, 0.13, 0.17);
 	 * </code>
 	 *
-	 * @return ANN_Values
-	 * @uses ANN_Exception::__construct()
-	 * @throws ANN_Exception
+	 * @return Values
+	 * @uses Exception::__construct()
+	 * @throws Exception
 	 */
 	
 	public function input()
 	{
 	  if($this->boolTrain && $this->boolLastActionInput)
-	    throw new ANN_Exception('After calling input() method output() should be called');
+	    throw new Exception('After calling input() method output() should be called');
 	
 	  $arrParameters = func_get_args();
 	
@@ -134,13 +135,13 @@ class ANN_Values extends ANN_Filesystem
 	  
 	  foreach($arrInputParameters as $floatParameter)
 	    if(!is_float($floatParameter) && !is_integer($floatParameter))
-	      throw new ANN_Exception('Each parameter should be float');
+	      throw new Exception('Each parameter should be float');
 	      
 	  if($this->intCountInputs === null)
 	    $this->intCountInputs =  $intCountParameters;
 	    
 	  if($this->intCountInputs != $intCountParameters)
-	    throw new ANN_Exception('There should be '. $this->intCountInputs .' parameter values for input()');
+	    throw new Exception('There should be '. $this->intCountInputs .' parameter values for input()');
 	
 	  $this->arrInputs[] = $arrInputParameters;
 	  
@@ -157,29 +158,29 @@ class ANN_Values extends ANN_Filesystem
 	 * again. You have to call input() again first.
 	 *
 	 * <code>
-	 * $objValues = new ANN_Values;
+	 * $objValues = new \ANN\Values;
 	 *
 	 * $objValues->train()
 	 *           ->input(0.12, 0.11, 0.15)
 	 *           ->output(0.56);
 	 * </code>
 	 *
-	 * @return ANN_Values
-	 * @uses ANN_Exception::__construct()
-	 * @throws ANN_Exception
+	 * @return Values
+	 * @uses Exception::__construct()
+	 * @throws Exception
 	 */
 	
 	public function output()
 	{
 	  if(!$this->boolLastActionInput)
-	    throw new ANN_Exception('After calling output() method input() should be called');
+	    throw new Exception('After calling output() method input() should be called');
 	
 	  if(!$this->boolTrain)
-	    throw new ANN_Exception('Calling output() is just allowed for training. Call train() if values for training.');
+	    throw new Exception('Calling output() is just allowed for training. Call train() if values for training.');
 	
 	  $arrParameters = func_get_args();
 	
-	  // If ANN_Classification is used
+	  // If Classification is used
 	  
 	  if(isset($arrParameters[0]) && is_array($arrParameters[0]))
 			$arrParameters = $arrParameters[0];
@@ -188,13 +189,13 @@ class ANN_Values extends ANN_Filesystem
 	
 	  foreach($arrParameters as $floatParameter)
 	    if(!is_float($floatParameter) && !is_integer($floatParameter))
-	      throw new ANN_Exception('Each parameter should be float');
+	      throw new Exception('Each parameter should be float');
 	
 	  if($this->intCountOutputs === null)
 	    $this->intCountOutputs =  $intCountParameters;
 	
 	  if($this->intCountOutputs != $intCountParameters)
-	    throw new ANN_Exception('There should be '. $this->intCountOutputs .' parameter values for output()');
+	    throw new Exception('There should be '. $this->intCountOutputs .' parameter values for output()');
 	
 	  $this->arrOutputs[] = $arrParameters;
 	
@@ -204,7 +205,7 @@ class ANN_Values extends ANN_Filesystem
 	}
 	
 	/**
-	 * @return ANN_Values
+	 * @return Values
 	 */
 	
 	public function train()
@@ -218,7 +219,7 @@ class ANN_Values extends ANN_Filesystem
 	 * Get internal saved input array
 	 *
 	 * Actually there is no reason to call this method in your application. This
-	 * method is used by ANN_Network only.
+	 * method is used by \ANN\Network only.
 	 *
 	 * @return array
 	 */
@@ -232,7 +233,7 @@ class ANN_Values extends ANN_Filesystem
 	 * Get internal saved output array
 	 *
 	 * Actually there is no reason to call this method in your application. This
-	 * method is used by ANN_Network only.
+	 * method is used by Network only.
 	 *
 	 * @return array
 	 */
@@ -243,10 +244,10 @@ class ANN_Values extends ANN_Filesystem
 	}
 	
 	/**
-	 * Unserializing ANN_Values
+	 * Unserializing \ANN\Values
 	 *
 	 * After calling unserialize the train mode is set to false. Therefore it is
-	 * possible to use a saved object of ANN_Values to use inputs not for training
+	 * possible to use a saved object of \ANN\Values to use inputs not for training
 	 * purposes.
 	 *
 	 * You would not use unserialize in your application but you can call loadFromFile()
@@ -265,7 +266,7 @@ class ANN_Values extends ANN_Filesystem
 	 * If train() was called before, train state does not change by calling reset().
 	 *
 	 * <code>
-	 * $objValues = new ANN_Values;
+	 * $objValues = new \ANN\Values;
 	 *
 	 * $objValues->train()
 	 *           ->input(0.12, 0.11, 0.15)
@@ -275,7 +276,7 @@ class ANN_Values extends ANN_Filesystem
 	 *           ->output(0.56);
 	 * </code>
 	 *
-	 * @return ANN_Values
+	 * @return Values
 	 */
 	
 	public function reset()

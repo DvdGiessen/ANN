@@ -40,12 +40,14 @@
  * @package ANN
  */
 
+namespace ANN;
+
 /**
  * @package ANN
  * @access public
  */
 
-class ANN_NetworkGraph
+class NetworkGraph
 {
 	/**#@+
 	 * @ignore
@@ -124,16 +126,16 @@ class ANN_NetworkGraph
 	/**#@-*/
 	
 	/**
-	 * @param ANN_Network $objNetwork
+	 * @param Network $objNetwork
 	 * @uses createImage()
 	 * @uses drawNetwork()
-	 * @uses ANN_Network::getNumberHiddenLayers()
-	 * @uses ANN_Network::getNumberInputs()
-	 * @uses ANN_Network::getNumberHiddens()
-	 * @uses ANN_Network::getNumberOutputs()
+	 * @uses Network::getNumberHiddenLayers()
+	 * @uses Network::getNumberInputs()
+	 * @uses Network::getNumberHiddens()
+	 * @uses Network::getNumberOutputs()
 	 */
 	
-	public function __construct(ANN_Network $objNetwork)
+	public function __construct(Network $objNetwork)
 	{
 	  $this->intNumberInputs = $objNetwork->getNumberInputs();
 	

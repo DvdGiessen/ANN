@@ -40,13 +40,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access public
  */
 
-final class ANN_Classification extends ANN_Filesystem
+final class Classification extends Filesystem
 {
 	/**#@+
 	 * @ignore
@@ -66,30 +67,30 @@ final class ANN_Classification extends ANN_Filesystem
 	
 	/**
 	 * @param integer $intMaxClassifiers
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function __construct($intMaxClassifiers)
 	{
 	  if(!is_integer($intMaxClassifiers) || $intMaxClassifiers <= 0)
-	    throw new ANN_Exception('Constraints: $intMaxClassifiers should be a positive integer number');
+	    throw new Exception('Constraints: $intMaxClassifiers should be a positive integer number');
 	
 	  $this->intMaxClassifiers = $intMaxClassifiers;
 	}
 	
 	/**
 	 * @param string $strValue
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 * @uses existsClassifier()
 	 */
 	
 	public function addClassifier($strValue)
 	{
 		if(count($this->arrClassifiers) == $this->intMaxClassifiers)
-			throw new ANN_Exception('Maximal count of classifiers reached');
+			throw new Exception('Maximal count of classifiers reached');
 			
 		if($this->existsClassifier($strValue))
-			throw new ANN_Exception('Classifier "'. $strValue .'" does already exist');
+			throw new Exception('Classifier "'. $strValue .'" does already exist');
 		
 		$this->arrClassifiers[] = $strValue;
 	}
@@ -114,13 +115,13 @@ final class ANN_Classification extends ANN_Filesystem
 	 * @param string|array $mixedValues
 	 * @return array
 	 * @uses calculateOutputValues()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function getOutputValue($mixedValues)
 	{
 		if(!is_string($mixedValues) && !is_array($mixedValues))
-			throw new ANN_Exception('$mixedValues should be either string or array');
+			throw new Exception('$mixedValues should be either string or array');
 			
 		$arrValues = array();
 			
@@ -139,7 +140,7 @@ final class ANN_Classification extends ANN_Filesystem
 	/**
 	 * @param array $arrValues
 	 * @return array
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	protected function calculateOutputValues($arrValues)
@@ -157,7 +158,7 @@ final class ANN_Classification extends ANN_Filesystem
 		}
 		
 		if(!$boolFound)
-			throw new ANN_Exception('Classifier(s) "'. implode(', ', $arrValues) .'" not found');
+			throw new Exception('Classifier(s) "'. implode(', ', $arrValues) .'" not found');
 		
 		$intCountRemainingOutputs = $this->intMaxClassifiers - count($arrReturn);
 	

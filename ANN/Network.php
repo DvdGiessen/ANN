@@ -43,19 +43,21 @@
  * @package ANN
  */
 
+namespace ANN;
+
 /**
  * @package ANN
  * @access public
  */
 
-class ANN_Network extends ANN_Filesystem
+class Network extends Filesystem
 {
 	/**#@+
 	 * @ignore
 	 */
 
 	/**
-	 * @var ANN_Layer
+	 * @var Layer
 	 */
 	protected $objOutputLayer = null;
 
@@ -135,12 +137,12 @@ class ANN_Network extends ANN_Filesystem
 	protected $intTrainingTime = 0; // Seconds
 
 	/**
-	 * @var ANN_Logging
+	 * @var Logging
 	 */
 	protected $objLoggingWeights = null;
 
 	/**
-	 * @var ANN_Logging
+	 * @var Logging
 	 */
 	protected $objLoggingNetworkErrors = null;
 
@@ -217,23 +219,23 @@ class ANN_Network extends ANN_Filesystem
 	 * @param integer $intNumberOfHiddenLayers (Default: 1)
 	 * @param integer $intNumberOfNeuronsPerLayer  (Default: 6)
 	 * @param integer $intNumberOfOutputs  (Default: 1)
-	 * @uses ANN_Exception::__construct()
+	 * @uses Exception::__construct()
 	 * @uses calculateMaxTrainingLoops()
 	 * @uses createHiddenLayers()
 	 * @uses createOutputLayer()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function __construct($intNumberOfHiddenLayers = 1, $intNumberOfNeuronsPerLayer = 6, $intNumberOfOutputs = 1)
 	{
 	  if(!is_integer($intNumberOfHiddenLayers) && $intNumberOfHiddenLayers < 2)
-	    throw new ANN_Exception('Constraints: $intNumberOfHiddenLayers must be a positiv integer >= 2');
+	    throw new Exception('Constraints: $intNumberOfHiddenLayers must be a positiv integer >= 2');
 	
 	  if(!is_integer($intNumberOfNeuronsPerLayer) && $intNumberOfNeuronsPerLayer < 1)
-	    throw new ANN_Exception('Constraints: $intNumberOfNeuronsPerLayer must be a positiv integer number > 1');
+	    throw new Exception('Constraints: $intNumberOfNeuronsPerLayer must be a positiv integer number > 1');
 	
 	  if(!is_integer($intNumberOfOutputs) && $intNumberOfOutputs < 1)
-	    throw new ANN_Exception('Constraints: $intNumberOfOutputs must be a positiv integer number > 1');
+	    throw new Exception('Constraints: $intNumberOfOutputs must be a positiv integer number > 1');
 	
 		$this->createOutputLayer($intNumberOfOutputs);
 		
@@ -255,7 +257,7 @@ class ANN_Network extends ANN_Filesystem
 	protected function setInputs($arrInputs)
 	{
 	  if(!is_array($arrInputs))
-	    throw new ANN_Exception('Constraints: $arrInputs should be an array');
+	    throw new Exception('Constraints: $arrInputs should be an array');
 	
 	  $this->arrInputs = $arrInputs;
 	  
@@ -268,17 +270,17 @@ class ANN_Network extends ANN_Filesystem
 	
 	/**
 	 * @param array $arrOutputs
-	 * @uses ANN_Exception::__construct()
+	 * @uses Exception::__construct()
 	 * @uses detectOutputType()
-	 * @uses ANN_Layer::getNeuronsCount()
-	 * @throws ANN_Exception
+	 * @uses Layer::getNeuronsCount()
+	 * @throws Exception
 	 */
 	
 	protected function setOutputs($arrOutputs)
 	{
 	  if(isset($arrOutputs[0]) && is_array($arrOutputs[0]))
 	    if(count($arrOutputs[0]) != $this->objOutputLayer->getNeuronsCount())
-	      throw new ANN_Exception('Count of arrOutputs doesn\'t fit to number of arrOutputs on instantiation of ANN_Network');
+	      throw new Exception('Count of arrOutputs doesn\'t fit to number of arrOutputs on instantiation of \\'. __NAMESPACE__ .'\\Network');
 	
 	  $this->arrOutputs = $arrOutputs;
 	  
@@ -294,9 +296,9 @@ class ANN_Network extends ANN_Filesystem
 	 * already trained network.
 	 *
 	 * <code>
-	 * $objNetwork = new ANN_Network(2, 4, 1);
+	 * $objNetwork = new \ANN\Network(2, 4, 1);
 	 *
-	 * $objValues = new ANN_Values;
+	 * $objValues = new \ANN\Values;
 	 *
 	 * $objValues->train()
 	 *           ->input(0.12, 0.11, 0.15)
@@ -305,15 +307,15 @@ class ANN_Network extends ANN_Filesystem
 	 * $objNetwork->setValues($objValues);
 	 * </code>
 	 *
-	 * @param ANN_Values $objValues
-	 * @uses ANN_Values::getInputsArray()
-	 * @uses ANN_Values::getOutputsArray()
+	 * @param Values $objValues
+	 * @uses Values::getInputsArray()
+	 * @uses Values::getOutputsArray()
 	 * @uses setInputs()
 	 * @uses setOutputs()
 	 * @since 2.0.6
 	 */
 	
-	public function setValues(ANN_Values $objValues)
+	public function setValues(Values $objValues)
 	{
 	  $this->setInputs($objValues->getInputsArray());
 	
@@ -322,7 +324,7 @@ class ANN_Network extends ANN_Filesystem
 	
 	/**
 	 * @param array $arrInputs
-	 * @uses ANN_Layer::setInputs()
+	 * @uses Layer::setInputs()
 	 */
 	
 	protected function setInputsToTrain($arrInputs)
@@ -341,8 +343,8 @@ class ANN_Network extends ANN_Filesystem
 	 * @return array two-dimensional array
 	 * @uses activate()
 	 * @uses getCountInputs()
-	 * @uses ANN_Layer::getOutputs()
-	 * @uses ANN_Layer::getThresholdOutputs()
+	 * @uses Layer::getOutputs()
+	 * @uses Layer::getThresholdOutputs()
 	 * @uses setInputsToTrain()
 	 */
 	
@@ -377,8 +379,8 @@ class ANN_Network extends ANN_Filesystem
 	 * @param integer $intKeyInput
 	 * @return array
 	 * @uses activate()
-	 * @uses ANN_Layer::getOutputs()
-	 * @uses ANN_Layer::getThresholdOutputs()
+	 * @uses Layer::getOutputs()
+	 * @uses Layer::getThresholdOutputs()
 	 * @uses setInputsToTrain()
 	 */
 	
@@ -401,7 +403,7 @@ class ANN_Network extends ANN_Filesystem
 	/**
 	 * @param integer $intNumberOfHiddenLayers
 	 * @param integer $intNumberOfNeuronsPerLayer
-	 * @uses ANN_Layer::__construct()
+	 * @uses Layer::__construct()
 	 */
 	
 	protected function createHiddenLayers($intNumberOfHiddenLayers, $intNumberOfNeuronsPerLayer)
@@ -418,7 +420,7 @@ class ANN_Network extends ANN_Filesystem
 	    if($i > 0)
 	      $nextLayer = $this->arrHiddenLayers[$layerId + 1];
 	
-	    $this->arrHiddenLayers[$layerId] = new ANN_Layer($this, $intNumberOfNeuronsPerLayer, $nextLayer);
+	    $this->arrHiddenLayers[$layerId] = new Layer($this, $intNumberOfNeuronsPerLayer, $nextLayer);
 	  }
 	
 	  ksort($this->arrHiddenLayers);
@@ -426,18 +428,18 @@ class ANN_Network extends ANN_Filesystem
 		
 	/**
 	 * @param integer $intNumberOfOutputs
-	 * @uses ANN_Layer::__construct()
+	 * @uses Layer::__construct()
 	 */
 	
 	protected function createOutputLayer($intNumberOfOutputs)
 	{
-		$this->objOutputLayer = new ANN_Layer($this, $intNumberOfOutputs);
+		$this->objOutputLayer = new Layer($this, $intNumberOfOutputs);
 	}
 		
 	/**
-	 * @uses ANN_Layer::setInputs()
-	 * @uses ANN_Layer::activate()
-	 * @uses ANN_Layer::getOutputs()
+	 * @uses Layer::setInputs()
+	 * @uses Layer::activate()
+	 * @uses Layer::getOutputs()
 	 */
 	
 	protected function activate()
@@ -456,7 +458,7 @@ class ANN_Network extends ANN_Filesystem
 		
 	/**
 	 * @return boolean
-	 * @uses ANN_Exception::__construct()
+	 * @uses Exception::__construct()
 	 * @uses setInputs()
 	 * @uses setOutputs()
 	 * @uses hasTimeLeftForTraining()
@@ -470,16 +472,16 @@ class ANN_Network extends ANN_Filesystem
 	 * @uses getNextIndexInputsToTrain()
 	 * @uses isTrainingCompleteByInputKey()
 	 * @uses setDynamicLearningRate()
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function train()
 	{
 	  if(!$this->arrInputs)
-	    throw new ANN_Exception('No arrInputs defined. Use ANN_Network::setValues().');
+	    throw new Exception('No arrInputs defined. Use \\'. __NAMESPACE__ .'\\Network::setValues().');
 	
 	  if(!$this->arrOutputs)
-	    throw new ANN_Exception('No arrOutputs defined. Use ANN_Network::setValues().');
+	    throw new Exception('No arrOutputs defined. Use \\'. __NAMESPACE__ .'\\Network::setValues().');
 	
 	  if($this->isTrainingComplete())
 	  {
@@ -608,17 +610,17 @@ class ANN_Network extends ANN_Filesystem
 	 * Setting the learning rate
 	 *
 	 * @param float $floatLearningRate (Default: 0.7) (0.1 .. 0.9)
-	 * @uses ANN_Exception::__construct()
-	 * @throws ANN_Exception
+	 * @uses Exception::__construct()
+	 * @throws Exception
 	 */
 	
 	protected function setLearningRate($floatLearningRate = 0.7)
 	{
 	  if(!is_float($floatLearningRate))
-	    throw new ANN_Exception('$floatLearningRate should be between 0.1 and 0.9');
+	    throw new Exception('$floatLearningRate should be between 0.1 and 0.9');
 	
 	  if($floatLearningRate <= 0 || $floatLearningRate >= 1)
-	    throw new ANN_Exception('$floatLearningRate should be between 0.1 and 0.9');
+	    throw new Exception('$floatLearningRate should be between 0.1 and 0.9');
 	
 	  $this->floatLearningRate = $floatLearningRate;
 	}
@@ -715,9 +717,9 @@ class ANN_Network extends ANN_Filesystem
 	/**
 	 * @param array $arrOutputs
 	 * @uses activate()
-	 * @uses ANN_Layer::calculateHiddenDeltas()
-	 * @uses ANN_Layer::adjustWeights()
-	 * @uses ANN_Layer::calculateOutputDeltas()
+	 * @uses Layer::calculateHiddenDeltas()
+	 * @uses Layer::adjustWeights()
+	 * @uses Layer::calculateOutputDeltas()
 	 * @uses getNetworkError()
 	 */
 	
@@ -750,9 +752,9 @@ class ANN_Network extends ANN_Filesystem
 	}
 	
 	/**
-	 * @param integer $intType (Default: ANN_Network::OUTPUT_LINEAR)
-	 * @uses ANN_Exception::__construct()
-	 * @throws ANN_Exception
+	 * @param integer $intType (Default: Network::OUTPUT_LINEAR)
+	 * @uses Exception::__construct()
+	 * @throws Exception
 	 */
 	
 	protected function setOutputType($intType = self::OUTPUT_LINEAR)
@@ -767,15 +769,15 @@ class ANN_Network extends ANN_Filesystem
 	      break;
 	
 	    default:
-	      throw new ANN_Exception('$strType must be ANN_Network::OUTPUT_LINEAR or ANN_Network::OUTPUT_BINARY');
+	      throw new Exception('$strType must be \\'. __NAMESPACE__ .'\\Network::OUTPUT_LINEAR or \\'. __NAMESPACE__ .'\\Network::OUTPUT_BINARY');
 	  }
 	}
 	
 	/**
 	 * @param integer $intLevel (0, 1, 2) (Default: 2)
-	 * @uses ANN_Neuron::getDelta()
-	 * @uses ANN_Neuron::getWeights()
-	 * @uses ANN_Layer::getNeurons()
+	 * @uses Neuron::getDelta()
+	 * @uses Neuron::getWeights()
+	 * @uses Layer::getNeurons()
 	 * @uses getNumberInputs()
 	 * @uses getNumberOutputs()
 	 * @uses getPrintNetworkDetails1()
@@ -1063,7 +1065,7 @@ class ANN_Network extends ANN_Filesystem
 	}
 	
 	/**
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 
 	protected function setMaxExecutionTime()
@@ -1071,7 +1073,7 @@ class ANN_Network extends ANN_Filesystem
 		$this->intMaxExecutionTime = (int)ini_get('max_execution_time');
 		
 		if($this->intMaxExecutionTime == 0)
-			throw new ANN_Exception('max_execution_time is 0');
+			throw new Exception('max_execution_time is 0');
 	}
 	
 	/**
@@ -1167,15 +1169,15 @@ class ANN_Network extends ANN_Filesystem
 	 * Log weights while training in CSV format
 	 *
 	 * @param string $strFilename
-	 * @uses ANN_Logging::__construct()
-	 * @uses ANN_Logging::setFilename()
+	 * @uses Logging::__construct()
+	 * @uses Logging::setFilename()
 	 */
 	
 	public function logWeightsToFile($strFilename)
 	{
 	  $this->boolLoggingWeights = TRUE;
 	
-	  $this->objLoggingWeights = new ANN_Logging;
+	  $this->objLoggingWeights = new Logging;
 	
 	  $this->objLoggingWeights->setFilename($strFilename);
 	}
@@ -1184,23 +1186,23 @@ class ANN_Network extends ANN_Filesystem
 	 * Log network errors while training in CSV format
 	 *
 	 * @param string $strFilename
-	 * @uses ANN_Logging::__construct()
-	 * @uses ANN_Logging::setFilename()
+	 * @uses Logging::__construct()
+	 * @uses Logging::setFilename()
 	 */
 	
 	public function logNetworkErrorsToFile($strFilename)
 	{
 	  $this->boolLoggingNetworkErrors = TRUE;
 	
-	  $this->objLoggingNetworkErrors = new ANN_Logging;
+	  $this->objLoggingNetworkErrors = new Logging;
 	
 	  $this->objLoggingNetworkErrors->setFilename($strFilename);
 	}
 	
 	/**
-	 * @uses ANN_Layer::getNeurons()
-	 * @uses ANN_Logging::logData()
-	 * @uses ANN_Neuron::getWeights()
+	 * @uses Layer::getNeurons()
+	 * @uses Logging::logData()
+	 * @uses Neuron::getWeights()
 	 * @uses getNetworkError()
 	 */
 	
@@ -1236,7 +1238,7 @@ class ANN_Network extends ANN_Filesystem
 	
 	/**
 	 * @uses getNetworkError()
-	 * @uses ANN_Logging::logData()
+	 * @uses Logging::logData()
 	 */
 	
 	protected function logNetworkErrors()
@@ -1272,14 +1274,14 @@ class ANN_Network extends ANN_Filesystem
 	 * @param string $strUsername
 	 * @param string $strPassword
 	 * @param string $strHost
-	 * @return ANN_Network
-	 * @throws ANN_Exception
+	 * @return Network
+	 * @throws Exception
 	 */
 	
 	public function trainByHost($strUsername, $strPassword, $strHost)
 	{
 	  if(!extension_loaded('curl'))
-	    throw new ANN_Exception('Curl extension is not installed or active on this system');
+	    throw new Exception('Curl extension is not installed or active on this system');
 	
 	  $handleCurl = curl_init();
 	
@@ -1298,7 +1300,7 @@ class ANN_Network extends ANN_Filesystem
 	
 	  $objNetwork = @unserialize($strResult);
 	
-	  if($objNetwork instanceof ANN_Network)
+	  if($objNetwork instanceof Network)
 	    return $objNetwork;
 	}
 	
@@ -1306,13 +1308,13 @@ class ANN_Network extends ANN_Filesystem
 	 * @param string $strUsername
 	 * @param string $strPassword
 	 * @param string $strHost
-	 * @throws ANN_Exception
+	 * @throws Exception
 	 */
 	
 	public function saveToHost($strUsername, $strPassword, $strHost)
 	{
 	  if(!extension_loaded('curl'))
-	    throw new ANN_Exception('Curl extension is not installed or active on this system');
+	    throw new Exception('Curl extension is not installed or active on this system');
 	
 	  $handleCurl = curl_init();
 	
@@ -1333,14 +1335,14 @@ class ANN_Network extends ANN_Filesystem
 	 * @param string $strUsername
 	 * @param string $strPassword
 	 * @param string $strHost
-	 * @return ANN_Network
-	 * @throws ANN_Exception
+	 * @return Network
+	 * @throws Exception
 	 */
 	
 	public static function loadFromHost($strUsername, $strPassword, $strHost)
 	{
 	  if(!extension_loaded('curl'))
-	    throw new ANN_Exception('Curl extension is not installed or active on this system');
+	    throw new Exception('Curl extension is not installed or active on this system');
 	
 	  $handleCurl = curl_init();
 	
@@ -1359,7 +1361,7 @@ class ANN_Network extends ANN_Filesystem
 	
 	  $objNetwork = unserialize(trim($strResult));
 	
-	  if($objNetwork instanceof ANN_Network)
+	  if($objNetwork instanceof Network)
 	    return $objNetwork;
 	}
 	
@@ -1390,24 +1392,24 @@ class ANN_Network extends ANN_Filesystem
 	public function setOutputErrorTolerance($floatOutputErrorTolerance = 0.02)
 	{
 	  if($floatOutputErrorTolerance < 0 || $floatOutputErrorTolerance > 0.1)
-	    throw new ANN_Exception('$floatOutputErrorTolerance must be between 0 and 0.1');
+	    throw new Exception('$floatOutputErrorTolerance must be between 0 and 0.1');
 	
 	  $this->floatOutputErrorTolerance = $floatOutputErrorTolerance;
 	}
 	
 	/**
 	 * @param float $floatMomentum (Default: 0.95) (0 .. 1)
-	 * @uses ANN_Exception::__construct()
-	 * @throws ANN_Exception
+	 * @uses Exception::__construct()
+	 * @throws Exception
 	 */
 	
 	public function setMomentum($floatMomentum = 0.95)
 	{
 	  if(!is_float($floatMomentum) && !is_integer($floatMomentum))
-	    throw new ANN_Exception('$floatLearningRate should be between 0 and 1');
+	    throw new Exception('$floatLearningRate should be between 0 and 1');
 	
 	  if($floatMomentum <= 0 || $floatMomentum > 1)
-	    throw new ANN_Exception('$floatLearningRate should be between 0 and 1');
+	    throw new Exception('$floatLearningRate should be between 0 and 1');
 	
 	  $this->floatMomentum = $floatMomentum;
 	}

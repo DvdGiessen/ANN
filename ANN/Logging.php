@@ -40,13 +40,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access private
  */
 
-class ANN_Logging
+class Logging
 {
 	/**#@+
 	 * @ignore
@@ -73,8 +74,8 @@ class ANN_Logging
 	
 	/**
 	 * @param string $strFilename
-	 * @uses ANN_Exception::__construct()
-	 * @throws ANN_Exception
+	 * @uses Exception::__construct()
+	 * @throws Exception
 	 */
 	
 	public function setFilename($strFilename)
@@ -84,7 +85,7 @@ class ANN_Logging
 	  $this->handleFile = @fopen($strFilename, 'w+');
 	
 	  if(!is_resource($this->handleFile))
-	    throw new ANN_Exception('File '. basename($strFilename). ' cannot be created');
+	    throw new Exception('File '. basename($strFilename). ' cannot be created');
 	}
 	
 	/**

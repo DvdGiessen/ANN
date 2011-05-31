@@ -43,13 +43,14 @@
  * @package ANN
  */
 
+namespace ANN;
 
 /**
  * @package ANN
  * @access private
  */
 
-final class ANN_Neuron
+final class Neuron
 {
 	/**#@+
 	 * @ignore
@@ -76,7 +77,7 @@ final class ANN_Neuron
 	protected $floatDelta = 0;
 	
 	/**
-	 * @var ANN_Network
+	 * @var Network
 	 */
 	
 	protected $objNetwork = null;
@@ -85,15 +86,15 @@ final class ANN_Neuron
 	/**#@-*/
 	
 	/**
-	 * @param ANN_Network $objNetwork
-	 * @uses ANN_Maths::randomDelta()
+	 * @param Network $objNetwork
+	 * @uses Maths::randomDelta()
 	 */
 	
-	public function __construct(ANN_Network $objNetwork)
+	public function __construct(Network $objNetwork)
 	{
 	  $this->objNetwork = $objNetwork;
 	
-	  $this->floatDelta = ANN_Maths::randomDelta();
+	  $this->floatDelta = Maths::randomDelta();
 	  
 	  $this->floatLearningRate = $this->objNetwork->floatLearningRate;
 	}
@@ -160,17 +161,17 @@ final class ANN_Neuron
 	}
 	
 	/**
-	 * @uses ANN_Maths::randomWeight()
+	 * @uses Maths::randomWeight()
 	 */
 	
 	protected function initializeWeights()
 	{
 		foreach($this->arrInputs as $intKey => $floatInput)
-			$this->arrWeights[$intKey] = ANN_Maths::randomWeight();
+			$this->arrWeights[$intKey] = Maths::randomWeight();
 	}
 		
 	/**
-	 * @uses ANN_Maths::sigmoid()
+	 * @uses Maths::sigmoid()
 	 */
 	
 	public function activate()
@@ -180,7 +181,7 @@ final class ANN_Neuron
 		foreach($this->arrInputs as $intKey => $floatInput)
 			$floatSum += $floatInput * $this->arrWeights[$intKey];
 	
-		$this->floatOutput = ANN_Maths::sigmoid($floatSum);
+		$this->floatOutput = Maths::sigmoid($floatSum);
 	}
 		
 	public function adjustWeights()
