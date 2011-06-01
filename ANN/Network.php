@@ -217,10 +217,10 @@ class Network extends Filesystem
 	
 	/**
 	 * @param integer $intNumberOfHiddenLayers (Default: 1)
-	 * @param integer $intNumberOfNeuronsPerLayer  (Default: 6)
-	 * @param integer $intNumberOfOutputs  (Default: 1)
+	 * @param integer $intNumberOfNeuronsPerLayer (Default: 6)
+	 * @param integer $intNumberOfOutputs (Default: 1)
 	 * @uses Exception::__construct()
-	 * @uses calculateMaxTrainingLoops()
+	 * @uses setMaxExecutionTime()
 	 * @uses createHiddenLayers()
 	 * @uses createOutputLayer()
 	 * @throws Exception
