@@ -1378,6 +1378,13 @@ class Network extends Filesystem
 	
 	protected function detectOutputType()
 	{
+		if(empty($this->arrOutputs))
+		{
+			$this->setOutputType(self::OUTPUT_LINEAR);
+			
+			return;
+		}			
+		
 	  foreach($this->arrOutputs as $arrOutputs)
 	    foreach($arrOutputs as $floatOutput)
 	      if($floatOutput < 1 && $floatOutput > 0)
