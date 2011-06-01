@@ -13,64 +13,64 @@ use ANN\Values;
 
 try
 {
-  $network = Network::loadFromFile();
+  $objNetwork = Network::loadFromFile();
 }
 catch(Exception $e)
 {
 	print "\nCreating a new one...";
 	
-	$network = new Network(1, 8, 1);
+	$objNetwork = new Network(1, 8, 1);
 
-  $temperature = new InputValue(-15, 50); // Temperature
+  $objTemperature = new InputValue(-15, 50); // Temperature
   
-  $temperature->saveToFile('input_temperature.dat');
+  $objTemperature->saveToFile('input_temperature.dat');
   
-  $humidity = new InputValue(0, 100); // Humidity
+  $objHumidity = new InputValue(0, 100); // Humidity
 
-  $humidity->saveToFile('input_humidity.dat');
+  $objHumidity->saveToFile('input_humidity.dat');
 
-  $quantity = new OutputValue(0, 300); // Quantity of sold articles
+  $objQuantity = new OutputValue(0, 300); // Quantity of sold articles
 
-  $quantity->saveToFile('output_quantity.dat');
+  $objQuantity->saveToFile('output_quantity.dat');
 
   $objValues = new Values;
 
   $objValues->train()
             ->input(
-                $temperature->GetInputValue(10),
-                $humidity->GetInputValue(10)
+                $objTemperature->GetInputValue(10),
+                $objHumidity->GetInputValue(10)
                 )
             ->output(
-                $quantity->GetOutputValue(10)
+                $objQuantity->GetOutputValue(10)
                 )
             ->input(
-                $temperature->GetInputValue(20),
-                $humidity->GetInputValue(20)
+                $objTemperature->GetInputValue(20),
+                $objHumidity->GetInputValue(20)
                 )
             ->output(
-                $quantity->GetOutputValue(20)
+                $objQuantity->GetOutputValue(20)
                 )
             ->input(
-                $temperature->GetInputValue(30),
-                $humidity->GetInputValue(30)
+                $objTemperature->GetInputValue(30),
+                $objHumidity->GetInputValue(30)
                 )
             ->output(
-                $quantity->GetOutputValue(30)
+                $objQuantity->GetOutputValue(30)
                 );
                 
   $objValues->saveToFile('values_supermarket.dat');
 
   unset($objValues);
-  unset($quantity);
-  unset($humidity);
-  unset($temperature);
+  unset($objHumidity);
+  unset($objQuantity);
+  unset($objTemperature);
 }
 
-$temperature = InputValue::loadFromFile('input_temperature.dat'); // Temperature
+$objTemperature = InputValue::loadFromFile('input_temperature.dat'); // Temperature
 
-$humidity = InputValue::loadFromFile('input_humidity.dat'); // Humidity
+$objHumidity = InputValue::loadFromFile('input_humidity.dat'); // Humidity
 
-$quantity = OutputValue::loadFromFile('output_quantity.dat'); // Quantity of sold articles
+$objQuantity = OutputValue::loadFromFile('output_quantity.dat'); // Quantity of sold articles
 
 try
 {
@@ -81,10 +81,10 @@ catch(Exception $e)
   die('Loading of values failed');
 }
 
-$network->setValues($objValues);
+$objNetwork->setValues($objValues);
 
-$network->train();
+$objNetwork->train();
 
-$network->saveToFile();
+$objNetwork->saveToFile();
 
-$network->printNetwork();
+$objNetwork->printNetwork();
