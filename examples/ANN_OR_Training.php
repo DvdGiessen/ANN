@@ -2,39 +2,47 @@
 
 ini_set('max_execution_time', 300);
 
-require_once '../ANN/ANN_Network.php';
+require_once '../ANN/Loader.php';
+
+use ANN\Network;
+use ANN\Values;
 
 try
 {
-$network = ANN_Network::loadFromFile('or.dat');
+  $network = Network::loadFromFile('or.dat');
 }
 catch(Exception $e)
 {
 	print "\nCreating a new one...";
-	
-	$network = new ANN_Network;
+
+	$network = new Network(2, 4, 1);
+
+  $objValues = new Values;
+
+  $objValues->train()
+            ->input(0, 0)->output(0)
+            ->input(0, 1)->output(1)
+            ->input(1, 0)->output(1)
+            ->input(1, 1)->output(1);
+
+  $objValues->saveToFile('values_or.dat');
+
+  unset($objValues);
 }
 
-$inputs = array(
-	array(0, 0),
-	array(0, 1),
-	array(1, 0),
-	array(1, 1)
-);
+try
+{
+  $objValues = Values::loadFromFile('values_or.dat');
+}
+catch(Exception $e)
+{
+  die('Loading of values failed');
+}
 
-$outputs = array(
-	array(0),
-	array(1),
-	array(1),
-	array(1)
-);
-
-$network->setInputs($inputs);
-
-$network->setOutputs($outputs);
+$network->setValues($objValues);
 
 $network->train();
 
 $network->saveToFile('or.dat');
 
-?>
+$network->printNetwork();

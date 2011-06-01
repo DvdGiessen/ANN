@@ -4,33 +4,38 @@ ini_set('max_execution_time', 90);
 
 require_once '../ANN/Loader.php';
 
+use ANN\Network;
+use ANN\InputValue;
+use ANN\OutputValue;
+use ANN\Values;
+
 try
 {
-  $objNetwork = ANN_Network::loadFromFile('icecreams.dat');
+  $objNetwork = Network::loadFromFile('icecreams.dat');
 }
 catch(Exception $e)
 {
   print 'Creating a new one...';
  
-  $objNetwork = new ANN_Network(2, 5, 1);
+  $objNetwork = new Network(2, 5, 1);
  
  
-  $objTemperature = new ANN_InputValue(-15, 50); // Temperature in Celsius
+  $objTemperature = new InputValue(-15, 50); // Temperature in Celsius
  
   $objTemperature->saveToFile('input_temperature.dat');
  
  
-  $objHumidity    = new ANN_InputValue(0, 100);  // Humidity percentage
+  $objHumidity    = new InputValue(0, 100);  // Humidity percentage
  
   $objHumidity->saveToFile('input_humidity.dat');
  
  
-  $objIcecream    = new ANN_OutputValue(0, 300); // Quantity of sold ice-creams
+  $objIcecream    = new OutputValue(0, 300); // Quantity of sold ice-creams
  
   $objIcecream->saveToFile('output_quantity.dat');
  
  
-  $objValues = new ANN_Values;
+  $objValues = new Values;
  
   $objValues->train()
             ->input(
@@ -72,11 +77,11 @@ catch(Exception $e)
  
 try
 {
-  $objTemperature = ANN_InputValue::loadFromFile('input_temperature.dat'); // Temperature in Celsius
+  $objTemperature = InputValue::loadFromFile('input_temperature.dat'); // Temperature in Celsius
  
-  $objHumidity    = ANN_InputValue::loadFromFile('input_humidity.dat'); // Humidity percentage
+  $objHumidity    = InputValue::loadFromFile('input_humidity.dat'); // Humidity percentage
  
-  $objIcecream    = ANN_OutputValue::loadFromFile('output_quantity.dat'); // Quantity of sold ice-creams
+  $objIcecream    = OutputValue::loadFromFile('output_quantity.dat'); // Quantity of sold ice-creams
 }
 catch(Exception $e)
 {
@@ -85,7 +90,7 @@ catch(Exception $e)
  
 try
 {
-  $objValues = ANN_Values::loadFromFile('values_icecreams.dat');
+  $objValues = Values::loadFromFile('values_icecreams.dat');
 }
 catch(Exception $e)
 {

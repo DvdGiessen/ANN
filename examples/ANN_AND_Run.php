@@ -1,27 +1,35 @@
 <?php
 
-ini_set('max_execution_time', 300);
+require_once '../ANN/Loader.php';
 
-require_once('../ANN/Loader.php');
+use ANN\Network;
+use ANN\Values;
 
 try
 {
-	$objNetwork = ANN_Network::loadFromFile('and.dat');
+  $objNetwork = Network::loadFromFile('and.dat');
 }
 catch(Exception $e)
 {
-	print "\nNetwork not found. Creating a new one...";
-	
-	$objNetwork = new ANN_Network;
+  die('Network not found');
 }
 
-$arrInputs = array(
-	array(0, 0),
-	array(0, 1),
-	array(1, 0),
-	array(1, 1)
-);
+try
+{
+  $objValues = Values::loadFromFile('values_and.dat');
+}
+catch(Exception $e)
+{
+  die('Loading of values failed');
+}
 
-$objNetwork->setInputs($arrInputs);
+$objValues->input(0, 1)  // input values appending the loaded ones
+          ->input(1, 1)
+          ->input(1, 0)
+          ->input(0, 0)
+          ->input(0, 1)
+          ->input(1, 1);
 
-print_r($objNetwork->getOutputs() );
+$objNetwork->setValues($objValues);
+
+print_r($objNetwork->getOutputs());

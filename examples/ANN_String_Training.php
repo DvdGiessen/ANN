@@ -6,15 +6,20 @@ ini_set('date.timezone', 'Europe/Berlin');
 
 require_once '../ANN/Loader.php';
 
+use ANN\Network;
+use ANN\Values;
+use ANN\Classification;
+use ANN\StringValue;
+
 try
 {
-  $objNetwork = ANN_Network::loadFromFile('strings.dat');
+  $objNetwork = Network::loadFromFile('strings.dat');
 }
 catch(Exception $e)
 {
 	print "\nCreating a new one...";
 
-	$objClassification = new ANN_Classification(2);
+	$objClassification = new Classification(2);
 	
 	$objClassification->addClassifier('german');
 	
@@ -22,13 +27,13 @@ catch(Exception $e)
 	
 	$objClassification->saveToFile('classifiers_strings.dat');
 
-	$objNetwork = new ANN_Network(1, 8, 2);
+	$objNetwork = new Network(1, 8, 2);
 
-	$objStringValues = new ANN_StringValue(15);
+	$objStringValues = new StringValue(15);
 	
 	$objStringValues->saveToFile('input_strings.dat');
 	
-	$objValues = new ANN_Values;
+	$objValues = new Values;
   
   $objValues->train()
   					->input($objStringValues->getInputValue('Hallo Welt'))
@@ -43,9 +48,9 @@ catch(Exception $e)
 
 try
 {
-  $objValues = ANN_Values::loadFromFile('values_strings.dat');
+  $objValues = Values::loadFromFile('values_strings.dat');
 
-	$objClassification = ANN_Classification::loadFromFile('classifiers_strings.dat');
+	$objClassification = Classification::loadFromFile('classifiers_strings.dat');
 }
 catch(Exception $e)
 {

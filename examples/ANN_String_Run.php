@@ -6,9 +6,13 @@ ini_set('date.timezone', 'Europe/Berlin');
 
 require_once '../ANN/Loader.php';
 
+use ANN\Network;
+use ANN\Values;
+use ANN\StringValue;
+
 try
 {
-  $objNetwork = ANN_Network::loadFromFile('strings.dat');
+  $objNetwork = Network::loadFromFile('strings.dat');
 }
 catch(Exception $e)
 {
@@ -17,7 +21,7 @@ catch(Exception $e)
 
 try
 {
-  $objValues = ANN_Values::loadFromFile('values_strings.dat');
+  $objValues = Values::loadFromFile('values_strings.dat');
 }
 catch(Exception $e)
 {
@@ -26,7 +30,7 @@ catch(Exception $e)
 
 try
 {
-	$objStringValues = ANN_StringValue::loadFromFile('input_strings.dat');
+	$objStringValues = StringValue::loadFromFile('input_strings.dat');
 }
 catch(Exception $e)
 {
@@ -35,6 +39,7 @@ catch(Exception $e)
 
 
 print_r($objStringValues->getInputValue('Helló Wórld!'));
+
 print_r($objStringValues('Helló Wórld!'));
 
 $objValues->input($objStringValues->getInputValue('HAllo Welt'));

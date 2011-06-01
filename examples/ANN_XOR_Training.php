@@ -6,17 +6,20 @@ ini_set('date.timezone', 'Europe/Berlin');
 
 require_once '../ANN/Loader.php';
 
+use ANN\Network;
+use ANN\Values;
+
 try
 {
-  $network = ANN_Network::loadFromFile('xor.dat');
+  $network = Network::loadFromFile('xor.dat');
 }
 catch(Exception $e)
 {
 	print "\nCreating a new one...";
 
-	$network = new ANN_Network(2, 4, 1);
+	$network = new Network(2, 4, 1);
 
-  $objValues = new ANN_Values;
+  $objValues = new Values;
 
   $objValues->train()
             ->input(0, 0)->output(0)
@@ -31,7 +34,7 @@ catch(Exception $e)
 
 try
 {
-  $objValues = ANN_Values::loadFromFile('values_xor.dat');
+  $objValues = Values::loadFromFile('values_xor.dat');
 }
 catch(Exception $e)
 {

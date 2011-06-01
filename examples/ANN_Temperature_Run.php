@@ -3,42 +3,72 @@
 ini_set('max_execution_time', 1200);
 ini_set('precision', '5');
 
-require_once('../ANN/ANN_Network.php');
+require_once('../ANN/Loader.php');
+
+use ANN\Network;
+use ANN\InputValue;
+use ANN\OutputValue;
+use ANN\Values;
+use ANN\NetworkGraph;
 
 try
 {
-$network = ANN_Network::loadFromFile('icecreams.dat');
+  $objNetwork = Network::loadFromFile('icecreams.dat');
 }
 catch(Exception $e)
 {
-	print "\nNetwork not found.";
+  die('Network not found');
 }
 
-// print_r($network); exit;
+try
+{
+  $objTemperature = InputValue::loadFromFile('input_temperature.dat'); // Temperature in Celsius
 
-$temperature = ANN_InputValue::loadFromFile('input_temperature.dat'); // Temperature
+  $objHumidity    = InputValue::loadFromFile('input_humidity.dat');    // Humidity percentage
 
-$humidity = ANN_InputValue::loadFromFile('input_humidity.dat'); // Humidity
+  $objIcecream    = OutputValue::loadFromFile('output_quantity.dat');  // Quantity of sold ice-creams
+}
+catch(Exception $e)
+{
+  die('Error loading value objects');
+}
 
-$icecream = ANN_OutputValue::loadFromFile('output_quantity.dat'); // Ice-Cream
+try
+{
+  $objValues = Values::loadFromFile('values_icecreams.dat');
+}
+catch(Exception $e)
+{
+  die('Loading of values failed');
+}
 
-$inputs = array(
-//	array($temperature->GetInputValue(21), $humidity->GetInputValue(35)),
-	array($temperature->GetInputValue(20), $humidity->GetInputValue(10)),
-	array($temperature->GetInputValue(30), $humidity->GetInputValue(40)),
-	array($temperature->GetInputValue(32), $humidity->GetInputValue(30)),
-	array($temperature->GetInputValue(33), $humidity->GetInputValue(20))
-);
+$objValues->input( // input values appending the loaded ones
+                 $objTemperature->getInputValue(17),
+                 $objHumidity->getInputValue(12)
+                 )
+          ->input(
+                 $objTemperature->getInputValue(31),
+                 $objHumidity->getInputValue(42)
+                 )
+          ->input(
+                 $objTemperature->getInputValue(31),
+                 $objHumidity->getInputValue(34)
+                 )
+          ->input(
+                 $objTemperature->getInputValue(34),
+                 $objHumidity->getInputValue(21)
+                 );
 
-$network->setInputs($inputs);
+$objNetwork->setValues($objValues);
 
-print_r($outputs = $network->getOutputs());
+$arrOutputs = $objNetwork->getOutputs();
 
-foreach($outputs as $output)
-  print $icecream->GetRealOutputValue($output). '<br>';
+/*
+foreach($arrOutputs as $arrOutput)
+  foreach($arrOutput as $floatOutput)
+    print $objIcecream->getRealOutputValue($floatOutput). '<br />';
+*/
 
-$img = new ANN_NetworkGraph($network);
+$objImage = new NetworkGraph($objNetwork);
 
-$img->printImage();
-
-?>
+$objImage->printImage();

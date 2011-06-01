@@ -7,7 +7,7 @@ use ANN\Values;
 
 try
 {
-  $objNetwork = Network::loadFromFile('xor.dat');
+  $objNetwork = Network::loadFromFile('notxor.dat');
 }
 catch(Exception $e)
 {
@@ -16,7 +16,7 @@ catch(Exception $e)
  
 try
 {
-  $objValues = Values::loadFromFile('values_xor.dat');
+  $objValues = Values::loadFromFile('values_notxor.dat');
 }
 catch(Exception $e)
 {

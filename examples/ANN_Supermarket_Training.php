@@ -4,32 +4,36 @@ ini_set('error_reporting', E_ALL | E_STRICT);
 ini_set('max_execution_time', 400);
 ini_set('date.timezone', 'Europe/Berlin');
 
-
 require_once '../ANN/Loader.php';
+
+use ANN\Network;
+use ANN\InputValue;
+use ANN\OutputValue;
+use ANN\Values;
 
 try
 {
-  $network = ANN_Network::loadFromFile();
+  $network = Network::loadFromFile();
 }
 catch(Exception $e)
 {
 	print "\nCreating a new one...";
 	
-	$network = new ANN_Network(1, 8, 1);
+	$network = new Network(1, 8, 1);
 
-  $temperature = new ANN_InputValue(-15, 50); // Temperature
+  $temperature = new InputValue(-15, 50); // Temperature
   
   $temperature->saveToFile('input_temperature.dat');
   
-  $humidity = new ANN_InputValue(0, 100); // Humidity
+  $humidity = new InputValue(0, 100); // Humidity
 
   $humidity->saveToFile('input_humidity.dat');
 
-  $quantity = new ANN_OutputValue(0, 300); // Quantity of sold articles
+  $quantity = new OutputValue(0, 300); // Quantity of sold articles
 
   $quantity->saveToFile('output_quantity.dat');
 
-  $objValues = new ANN_Values;
+  $objValues = new Values;
 
   $objValues->train()
             ->input(
@@ -62,15 +66,15 @@ catch(Exception $e)
   unset($temperature);
 }
 
-$temperature = ANN_InputValue::loadFromFile('input_temperature.dat'); // Temperature
+$temperature = InputValue::loadFromFile('input_temperature.dat'); // Temperature
 
-$humidity = ANN_InputValue::loadFromFile('input_humidity.dat'); // Humidity
+$humidity = InputValue::loadFromFile('input_humidity.dat'); // Humidity
 
-$quantity = ANN_OutputValue::loadFromFile('output_quantity.dat'); // Quantity of sold articles
+$quantity = OutputValue::loadFromFile('output_quantity.dat'); // Quantity of sold articles
 
 try
 {
-  $objValues = ANN_Values::loadFromFile('values_supermarket.dat');
+  $objValues = Values::loadFromFile('values_supermarket.dat');
 }
 catch(Exception $e)
 {
@@ -79,21 +83,8 @@ catch(Exception $e)
 
 $network->setValues($objValues);
 
-// $network->setOutputErrorTolerance(0.01);
-
-// $network->logNetworkErrorsToFile('network_errors.csv');
-
-// $network->setLearningRate(0.3);
-
 $network->train();
 
 $network->saveToFile();
 
 $network->printNetwork();
-
-
-// $img = new ANN_NetworkGraph($network);
-
-// $img->saveToFile('network.png');
-
-?>
