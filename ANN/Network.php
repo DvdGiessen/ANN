@@ -1096,6 +1096,7 @@ class Network extends Filesystem
 	
 	/**
 	 * @param string $strFilename (Default: null)
+	 * @return Network
 	 * @uses parent::loadFromFile()
 	 * @uses getDefaultFilename()
 	 */
@@ -1464,7 +1465,6 @@ class Network extends Filesystem
 	 * Setting learning rate all 1000 loops dynamically
 	 *
 	 * @param integer $intLoop
-	 * @return float
 	 * @uses setLearningRate()
 	 */
 
