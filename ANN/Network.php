@@ -235,14 +235,14 @@ class Network extends Filesystem implements InterfaceLoadable
 	
 	public function __construct($intNumberOfHiddenLayers = 1, $intNumberOfNeuronsPerLayer = 6, $intNumberOfOutputs = 1)
 	{
-	  if(!is_integer($intNumberOfHiddenLayers) && $intNumberOfHiddenLayers < 2)
-	    throw new Exception('Constraints: $intNumberOfHiddenLayers must be a positiv integer >= 2');
+	  if(!is_integer($intNumberOfHiddenLayers) || $intNumberOfHiddenLayers < 1)
+	    throw new Exception('Constraints: $intNumberOfHiddenLayers must be a positiv integer >= 1');
 	
-	  if(!is_integer($intNumberOfNeuronsPerLayer) && $intNumberOfNeuronsPerLayer < 1)
-	    throw new Exception('Constraints: $intNumberOfNeuronsPerLayer must be a positiv integer number > 1');
+	  if(!is_integer($intNumberOfNeuronsPerLayer) || $intNumberOfNeuronsPerLayer < 2)
+	    throw new Exception('Constraints: $intNumberOfNeuronsPerLayer must be a positiv integer number >= 2');
 	
-	  if(!is_integer($intNumberOfOutputs) && $intNumberOfOutputs < 1)
-	    throw new Exception('Constraints: $intNumberOfOutputs must be a positiv integer number > 1');
+	  if(!is_integer($intNumberOfOutputs) || $intNumberOfOutputs < 1)
+	    throw new Exception('Constraints: $intNumberOfOutputs must be a positiv integer number >= 1');
 	
 		$this->createOutputLayer($intNumberOfOutputs);
 		
