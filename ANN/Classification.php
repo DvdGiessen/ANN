@@ -53,7 +53,7 @@ namespace ANN;
  * @access public
  */
 
-final class Classification extends Filesystem
+final class Classification extends Filesystem implements InterfaceLoadable
 {
 	/**#@+
 	 * @ignore

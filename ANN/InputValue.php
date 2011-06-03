@@ -53,7 +53,7 @@ namespace ANN;
  * @access public
  */
 
-final class InputValue extends Filesystem
+final class InputValue extends Filesystem implements InterfaceLoadable
 {
 	/**#@+
 	 * @ignore

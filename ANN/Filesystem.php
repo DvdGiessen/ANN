@@ -63,6 +63,9 @@ abstract class Filesystem
 	
 	public function saveToFile($strFilename = null)
 	{
+	  if(!($this instanceof InterfaceLoadable))
+	    throw new Exception('Current object not instance of Interface \\ANN\\InterfaceLoadable');
+	
 	  settype($strFilename, 'string');
 	
 	  if(empty($strFilename))
@@ -96,7 +99,7 @@ abstract class Filesystem
 	
 	/**
 	 * @param string $strFilename (Default: null)
-	 * @return Network|InputValue|OutputValue|Values|StringValue|Classification
+	 * @return Network|InputValue|OutputValue|Values|StringValue|Classification|InterfaceLoadable
 	 * @uses Exception::__construct()
 	 * @throws Exception
 	 */
@@ -112,12 +115,7 @@ abstract class Filesystem
 	
 			$objInstance = unserialize($strSerialized);
 			
-			if(!($objInstance instanceof Network)
-	    && !($objInstance instanceof Values)
-	    && !($objInstance instanceof InputValue)
-	    && !($objInstance instanceof StringValue)
-	    && !($objInstance instanceof Classification)
-	    && !($objInstance instanceof OutputValue))
+			if(!($objInstance instanceof InterfaceLoadable))
 	      throw new Exception('File '. basename($strFilename) .' could not be opened (no ANN format)');
 			
 			return $objInstance;

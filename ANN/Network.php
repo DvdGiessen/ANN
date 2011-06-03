@@ -57,7 +57,7 @@ namespace ANN;
  * @access public
  */
 
-class Network extends Filesystem
+class Network extends Filesystem implements InterfaceLoadable
 {
 	/**#@+
 	 * @ignore

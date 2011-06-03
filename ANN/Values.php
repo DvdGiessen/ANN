@@ -54,7 +54,7 @@ namespace ANN;
  * @since 2.0.6
  */
 
-class Values extends Filesystem
+class Values extends Filesystem implements InterfaceLoadable
 {
 	/**#@+
 	 * @ignore
