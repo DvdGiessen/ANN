@@ -11,13 +11,13 @@ use ANN\Values;
 
 try
 {
-  $network = Network::loadFromFile('xor.dat');
+  $objNetwork = Network::loadFromFile('xor.dat');
 }
 catch(Exception $e)
 {
 	print "\nCreating a new one...";
 
-	$network = new Network(2, 4, 1);
+	$objNetwork = new Network(2, 4, 1);
 
   $objValues = new Values;
 
@@ -41,10 +41,10 @@ catch(Exception $e)
   die('Loading of values failed');
 }
 
-$network->setValues($objValues);
+$objNetwork->setValues($objValues);
 
-$network->train();
+$objNetwork->train();
 
-$network->saveToFile('xor.dat');
+$objNetwork->saveToFile('xor.dat');
 
-$network->printNetwork();
+$objNetwork->printNetwork();
