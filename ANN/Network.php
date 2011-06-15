@@ -278,7 +278,6 @@ class Network extends Filesystem implements InterfaceLoadable
 	/**
 	 * @param array $arrOutputs
 	 * @uses Exception::__construct()
-	 * @uses detectOutputType()
 	 * @uses Layer::getNeuronsCount()
 	 * @throws Exception
 	 */
@@ -290,8 +289,6 @@ class Network extends Filesystem implements InterfaceLoadable
 	      throw new Exception('Count of arrOutputs doesn\'t fit to number of arrOutputs on instantiation of \\'. __NAMESPACE__ .'\\Network');
 	
 	  $this->arrOutputs = $arrOutputs;
-	  
-	  $this->detectOutputType();
 	  
 	  $this->boolNetworkActivated = FALSE;
 	}
@@ -479,6 +476,7 @@ class Network extends Filesystem implements InterfaceLoadable
 	 * @uses getNextIndexInputsToTrain()
 	 * @uses isTrainingCompleteByInputKey()
 	 * @uses setDynamicLearningRate()
+	 * @uses detectOutputType()
 	 * @throws Exception
 	 */
 	
@@ -489,6 +487,8 @@ class Network extends Filesystem implements InterfaceLoadable
 	
 	  if(!$this->arrOutputs)
 	    throw new Exception('No arrOutputs defined. Use \\'. __NAMESPACE__ .'\\Network::setValues().');
+	    
+	  $this->detectOutputType();
 	
 	  if($this->isTrainingComplete())
 	  {
@@ -1380,11 +1380,7 @@ class Network extends Filesystem implements InterfaceLoadable
 	protected function detectOutputType()
 	{
 		if(empty($this->arrOutputs))
-		{
-			$this->setOutputType(self::OUTPUT_LINEAR);
-			
 			return;
-		}			
 		
 	  foreach($this->arrOutputs as $arrOutputs)
 	    foreach($arrOutputs as $floatOutput)
