@@ -781,6 +781,8 @@ class Network extends Filesystem implements InterfaceLoadable
 	}
 	
 	/**
+	 * @uses getCPULimit()
+	 * @uses getMaxExecutionTime()
 	 * @throws Exception
 	 */
 
@@ -1152,7 +1154,7 @@ class Network extends Filesystem implements InterfaceLoadable
 	}
 
 	/**
-	 * @uses getPrintNetwork()
+	 * @uses \ANN\Controller\ControllerPrintNetwork::__construct()
 	 */
 
 	public function printNetwork()
@@ -1199,6 +1201,15 @@ class Network extends Filesystem implements InterfaceLoadable
     $this->setLearningRate($floatLearningRate);
 	}
 	
+	/**
+	 * @return array
+	 * @uses getCPULimit()
+	 * @uses getMaxExecutionTime()
+	 * @uses getNetworkError()
+	 * @uses getNumberInputs()
+	 * @uses getTrainedInputsPercentage()
+	 */
+
 	public function getNetworkInfo()
 	{
 		$arrReturn = array();
@@ -1281,6 +1292,11 @@ class Network extends Filesystem implements InterfaceLoadable
 		return (int)shell_exec('ulimit -t');
 	}
 	
+	/**
+	 * @return float
+	 * @uses isTrainingCompleteByInputKey()
+	 */
+
 	protected function getTrainedInputsPercentage()
 	{
 		$boolTrained = 0;

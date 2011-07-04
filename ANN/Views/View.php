@@ -90,6 +90,11 @@ class View
 	  $this->Translate('{php:'. $strVar .'}', $strValue, $strModifier);
 	}
 	
+	/**
+	 * @param array $arrArray
+	 * @uses setVar()
+	 */
+
 	public function setArray(array $arrArray)
 	{
 		foreach($arrArray as $strKey => $strValue)

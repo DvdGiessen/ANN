@@ -75,6 +75,7 @@ class ControllerPrintNetwork extends Controller
 
 	/**
 	 * @param \ANN\Network $objNetwork
+	 * @uses parent::__construct()
 	 */
 	
 	public function __construct(\ANN\Network $objNetwork)
@@ -124,6 +125,13 @@ class ControllerPrintNetwork extends Controller
 		$this->objViewNeuron = new \ANN\Views\View($strFilenameNeuron);
 	}
 
+	/**
+	 * @uses getNeurons()
+	 * @uses \ANN\Network::getNetworkInfo()
+	 * @uses \ANN\Views\View::setArray()
+	 * @uses \ANN\Views\View::setVar()
+	 */
+
 	protected function Content()
 	{
 		$arrNetworkInfo = $this->objNetwork->getNetworkInfo();
@@ -137,6 +145,17 @@ class ControllerPrintNetwork extends Controller
 		$this->objViewContent->setVar('memory_peak', $intMemoryPeak);
 	}
 	
+	/**
+	 * @return string
+	 * @uses \ANN\Network::getNetworkInfo()
+	 * @uses \ANN\Layer::getDelta()
+	 * @uses \ANN\Layer::getNeurons()
+	 * @uses \ANN\Views\View::getView()
+	 * @uses \ANN\Views\View::resetView()
+	 * @uses \ANN\Views\View::setIf()
+	 * @uses \ANN\Views\View::setVar()
+	 */
+
 	protected function getNeurons()
 	{
 		$strReturn = '';
