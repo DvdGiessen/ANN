@@ -124,8 +124,6 @@ abstract class Controller
 			$this->objViewMain->SetVar('content', $this->objViewContent->getView());
 		
 		$this->objViewMain->printView();
-		
-		exit;
 	}
 }
 
