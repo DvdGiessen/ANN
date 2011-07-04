@@ -131,6 +131,10 @@ class ControllerPrintNetwork extends Controller
 		$this->objViewContent->setArray($arrNetworkInfo);
 		
 		$this->objViewContent->setVar('neurons', $this->getNeurons());
+		
+		$intMemoryPeak = (int)memory_get_peak_usage(TRUE) / 1024;
+		
+		$this->objViewContent->setVar('memory_peak', $intMemoryPeak);
 	}
 	
 	protected function getNeurons()
