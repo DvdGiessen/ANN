@@ -81,12 +81,14 @@ class Loader
 	public function autoload($strClassname)
 	{
 	  settype($strClassname, 'string');
-	
+	  
 	  if(!preg_match('/^ANN\\\/', $strClassname))
 	    return FALSE;
 	    
 	  $strClassname = preg_replace('/^ANN\\\/', '', $strClassname);
-	
+
+	  $strClassname = preg_replace('/\\\/', DIRECTORY_SEPARATOR, $strClassname);
+
 	  $strFilename = $this->strDir . "/$strClassname.php";
 	
 	  if(is_file($strFilename))
