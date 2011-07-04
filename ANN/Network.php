@@ -786,7 +786,24 @@ class Network extends Filesystem implements InterfaceLoadable
 
 	protected function setMaxExecutionTime()
 	{
-		$this->intMaxExecutionTime = (int)ini_get('max_execution_time');
+		$intMaxExecutionTime = $this->getMaxExecutionTime();
+		
+		$intCPULimit = $this->getCPULimit();
+		
+		if($intMaxExecutionTime == 0)
+		{
+			$intMaxExecutionTime = $intCPULimit;
+		}
+		elseif($intCPULimit == 0)
+		{
+			$intMaxExecutionTime = $intMaxExecutionTime;
+		}
+		else
+		{
+			$intMaxExecutionTime = min($intMaxExecutionTime, $intCPULimit);
+		}
+		
+		$this->intMaxExecutionTime = $intMaxExecutionTime;
 		
 		if($this->intMaxExecutionTime == 0 && !isset($_REQUEST['XDEBUG_SESSION_START']))
 			throw new Exception('max_execution_time is 0');
@@ -1240,6 +1257,8 @@ class Network extends Filesystem implements InterfaceLoadable
 		$arrReturn['network']['intCountInputs'] = $this->getNumberInputs();
 		
 		$arrReturn['trained_percentage'] = $this->getTrainedInputsPercentage();
+		
+		$arrReturn['max_execution_time_network'] = $this->intMaxExecutionTime;
 		
 		return $arrReturn;
 	}
