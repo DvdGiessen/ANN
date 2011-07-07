@@ -1196,7 +1196,7 @@ class Network extends Filesystem implements InterfaceLoadable
 	  if($intLoop % 1000)
 	    return;
 	
-	  $floatLearningRate = (mt_rand(1, 7) / 10);
+	  $floatLearningRate = (mt_rand(5, 7) / 10);
 	  
     $this->setLearningRate($floatLearningRate);
 	}
