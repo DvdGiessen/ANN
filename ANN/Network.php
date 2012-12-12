@@ -1253,7 +1253,14 @@ class Network extends Filesystem implements InterfaceLoadable
 		
 		$arrReturn['training_time_minutes'] = round($this->intTrainingTime / 60, 1);
 		
-		$arrReturn['loops_per_second'] = round($this->intTotalLoops / $this->intTrainingTime);
+		if($this->intTrainingTime > 0)
+		{
+			$arrReturn['loops_per_second'] = round($this->intTotalLoops / $this->intTrainingTime);
+		}
+		else
+		{
+			$arrReturn['loops_per_second'] = round($this->intTotalLoops / 0.1);
+		}
 		
 		$arrReturn['training_finished'] = ($this->boolTrained) ? 'Yes' : 'No';
 
