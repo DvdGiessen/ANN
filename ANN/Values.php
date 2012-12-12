@@ -13,7 +13,7 @@
  *
  * http://opensource.org/licenses/bsd-license.php
  *
- * Copyright (c) 2007 - 2011, Thomas Wien
+ * Copyright (c) 2007 - 2012, Thomas Wien
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@
  *
  * @author Thomas Wien <info_at_thwien_dot_de>
  * @version ANN Version 2.2 by Thomas Wien
- * @copyright Copyright (c) 2007-2011 by Thomas Wien
+ * @copyright Copyright (c) 2007-2012 by Thomas Wien
  * @package ANN
  */
 
