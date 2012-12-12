@@ -1278,6 +1278,10 @@ class Network extends Filesystem implements InterfaceLoadable
 		
 		$arrReturn['max_execution_time_network'] = $this->intMaxExecutionTime;
 		
+		$arrReturn['phpversion'] = phpversion();
+		
+		$arrReturn['phpinterface'] = php_sapi_name();
+		
 		return $arrReturn;
 	}
 	
