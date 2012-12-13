@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Artificial Neural Network - Version 2.2
+ * Artificial Neural Network - Version 2.3
  *
  * For updates and changes visit the project page at http://ann.thwien.de/
  *
@@ -41,7 +41,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Thomas Wien <info_at_thwien_dot_de>
- * @version ANN Version 2.2 by Thomas Wien
+ * @version ANN Version 2.3 by Thomas Wien
  * @copyright Copyright (c) 2007-2012 by Thomas Wien
  * @package ANN
  */
