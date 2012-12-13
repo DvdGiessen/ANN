@@ -63,6 +63,8 @@ class Loader
 	
 	public function __construct()
 	{
+		$this->CheckPHPVersion();
+	
 	  $this->strDir = dirname(__FILE__);
 	
 	  spl_autoload_register(array($this, 'autoload'));
@@ -99,6 +101,14 @@ class Loader
 	  }
 	
 	  return FALSE;
+	}
+	
+	protected function CheckPHPVersion()
+	{
+		if(version_compare(PHP_VERSION, '5.4.0') < 0)
+		{
+			throw new \Exception('Use PHP version 5.4.x for running ANN library');
+		}
 	}
 }
 
