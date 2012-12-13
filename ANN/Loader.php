@@ -65,14 +65,14 @@ class Loader
 	{
 		$this->CheckPHPVersion();
 	
-	  $this->strDir = dirname(__FILE__);
+		$this->strDir = dirname(__FILE__);
 	
-	  spl_autoload_register(array($this, 'autoload'));
+		spl_autoload_register(array($this, 'autoload'));
 	}
 	
 	public function __destruct()
 	{
-	  spl_autoload_unregister(array($this, 'autoload'));
+		spl_autoload_unregister(array($this, 'autoload'));
 	}
 	
 	/**
@@ -82,25 +82,25 @@ class Loader
 	
 	public function autoload($strClassname)
 	{
-	  settype($strClassname, 'string');
-	  
-	  if(!preg_match('/^ANN\\\/', $strClassname))
-	    return FALSE;
-	    
-	  $strClassname = preg_replace('/^ANN\\\/', '', $strClassname);
+		settype($strClassname, 'string');
 
-	  $strClassname = preg_replace('/\\\/', DIRECTORY_SEPARATOR, $strClassname);
+		if(!preg_match('/^ANN\\\/', $strClassname))
+			return FALSE;
 
-	  $strFilename = $this->strDir . "/$strClassname.php";
-	
-	  if(is_file($strFilename))
-	  {
-	    require_once($strFilename);
-	    
-	    return TRUE;
-	  }
-	
-	  return FALSE;
+		$strClassname = preg_replace('/^ANN\\\/', '', $strClassname);
+
+		$strClassname = preg_replace('/\\\/', DIRECTORY_SEPARATOR, $strClassname);
+
+		$strFilename = $this->strDir . "/$strClassname.php";
+
+		if(is_file($strFilename))
+		{
+			require_once($strFilename);
+
+			return TRUE;
+		}
+
+		return FALSE;
 	}
 	
 	protected function CheckPHPVersion()
