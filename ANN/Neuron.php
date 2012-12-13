@@ -62,6 +62,8 @@ final class Neuron
 	/**#@+
 	 * @ignore
 	 */
+	 
+	use Maths;
 
 	/**
 	 * @var array
@@ -101,7 +103,7 @@ final class Neuron
 	{
 	  $this->objNetwork = $objNetwork;
 	
-	  $this->floatDelta = Maths::randomDelta();
+	  $this->floatDelta = $this->randomDelta();
 	  
 	  $this->floatLearningRate = $this->objNetwork->floatLearningRate;
 	}
@@ -174,7 +176,7 @@ final class Neuron
 	protected function initializeWeights()
 	{
 		foreach($this->arrInputs as $intKey => $floatInput)
-			$this->arrWeights[$intKey] = Maths::randomWeight();
+			$this->arrWeights[$intKey] = $this->randomWeight();
 	}
 		
 	/**
@@ -188,7 +190,7 @@ final class Neuron
 		foreach($this->arrInputs as $intKey => $floatInput)
 			$floatSum += $floatInput * $this->arrWeights[$intKey];
 	
-		$this->floatOutput = Maths::sigmoid($floatSum);
+		$this->floatOutput = $this->sigmoid($floatSum);
 	}
 		
 	public function adjustWeights()

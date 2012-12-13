@@ -63,7 +63,8 @@ final class Layer
 	 * @ignore
 	 */
 	
-
+	use Maths;
+	
 	/**
 	 * @var array
 	 */
@@ -158,7 +159,7 @@ final class Layer
 	  $arrReturnOutputs = array();
 	
 	  foreach($this->arrOutputs as $intKey => $floatOutput)
-	    $arrReturnOutputs[$intKey] = Maths::threshold($floatOutput);
+	    $arrReturnOutputs[$intKey] = $this->threshold($floatOutput);
 	  
 	  return $arrReturnOutputs;
 	}

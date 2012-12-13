@@ -57,7 +57,7 @@ namespace ANN;
  * @access private
  */
 
-class Maths
+trait Maths
 {
 	/**
 	 * @param float $floatValue
